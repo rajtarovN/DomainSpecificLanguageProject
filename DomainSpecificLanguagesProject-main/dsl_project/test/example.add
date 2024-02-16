@@ -1,0 +1,15 @@
+class Person{
+      'id' String;
+      'age' int;
+}
+class Address{
+  'street' String;
+  'city' String;
+  'zipCode' String;
+}
+
+enum Gender{
+  'MALE';
+  'FEMALE';
+  'OTHER';}
+

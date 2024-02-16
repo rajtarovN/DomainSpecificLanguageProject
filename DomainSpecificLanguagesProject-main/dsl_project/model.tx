@@ -1,0 +1,101 @@
+Nelly: ( Class | Enum | Relations | File)*;
+
+Class:  'class' ID '{' (Attribute)* '}';
+
+Attribute: name Type ';' ;
+
+Type: ('String' | 'int' | 'float' | 'boolean' | 'byte' | 'short' |  'long' |  'double' | 'char');
+
+Enum: 'enum' ID '{' (enumName)* '}';
+
+enumName: STRING ';' ;
+
+Relations: (OneToOne | OneToMany | ManyToOne | ManyToMany);
+
+OneToOne: 'OneToOne' '{' Link* '}';
+OneToMany: 'OneToMany''{' Link* '}';
+ManyToOne: 'ManyToOne' '{' Link* '}';
+ManyToMany: 'ManyToMany' '{' Link* '}';
+
+Link: name 'to' name ';';
+name: STRING;
+
+File: 'file' name '[' Function* ']' ;
+
+Function: 'def' Type ID '(' ParameerList? ')' '{' Statement* '}';
+
+ParameerList: Parameter *( ',' Parameter) ;
+
+Parameter: Type ID ;
+
+CallFunctionStatement: ID '(' Arguments? ')' ';';
+
+Arguments: Argument (',' Argument)*;
+
+Argument: (FunctionCall | ID | value | ShortFunctions |Operations);
+
+FunctionCall: ID '(' Arguments? ')';
+
+ReturnStatement: 'return' ( ID |value | CopyName| CallFunctionStatement | ShortFunctions |  Operations| OneLineCondition)? ';';
+
+Statement: (VariableInit | CopyName | Variable | IfStatement | ForStatement | ForInStatement | CallFunctionStatement | ReturnStatement );
+
+VariableInit: Type ID "=" PosibleValuesForVariable ';';
+
+Variable: ID "=" PosibleValuesForVariable ';'?;
+
+PosibleValuesForVariable: (value | CopyName | Condition | CallFunctionStatement |  OneLineCondition | Operations | NewObject | ShortFunctions);
+
+NewObject: "new" name '(' Arguments ')';
+
+ForStatement:
+    'for' Type ID '=' (INT | FLOAT) ';' Conditions  ';' Variable  '{'
+        Statement*
+     '}'
+ ;
+
+ForInStatement: (name| CopyName) '.' 'for' '(' name '->' '{' Statement* '}' ')' ;
+
+IfStatement:
+    'if' Conditions '{'
+        Statement*
+        '}'
+    *('elif' Conditions '{'
+       Statement* '}')
+    ('else' '{'
+        Statement* '}')?
+;
+
+OneLineCondition: Conditions '?' (PosibleValuesForVariable | ID | ForInStatement) (':' (PosibleValuesForVariable | ID | ForInStatement) )? ';';
+
+Conditions: Condition ( LogicalOperator Condition )*;
+
+LogicalOperator: ('&&' | '||');
+
+Negation: '!';
+
+Condition:  Negation?  ( ID |value | ShortFunctions | CopyName) RelationOperator Negation? (ID | value | CopyName | ShortFunctions ) ;
+
+RelationOperator: ('==' | '!=' | '>' | '<' | '>=' | '<=') ;
+
+Operations: (( ID | INT | FLOAT | CopyName) Operator Operations) | (ID | INT | FLOAT | CopyName);
+
+Operator: ('+' | '-' | '*' | '/' | '%' | '^');
+
+Size: (name |CopyName)'.size' '(' ')';
+Count: (name |CopyName) '.' 'count' '(' Conditions ')' ;
+All:  (name |CopyName) '.' 'all' '(' Conditions ')' ;
+Any:  (name |CopyName) '.' 'any' '(' Conditions ')' ;
+NoOne:  (name |CopyName) '.' 'none' '(' Conditions ')' ;
+Min:  (name |CopyName) '.' 'min' '(' STRING ')' ;
+Max:  (name |CopyName) '.' 'max' '(' STRING ')' ;
+Add:  (name |CopyName) '.' 'add' '(' PosibleValuesForVariable ')' ;
+Remove:  (name |CopyName) '.' 'remove' '(' PosibleValuesForVariable ')' ;
+Clear : (name |CopyName) '.' 'clear' '('')' ;
+Index: (name |CopyName) '.' 'index' '(' PosibleValuesForVariable ')' ;
+
+CopyName: '#' STRING '#';
+
+ShortFunctions: ( Size | Count | All | Any | NoOne | Min | Max | Add |Remove | Clear | Index ) ;
+
+value: (INT | STRING | FLOAT | BOOL );

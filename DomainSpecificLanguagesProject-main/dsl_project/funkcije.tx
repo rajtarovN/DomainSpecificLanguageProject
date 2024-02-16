@@ -1,0 +1,13 @@
+
+Operations: (( ID | value) Operator Operations) | (ID | value);
+Operator: ('+' | '-' | '*' | '/' | '%' | '//' | '^');
+
+
+
+
+
+
+
+PosibleValuesForVariable: (value  | Condition | CallFunctionStatement |  OneLineCondition | Operations | NewObject | ShortFunctions);
+NewObject: "new" name '(' Arguments ')';
+Operations: (( ID | value) Operator Operations) | (ID | value); #ovde call fje

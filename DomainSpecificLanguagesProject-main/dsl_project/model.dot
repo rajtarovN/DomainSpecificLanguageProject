@@ -1,0 +1,65 @@
+
+    digraph textX {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+
+
+match_rules [ shape=plaintext, label=< <table>
+	<tr>
+		<td><b>Attribute</b></td><td>ID type</td>
+	</tr>
+	<tr>
+		<td><b>Class</b></td><td>class ID : (Attribute)*</td>
+	</tr>
+	<tr>
+		<td><b>Classes</b></td><td>Classes</td>
+	</tr>
+	<tr>
+		<td><b>Enum</b></td><td>enum ID : (ID)*</td>
+	</tr>
+	<tr>
+		<td><b>Enums</b></td><td>Enums</td>
+	</tr>
+	<tr>
+		<td><b>Link</b></td><td>STRING to STRING</td>
+	</tr>
+	<tr>
+		<td><b>ManyToMany</b></td><td>ManyToMany: (Link)*</td>
+	</tr>
+	<tr>
+		<td><b>ManyToOne</b></td><td>ManyToOne: (Link)*</td>
+	</tr>
+	<tr>
+		<td><b>Nelly</b></td><td></td>
+	</tr>
+	<tr>
+		<td><b>OneToMany</b></td><td>OneToMany: (Link)*</td>
+	</tr>
+	<tr>
+		<td><b>OneToOne</b></td><td>OneToOne: (Link)*</td>
+	</tr>
+	<tr>
+		<td><b>Relations</b></td><td></td>
+	</tr>
+	<tr>
+		<td><b>Type</b></td><td>String|int|float|boolean|byte|short|long|double|char</td>
+	</tr>
+	<tr>
+		<td><b>name</b></td><td>STRING</td>
+	</tr>
+	<tr>
+		<td><b>type</b></td><td>String|int|float|boolean|byte|short|long|double|char|STRING</td>
+	</tr>
+</table> >]
+
+
+}

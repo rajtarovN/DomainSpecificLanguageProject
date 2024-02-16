@@ -1,0 +1,27 @@
+file 'MyFile' [
+    int afdd(int a, int b) {
+return a;
+    }
+
+    int nnn(int a, int b) {
+    afdd(7,8);
+
+    if 5 == 5 {
+        int vvv = 5;
+        afdd(2, 3);
+        if 3>2 {
+            int gg =7;
+        }
+
+    } elif 7 == 5 {
+        afdd(2, 3);
+    } else {
+        add(2, 3);
+    }
+
+    afdd(afdd(3,5),9);
+
+    for int i = 0; i < 5; i=i+1 {
+        afdd(i, i);
+    }
+    }]
