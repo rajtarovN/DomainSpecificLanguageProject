@@ -8,6 +8,11 @@ class Address{
   'zipCode' String;
 }
 
+class Product{
+    'name' String;
+    'price' double;
+}
+
 enum Gender{
   'MALE';
   'FEMALE';
