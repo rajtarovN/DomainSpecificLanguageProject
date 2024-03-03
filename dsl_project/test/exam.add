@@ -1,0 +1,10 @@
+file 'MyFile' [
+    def int applyAction (User user, List Product productsOnAction, Order o){
+        int number = 0;
+        productsOnAction.for( e=> {
+            number = number + e.products.count(e.id==id);
+            });
+
+        o.totalprice = number > 3? o.totalPrice - o.products.min(price);
+    }
+]
