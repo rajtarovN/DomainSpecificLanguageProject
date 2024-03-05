@@ -1,0 +1,11 @@
+
+// elementi su iz liste na akciji 50%
+
+file 'MyFile' [ 
+    def int applyAction (User user, List Product productsOnAction, Order order){
+
+	//za svaki product iz korpe, prveri da li se nalazi u listi proizvoda na popustu i ako da, izracunaj novu sumu tih proiyvoda na popustu
+	int number = for order.products as o sumOf productsOnAction as e.price*0.5*e.kolicina where e.id==o.id;
+        o.totalPrice = o.totalPrice-number;
+    }
+]
