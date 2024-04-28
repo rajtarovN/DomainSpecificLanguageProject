@@ -1,0 +1,153 @@
+{# Check primitiveProperties #}
+{% for atr in current_class.attributes %}
+  {% if atr.isEnum %}
+    {% set hasEnum = true %}
+  {% endif %}
+{% endfor %}
+
+package uns.ac.rs.mbrs.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import org.hibernate.annotations.Where;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.*;
+import java.util.Date;
+import uns.ac.rs.mbrs.model.*;
+import lombok.Getter;
+import lombok.Setter;
+{% if hasEnum == true %}import uns.ac.rs.mbrs.enumeration.*;
+{% endif %}
+
+@AllArgsConstructor
+@Entity
+@Where(clause = "deleted = false")
+@Table(name = "{{ current_class.name|lower }}")
+@Getter
+@Setter
+public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
+    @Id
+    @GeneratedValue
+    private long id;
+    {% for property in current_class.attributes %}
+        {% if property %}
+
+    @Column(name="{{ property.name|lower }}"{% if property.length is defined or property.unique is defined or property.lower is defined and property.lower == 0 %}
+            {% endif %})
+            {% if property.isEnum == true %}
+    @Enumerated(Enum_type.STRING)
+            {% endif %}
+    private {% if property.type == "date" %}Date{% else %}{% if property.type == "string" %}{{ property.type | capitalize }}{%else%}{{ property.type}}{%endif%}{% endif %} {{ property.name[0]|lower }}{{ property.name[1:] }};
+        {% endif %}
+    {% endfor %}
+    @Column(name="deleted", unique = false)
+    private boolean deleted;
+
+    {% for property in current_class.reference_properties %}
+
+        {% if property.upper is defined and property.cardinality %}
+            @{{ property.cardinality }}
+        {% endif %}
+        {% if property.fetch_type is defined or property.cascade_type is defined or property.mapped_by is not none %}
+        (
+            {% if property.cascade_type %}
+                cascade = CascadeType.{{ property.cascade_type }}
+            {% endif %}
+            {% if property.fetch_type %}
+                {% if property.cascade_type %}, {% endif %}
+                fetch = FetchType.{{ property.fetch_type }}
+            {% endif %}
+            {% if property.mapped_by is not none%}
+                {% if property.cascade_type or property.fetch_type %} {% endif %}
+                {% if property.mapped_by != "" and "_" not in property.mapped_by|string %},mappedBy = "{{ property.mapped_by}}" {%else%}
+                 {% if "_" not in property.mapped_by|string %}
+                ,mappedBy = "{{ current_class.name|lower }}"{% endif %}{% endif %}
+            {% endif %}
+        )
+         {% if "_" in property.mapped_by|string %}
+         {% set parts = property.mapped_by.split("_") %}
+         @JoinTable(
+                    name = "{{property.mapped_by}}",
+                    joinColumns = @JoinColumn(name = "{{ parts[0] }}_id"),
+                    inverseJoinColumns = @JoinColumn(name = "{{ parts[1] }}_id")
+            )
+         {%endif%}
+        {% endif %}
+        {% for model_cl in model.classes %}
+            {% if model_cl.name == property.name %}
+                {% set references = [] %}
+                {% for p in model_cl.reference_properties %}
+                    {% if p.name != current_class.name and p.name not in references %}
+                        {% set _ = references.append(p.name | lower) %}
+                    {% endif %}
+                {% endfor %}
+                 {% if references %}
+                    @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+                 {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {% if property.type is defined and property.name is defined %}
+        private {% if property.upper is defined and property.upper == -1 %}List<{% endif %}{{ property.name[0]|capitalize }}{{ property.name[1:] }}{% if property.upper is defined and property.upper == -1 %}> {% endif %} {% if property.as_part!=""%}{{ property.as_part[0]|lower }}{{ property.as_part[1:]}}{% else %}{{ property.name[0]|lower }}{{ property.name[1:]}}{%endif%};
+        {% endif %}
+    {% endfor %}
+
+    public {{ current_class.name }}() {}
+    {% if hasId == false %}
+        public long getId(){
+            return id;
+        }
+        public void setId(long id){
+            this.id = id;
+        }
+    {% endif %}
+    {% for property in primitiveProperties %}
+        {% if property and property.type and property.name %}
+            public {% if property.type == "date" %}Date{% elif property.generation_type is defined and property.generation_type == "UUID" %}UUID{% else %}{{ property.type }}{% endif %} get{{ property.type|capitalize }}(){
+                return {{ property.name[0]|lower}}{{property.name[1:]}};
+            }
+            public void set{{ property.type|capitalize }}({% if property.type == "date" %}Date{% else %}{{ property.type }}{% endif %} {{ property.name[0]|lower}}{{ property.name[1:] }}){
+                this.{{ property.name[0]|lower }}{{ property.name[1:]}} = {{ property.name[0]|lower}}{{ property.name[1:]}};
+            }
+        {% endif %}
+    {% endfor %}
+
+    {% for property in current_class.reference_properties %}
+        {% if property and property.type and property.name %}
+            public {% if property.upper is defined and property.upper == -1 %} List< {% endif %}{{ property.name[0]|capitalize }}{{ property.name[1:] }} {% if property.upper is defined and property.upper == -1 %}>{% endif %} get{% if property.as_part!="" %}{{ property.as_part|capitalize }}{%else%}{{ property.name }}{% endif %}() {
+                {% if property.as_part!="" %}
+                return {{ property.as_part }};
+                {% else %}
+                return {{ property.name[0]|lower }}{{ property.name[1:] }};
+                {% endif %}
+            }
+            public void set{% if property.as_part!="" %}{{ property.as_part|capitalize }}{%else%}{{ property.type|capitalize }}{% endif %}(
+            {% if property.upper is defined and property.upper == -1 %}
+                List<
+            {% endif %}
+           {{ property.name[0]|capitalize }}{{ property.name[1:] }}
+            {% if property.upper is defined and property.upper == -1 %}
+                >
+            {% endif %}
+            {% if property.as_part!="" %}
+            {{ property.as_part[0]|lower }}{{ property.as_part[1:]}}
+             {% else %}
+             {{ property.name[0]|lower }}{{ property.name[1:]}}
+             {% endif %}
+            ) {
+            {% if property.as_part!="" %}
+                this.{{ property.as_part[0]|lower}}{{ property.as_part[1:]}} = {{ property.as_part[0]|lower}}{{ property.as_part[1:]}};
+            {% else %}
+                this.{{ property.name[0]|lower}}{{ property.name[1:]}} = {{ property.name[0]|lower}}{{ property.name[1:]}};
+            {% endif %}
+            }
+        {% endif %}
+    {% endfor %}
+    public boolean getDeleted() {
+        return deleted;
+    }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+}

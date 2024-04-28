@@ -1,0 +1,51 @@
+{# Assignments #}
+{% set hasType = "long" %}
+package uns.ac.rs.mbrs.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO {
+
+    private {{ hasType }} id;
+
+    {% for property in current_class.attributes %}
+        {% if property %}
+            private {% if property.isEnum == true %}String{% else %}{{ property.type }}{% endif %} {{ property.name[0]|lower }}{{ property.name[1:]}};
+        {% endif %}
+    {% endfor %}
+    {% set added = false %}
+    {% for property in current_class.reference_properties %}
+        {% if property is defined and property.upper is defined and property.cardinality is defined and (property.cardinality == "OneToOne" or property.cardinality == "ManyToOne") %}
+            {% if property.as_part is not none %}
+            {% if property.as_part != "" %}
+            private {{ property.type }}DTO {{ property.as_part[0]|lower}}{{property.as_part[1:] }};
+            {% set added = true %}
+            {% else %}
+            private {{ property.type }}DTO {{ property.name[0]|lower}}{{property.name[1:] }};
+            {% set added = true %}
+            {% endif %}
+            {% else %}
+            private {{ property.type }}DTO {{ property.name[0]|lower}}{{property.name[1:] }};
+            {% set added = true %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% if added %}
+        public {{ class.name }}DTO(long id,{% for prop in primitiveProperties %}{% if prop.isEnum == true %}String{% else %}{{ prop.type }}{% endif %} {{ prop.name[0]|lower}}{{ prop.name[1:]}}{% if prop is not loop.last %}, {% endif %}{% endfor %}){
+            {% for prop in current_class.attributes %}
+                this.{{ prop.name[0]|lower}}{{ prop.name[1:]}} = {{ prop.name[0]|lower}}{{ prop.name[1:]}};
+            {% endfor %}
+            this.id = id;
+        }
+    {% endif %}
+}

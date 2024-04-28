@@ -1,8 +1,8 @@
 //tri iz liste ako kupi, dobija najmanji besplatno
-file 'MyFile' [
-    def int applyAction (User user, List Product productsOnAction, Order order){
-		    //za svaki produkt u listi narucenog, prebroj koliko puta ga ima u listi i to saberi, rezultat je ukupan broj ponavljanja elementa u listi
-	int number = for order.products as o sum count from productsOnAction as e where e.id==o.id;
-        o.totalPrice = number > 3? o.totalPrice - min order.products as o.price;
-    }
-]
+def applyAction (User user, List Product productsOnAction, Order order){
+        //za svaki produkt u listi narucenog, prebroj koliko puta ga ima u listi i to saberi, rezultat je ukupan broj ponavljanja elementa u listi
+int number = for order.products as: o sum countFrom productsOnAction as: e where e.id==o.id;
+    o.totalPrice = number > 3? o.totalPrice - min order.products as o.price;
+}
+
+defapplyAction(Useruser,ListProductproductsOnAction,Orderorder){intnumber=fororder.products as:osumcountFromproductsOnActionas:ewheree.id==o.id;o.totalPrice=number>3?o.totalPrice-minorder.productsaso.price;}

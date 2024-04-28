@@ -1,11 +1,20 @@
 class Person{
-      'id' String;
       'age' int;
 }
 class Address{
   'street' String;
   'city' String;
   'zipCode' String;
+}
+
+class Jedan{
+  'street' String;
+}
+class Dva{
+    'sds' String;
+}
+class Tri{
+    'sdssdfe' String;
 }
 
 class Product{
@@ -18,3 +27,16 @@ enum Gender{
   'FEMALE';
   'OTHER';}
 
+
+OneToMany{
+'Address' to: 'Person' as: probannn;
+'Product' to: 'Person' ;
+'Jedan' to: 'Tri';
+}
+ManyToOne{
+'Jedan' to: 'Dva' as: valjda;
+}
+
+ManyToMany{
+    'Tri' to: 'Dva';
+}

@@ -1,7 +1,9 @@
 //20 % popust ako kupi 3 iz liste
-file 'MyFile' [
-    def int applyAction (User user, List Product productsOnAction, Order order){
-	int number = for order.products as o sum count of productsOnAction as e where e.id==o.id;
-        o.totalPrice = number > 3? o.totalPrice *0.8;
-    }
-]
+
+def applyAction (User user, List Product productsOnAction, Order order){
+int number = for order.products as: o sum countFrom productsOnAction as: e where e.id==o.id;
+    o.totalPrice = number > 3? o.totalPrice *0.8;
+}
+
+
+defapplyAction(Useruser,ListProductproductsOnAction,Orderorder){intnumber=fororder.productsas:osumcountOfproductsOnActionasewheree.id==o.id;o.totalPrice =number>3?o.totalPrice*0.8;}

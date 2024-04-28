@@ -1,0 +1,8 @@
+{# Check if enum exists #}
+package uns.ac.rs.mbrs.enums;
+
+public enum {{ enum.name|capitalize}} {
+  {% for value in enum.values %}
+  {{ value|upper }}{% if not loop.last %},{% endif %}
+  {% endfor %}
+}

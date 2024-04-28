@@ -1,0 +1,233 @@
+package uns.ac.rs.mbrs.service;
+
+import javassist.NotFoundException;
+import java.util.ArrayList;
+import uns.ac.rs.mbrs.repository.*;
+import uns.ac.rs.mbrs.model.*;
+import uns.ac.rs.mbrs.mapper.*;
+import uns.ac.rs.mbrs.dtos.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+@Service
+@Transactional
+public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Service  {
+
+    {% set processed_types = [] %}
+    private final {{ current_class.name[0]| capitalize }}{{ current_class.name[1:] }}Mapper {{ current_class.name | lower }}Mapper;
+    private final {{ current_class.name[0]| capitalize }}{{ current_class.name[1:] }}Repository {{ current_class.name | lower }}Repository;
+    {% set _ = processed_types.append(current_class.name) %}
+    {% for property in current_class.reference_properties %}
+        {% if property.type not in processed_types %}
+    private final {{ property.type }}Repository {{ property.type | lower }}Repository;
+    private final {{ property.type }}Mapper {{ property.type | lower }}Mapper;
+            {% set _ = processed_types.append(property.type) %}
+        {% endif %}
+    {% endfor %}
+
+    public {{ current_class.name }}Service(
+    {{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}Mapper {{ current_class.name | lower }}Mapper,
+    {{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}Repository {{ current_class.name | lower }}Repository
+    {% set processed_types = [] %}
+    {% set _ = processed_types.append(current_class.name) %}
+    {% for property in current_class.reference_properties %}
+        {% if property.type not in processed_types %}
+            ,{{ property.type }}Repository {{ property.name | lower }}Repository
+            ,{{ property.type }}Mapper {{ property.type | lower }}Mapper
+            {% set _ = processed_types.append(property.type) %}
+        {% endif %}
+    {% endfor %}
+) {
+        this.{{ current_class.name | lower }}Mapper = {{ current_class.name | lower }}Mapper;
+        this.{{ current_class.name | lower }}Repository = {{ current_class.name | lower }}Repository;
+        {% set processed_types = [] %}
+        {% set _ = processed_types.append(current_class.name) %}
+        {% for property in current_class.reference_properties %}
+            {% if property.type not in processed_types %}
+        this.{{ property.type | lower }}Repository = {{ property.name | lower }}Repository;
+
+        this.{{ property.type | lower }}Mapper = {{ property.type | lower }}Mapper;
+                {% set _ = processed_types.append(property.type) %}
+            {% endif %}
+{% endfor %}
+    }
+    
+    public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO save({{ current_class.name }} {{ current_class.name | lower }}) {
+        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} s = {{ current_class.name | lower }}Repository.save({{ current_class.name | lower }});
+       
+        {% for prop in reference_properties %}
+        {% if prop.upper == -1 %}
+        for({{ prop.type | capitalize }} g : {{ current_class.name | lower }}.get{{ prop.name | capitalize }}()){
+            {{ prop.type | capitalize }} gr = {{ prop.type | lower }}Repository.findById(g.getId()).get();
+            {% if prop.cardinality == "ManyToMany" %}
+            if(gr.get{{ current_class.name | capitalize }}s()==null){
+                 gr.set{{ current_class.name | capitalize }}s(new ArrayList<>());
+             }
+             gr.get{{ current_class.name | capitalize }}s().add(s);
+            {% else %}
+             gr.set{{ current_class.name | capitalize }}(s);
+            {% endif %}
+            {{ prop.type | lower }}Repository.save(gr);
+        }
+        {% endif %}
+        {% endfor %}
+        return {{ current_class.name | lower }}Mapper.toDTO(s);
+    }
+
+    public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO update({{ current_class.name }} {{ current_class.name | lower }}) {
+    
+    {% for prop in reference_properties %}
+        {% if prop.upper == -1 %}
+        if ({{ current_class.name | lower }}Repository.findById({{ current_class.name | lower }}.get{{ idName | capitalize }}()).isPresent()){
+            List<{{ prop.type.name[0]|capitalize }}{{ prop.type.name[1:] }}> g = {{ current_class.name | lower }}Repository.findById({{ current_class.name | lower }}.get{{ idName | capitalize }}()).get().get{{ prop.name | capitalize }}();
+            if(g!=null){
+                for({{ prop.type | capitalize }} gr : g){
+                
+                {% if prop.cardinality == "ManyToMany" %}
+                    List<{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}> depInIns = gr.get{{ current_class.name | capitalize }}s();
+                    for({{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}} d : depInIns){
+                        if(d.getIdSTR().equals( {{ current_class.name | lower }}.getIdSTR())){
+                            depInIns.remove(d);
+                            break;
+                        }
+                    }
+                {% else %}
+                    gr.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}(null);
+                {% endif %}
+                    {{ prop.type | lower }}Repository.save(gr);
+                }
+            }
+        }
+        {% endif %}
+    {% endfor %}
+    
+    
+        {% for prop in reference_properties %}
+        {% if prop.upper == -1 %}
+        for({{ prop.type | capitalize }} g : {{ current_class.name | lower }}.get{{ prop.name | capitalize }}()){
+            
+            {% if prop.cardinality == "ManyToMany" %}
+             if(g.get{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}s()==null){
+                 g.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}s(new ArrayList<>());
+             }
+             g.get{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}s().add({{ current_class.name | lower }});
+            {% else %}
+             g.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}({{ current_class.name | lower }});
+            {% endif %}
+            {{ prop.type | lower }}Repository.save(g);
+        }
+        {% endif %}
+        {% endfor %}
+        {{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}} s = {{ current_class.name | lower }}Repository.save({{ current_class.name | lower }});
+        return {{ current_class.name | lower }}Mapper.toDTO(s);
+       }
+
+     public Optional<{{ current_class.name }}> partialUpdate({{ current_class.name }} {{ current_class.name|lower }}) {
+
+    return {{ current_class.name|lower }}Repository
+        {% if hasIdProperty %}
+        .findById({{ current_class.name|lower }}.get{{ idName|capitalize }}())
+        {% else %}
+        .findById({{ current_class.name|lower }}.getId())
+        {% endif %}
+        .map(existing{{ current_class.name }} -> {
+
+            {% for property in current_class.attributes %}
+            {% if property.type == "String" or property.type == "char" %}
+            if ({{ current_class.name|lower }}.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}() != null) {
+            {% elif property.type == "boolean" %}
+            if ({{ current_class.name|lower }}.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}() != false) {
+            {% elif property.type in ["int", "Integer", "double", "Double", "long", "float"] %}
+            if ({{ current_class.name|lower }}.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}() != 0) {
+            {% else %}
+            if ({{ current_class.name|lower }}.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}() != null) {
+            {% endif %}
+                existing{{ current_class.name }}.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}({{ current_class.name|lower }}.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}());
+            }
+            {% endfor %}
+
+            return existing{{ current_class.name }};
+        })
+        .map({{ current_class.name|lower }}Repository::save);
+}
+
+@Transactional(readOnly = true)
+public List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO> findAll() {
+    List<{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}> {{ current_class.name|lower }}s = {{ current_class.name|lower }}Repository.findAll();
+    List<{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}DTO> dtos = new ArrayList<>();
+    for ({{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}} s : {{ current_class.name|lower }}s){
+        {{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}DTO dto = {{ current_class.name| lower }}Mapper.toDTO(s);
+        dtos.add(dto);
+    }
+    return dtos;
+}
+
+@Transactional(readOnly = true)
+public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO findOne(Long id) throws NotFoundException {
+    Optional<{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}> maybe{{ current_class.name }} =  {{ current_class.name|lower }}Repository.findById(id);
+    if (maybe{{ current_class.name }}.isPresent()) {
+        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}} {{ current_class.name|lower }} = maybe{{ current_class.name }}.get();
+        {% for property in current_class.reference_properties %}
+        {% if property.upper == 1 %}
+        {{ property.name[0]|capitalize }}{{ property.name[1:] }} {{ property.name|lower }} = {{ property.name }}Repository.getById({{ current_class.name|lower }}.get{{ property.name|capitalize }}().getId());
+        {{ current_class.name|lower }}.set{{ property.name|capitalize }}({{ property.name }});
+        {% endif %}
+        {% endfor %}
+        return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }});
+    }
+    throw new NotFoundException("");
+}
+
+public void delete(Long id) {
+    Optional<{{ current_class.name }}> maybe{{ current_class.name }} = {{ current_class.name|lower }}Repository.findById(id);
+
+    if (maybe{{ current_class.name }}.isPresent()) {
+        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} existing{{ current_class.name }} = maybe{{ current_class.name }}.get();
+        existing{{ current_class.name }}.setDeleted(true);
+        {% for property in current_class.reference_properties %}
+        if (existing{{ current_class.name }}.get{% if property.as_part!="" %}{{ property.as_part[0]|capitalize }}{{ property.as_part[1:]}}{%else%}{{ property.name[0]|capitalize }}{{ property.name[1:]}}{%endif%}() != null){
+            {% if property.upper == -1 %}
+            for ({{ property.type }} p: existing{{ current_class.name }}.get{% if property.as_part !="" %}{{ property.as_part[0]|capitalize }}{{ property.as_part[1:]}}{% else %}{{ property.name[0]|capitalize }}{{ property.name[1:]}}{% endif %}()){
+                p.setDeleted(true);
+            }
+            {% else %}
+            existing{{ current_class.name }}.get{% if property.as_part!="" %}{{ property.as_part[0]|capitalize }}{{ property.as_part[1:]}}{%else%}{{ property.name[0]|capitalize }}{{ property.name[1:]}}{%endif%}().setDeleted(true);
+            {% endif %}
+        }
+        {% endfor %}
+
+        {{ current_class.name|lower }}Repository.save(existing{{ current_class.name }});
+    }
+}
+
+{% for prop in reference_properties %}
+    {% if prop.upper == -1 and prop.cardinality == "ManyToMany" %}
+    public Object find{{ prop.name|capitalize }}Of{{ current_class.name|capitalize }}({{ idType }} {{ idName }}) {
+        Optional<{{ current_class.name|capitalize }}> {{ current_class.name|lower }}={{ current_class.name|lower }}Repository.findById({{ idName }});
+        if ({{ current_class.name|lower }}.isPresent()){
+            List<{{ prop.type.name[0]|capitalize }}{{ prop.type.name[1:] }}DTO> dtos = new ArrayList<>();
+            for ({{ prop.type|capitalize }} g : {{ current_class.name|lower }}.get().get{{ prop.name|capitalize }}()){
+                {{ prop.type|capitalize }}DTO dto = {{ prop.type|lower }}Mapper.toDTO(g);
+                dtos.add(dto);
+            }
+            return dtos;
+        }
+        return new ArrayList<>();
+    }
+    {% elif prop.upper == -1 and prop.cardinality == "OneToMany" %}
+    public List<{{ prop.type|capitalize }}DTO> find{{ prop.name|capitalize }}Of{{ current_class.name|capitalize }}({{ idType }} {{ idName }}) {
+        List<{{ prop.type|capitalize }}> {{ prop.type|lower }}s = {{ prop.type|lower }}Repository.findAllBy{{ current_class.name|capitalize }}Id({{ idName }});
+        List<{{ prop.type|capitalize }}DTO> dtos = new ArrayList<>();
+        for ({{ prop.type|capitalize }} {{ prop.type|lower }} : {{ prop.type|lower }}s){
+            dtos.add({{ prop.type|lower }}Mapper.toDTO({{ prop.type|lower }}));
+        }
+        return dtos;
+    }
+    {% endif %}
+{% endfor %}
+}

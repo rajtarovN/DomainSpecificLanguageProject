@@ -1,4 +1,4 @@
-Nelly: ( Class | Enum | Relations | File)*;
+Model: ( Class | Enum | Relations | Function)*;
 
 Class:  'class' ID '{' (Attribute)* '}';
 
@@ -17,36 +17,30 @@ OneToMany: 'OneToMany''{' Link* '}';
 ManyToOne: 'ManyToOne' '{' Link* '}';
 ManyToMany: 'ManyToMany' '{' Link* '}';
 
-Link: name 'to' name ';';
+Link: name 'to:' name ('as:' ID)? ';';
 name: STRING;
 
-File: 'file' name '[' Function* ']' ;
+Function: 'def' ID ParameterList '{' Statement* '}';
 
-Function: 'def' Type ID '(' ParameerList? ')' '{' Statement* '}';
+ParameterList: Param *( ',' Param) ;
 
-ParameerList: Parameter *( ',' Parameter) ;
-
-Parameter: Type ID ;
-
-CallFunctionStatement: ID '(' Arguments? ')' ';';
+Param: (Type| ID) ID ;
 
 Arguments: Argument (',' Argument)*;
 
 Argument: (FunctionCall | ID | value | ShortFunctions |Operations | ChaneId);
 
-FunctionCall: ID '(' Arguments? ')';
+FunctionCall: ID '(' Arguments? ')' ';'?;
 
-ReturnStatement: 'return' ( ID |value | CopyName| CallFunctionStatement | ShortFunctions |  Operations| OneLineCondition | ChaneId)? ';';
-
-Statement: (VariableInit | CopyName | Variable | IfStatement | CallFunctionStatement | ReturnStatement );
+Statement: (VariableInit | Variable | IfStatement | FunctionCall );
 
 VariableInit: Type ID "=" PosibleValuesForVariable ';';
 
 Variable: ID "=" PosibleValuesForVariable ';'?;
 
-PosibleValuesForVariable: (value | CopyName | Condition | CallFunctionStatement |  OneLineCondition | Operations | NewObject | ShortFunctions |ChaneId);
+PosibleValuesForVariable: (value |  Condition | FunctionCall |  OneLineCondition | Operations | NewObject | ShortFunctions |ChaneId);
 
-NewObject: "new" name '(' Arguments ')';
+NewObject: "new" ID '(' Arguments ')';
 
 IfStatement:
     'if' Conditions '{'
@@ -58,7 +52,7 @@ IfStatement:
         Statement* '}')?
 ;
 
-OneLineCondition: Conditions '?' (PosibleValuesForVariable | ID ) (':' (PosibleValuesForVariable | ID ) )? ';';
+OneLineCondition: Conditions '?' (PosibleValuesForVariable | ID ) 'or:' (PosibleValuesForVariable | ID )  ';';
 
 Conditions: Condition ( LogicalOperator Condition )*;
 
@@ -66,42 +60,45 @@ LogicalOperator: ('&&' | '||');
 
 Negation: '!';
 
-Condition:  Negation?  ( ID |value | ShortFunctions | CopyName | ChaneId) RelationOperator Negation? (ID | value | CopyName | ShortFunctions | ChaneId) ;
+Condition:  Negation?  ( ID |value | ShortFunctions | ChaneId) RelationOperator Negation? (ID | value | ShortFunctions | ChaneId) ;
 
 RelationOperator: ('==' | '!=' | '>' | '<' | '>=' | '<=') ;
 
-Operations: (( ID | INT | FLOAT | CopyName | ChaneId) Operator Operations) | (ID | INT | FLOAT | CopyName| ChaneId);
+Operations: (( ID | INT | FLOAT | ChaneId) Operator Operations) | (ID | INT | FLOAT |  ChaneId);
 
 Operator: ('+' | '-' | '*' | '/' | '%' | '^');
 
 ChaneId: ID ('.' ID)*;
 
-Size: 'size' 'of' PosibleLists ;
-Count: 'count' 'from' PosibleLists ('as' ( ChaneId|ID))?( WherePart )? ;
-All:  'all' 'of' PosibleLists ('as' ( ChaneId|ID))? ( WherePart )?;
-Any: 'any' 'of' PosibleLists ('as' ( ChaneId|ID))?( WherePart)?;
-NoOne: 'none' 'of' PosibleLists ('as' ID)?( WherePart)?;
-Min: 'min' PosibleLists   ('as' ( ChaneId|ID))? ;
-Max: 'max' PosibleLists   ('as' ( ChaneId|ID))?;
-Add: 'add' (value | CopyName | ChaneId|ID|NewObject) 'in' PosibleLists;
-Remove: 'remove'  'from' PosibleLists 'as' ID  WherePart;
-Clear : 'clear' PosibleLists;
-Index: 'indexOf' (value |CopyName | ChaneId | ID ) 'from' PosibleLists;
-Sum: 'sumOf' PosibleLists ('as' (ID | ChaneId | Operations)   WherePart)?;
-Average: 'averageOf' PosibleLists ('as' ( ChaneId | ID | Operations)  WherePart)?;
-Like: 'like' 'of' PosibleLists ('as' ( ChaneId|ID)  WherePart)?;
-SelectIn: 'selectIn' PosibleLists ('as' ( ChaneId|ID)  WherePart)?;
-Between: 'between' 'of' PosibleLists  Conditions;
-Exist: 'existIn' PosibleLists  (WherePart)?;
-ForEach: 'for' ( ChaneId | ID) 'as' ( ChaneId | ID) ForOperation WherePart;
-SelectTop: 'selectTop' INT 'of' PosibleLists   (WherePart)?;
+Sum:        'sumOf' 	PosibleLists 				(('as:' (ID | ChaneId) (UsingFormula)?   WherePart)?);
+Average:    'averageOf' 	PosibleLists 				('as:' ( ChaneId | ID ) (UsingFormula)?  WherePart)?;
+SelectIn:   'selectIn' 	PosibleLists 				'as:' ( ChaneId|ID)  WherePart;
+Count:      'countFrom' 	PosibleLists 				('as:' ( ChaneId|ID))?( WherePart)? ;
+All:        'allOf' 	PosibleLists 				('as:' ( ChaneId|ID))? ( WherePart )?;
+Any:        'anyOf' 	PosibleLists 				('as:' ( ChaneId|ID))?( WherePart)?;
+NoOne:      'noneOf' 	PosibleLists 				('as:' ID)?( WherePart)?;
+Min:        'min'		PosibleLists   				('as:' ( ChaneId|ID))? ;
+Max:        'max' 		PosibleLists   				('as:' ( ChaneId|ID))?;
+Remove:     'removeFrom' 	PosibleLists 				'as:' ID  WherePart;
 
-ForOperation: ('sum'|'average'|'product' | ID);
-PosibleLists: (name |CopyName | ChaneId | FunctionCall | OneLineCondition |ShortFunctions);
-CopyName: '#' STRING '#';
+Exist:      'existIn' 	PosibleLists  				(WherePart)?;
+Size:       'sizeOf' 	PosibleLists ;
+Clear:      'clear' 	PosibleLists;
 
-WherePart: 'where'  (Conditions | ShortFunctions | CopyName | CallFunctionStatement);
+ForEach:    'for' 		( ChaneId | ID) 			'as:' ( ChaneId | ID) UsingFormula? (((ForOperation)? ShortFunctions)| SetOperation);
 
-ShortFunctions: ( Size | Count | All | Any | NoOne | Min | Max | Add |Remove | Clear | Index |SelectTop| Sum |Average | Like | SelectIn | Between | Exist | ForEach);
+SelectTop:  'selectTop' 	INT 'of' PosibleLists   		(WherePart)?;
+
+Add:        'add' 		(value | ChaneId|ID|NewObject) 		'in' PosibleLists;
+Index:      'indexOf' 	(value | ChaneId | ID ) 		'in' PosibleLists;
+
+ForOperation: ('sum'|'average'|'product' );
+PosibleLists: (ID | ChaneId | SelectIn);
+
+WherePart: 'where'  (Conditions | All| Any | NoOne);
+UsingFormula: 'formula' Operations;
+SetOperation: 'on:' ( ChaneId | ID) 'apply' ( ChaneId | ID | Operations);
+
+ShortFunctions: ( Size | Count | All | Any | NoOne | Min | Max | Add |Remove | Clear | Index |SelectTop| Sum |Average | SelectIn | Exist | ForEach);
 
 value: (INT | STRING | FLOAT | BOOL );

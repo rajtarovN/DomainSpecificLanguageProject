@@ -1,0 +1,38 @@
+package uns.ac.rs.mbrs.repository;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import uns.ac.rs.mbrs.model.*;
+import java.util.List;
+
+@Repository
+public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Repository extends JpaRepository<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}, Long> {
+
+{% for prop in current_class.reference_properties %}
+    {% for model_cl in model.classes %}
+            {% if model_cl.name == prop.name %}
+                {% set references = [] %}
+                {% for p in model_cl.reference_properties %}
+                    {% if p.name != current_class.name %}
+                        {% set _ = references.append('"'+p.name+'"') %}
+                    {% endif %}
+                {% endfor %}
+                 {% if references %}
+                    {% if prop.as_part is not none%}
+                        {% if prop.as_part != "" %}
+                        List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}> findAllBy{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:] }}Id(Long id);
+
+                        {%else%}
+                        List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}> findAllBy{{ prop.name[0]|capitalize }}{{ prop.name[1:] }}Id(Long id);
+                        {%endif%}
+                    {% else %}
+                    List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}> findAllBy{{ prop.name[0]|capitalize }}{{ prop.name[1:] }}Id(Long id);
+                    {% endif %}
+                 {% endif %}
+            {% endif %}
+        {% endfor %}
+
+
+{% endfor %}
+
+}

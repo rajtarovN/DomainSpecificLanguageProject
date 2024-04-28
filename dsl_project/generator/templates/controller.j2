@@ -1,0 +1,60 @@
+package uns.ac.rs.mbrs.controller;
+
+import javassist.NotFoundException;
+import uns.ac.rs.mbrs.model.{{ current_class.name }};
+import uns.ac.rs.mbrs.service.*;
+import uns.ac.rs.mbrs.dtos.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(value = "/api/{{ current_class.name[0]|lower}}{{current_class.name[1:]}}")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Controller {
+
+    @Autowired
+    private {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Service {{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service;
+
+    @GetMapping
+    public ResponseEntity<List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO>> findAll() {
+        return ResponseEntity.ok().body({{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service.findAll());
+    }
+
+    @GetMapping("/id")
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> findOne(@PathVariable Long id) throws NotFoundException {
+        {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.findOne(id);
+        return ResponseEntity.ok().body({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
+    }
+
+    @PostMapping
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }} {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
+        {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.save({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
+        if ({{ current_class.name[0]|lower }}{{ current_class.name[1:]}} == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>({{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/id")
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> put(@PathVariable Long id, @RequestBody {{ current_class.name }} {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
+        {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.update({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
+        return {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} != null ? ResponseEntity.ok({{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1) : ResponseEntity.badRequest().build();
+    }
+
+    @DeleteMapping("/id")
+    public ResponseEntity<?> deleteOne(@PathVariable Long id) {
+        {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/d/id")
+    public ResponseEntity<?> deleOne(@PathVariable Long id) {
+        {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+}

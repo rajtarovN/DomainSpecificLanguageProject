@@ -1,0 +1,36 @@
+{# Assignments #}
+{% set hasEnum = false %}
+{% set hasRefProp = false %}
+{% set idName = "id" %}
+{% for prim in current_class.attributes %}
+  {% if prim.isEnum %}
+    {% set hasEnum = true %}
+  {% endif %}
+{% endfor %}
+package uns.ac.rs.mbrs.mapper;
+
+{% if hasEnum == true %}import uns.ac.rs.mbrs.enumeration.*;{% endif %}
+import uns.ac.rs.mbrs.model.*;
+import uns.ac.rs.mbrs.dtos.*;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}Mapper {
+
+
+    public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO toDTO({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} model) {
+        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO dto = new {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO();
+        {% for property in current_class.attributes %}
+            {% if property.isEnum %}
+        dto.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(model.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}().toString());
+            {% else %}
+        dto.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(model.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}());
+            {% endif %}
+        {% endfor %}
+        dto.setId(model.getId());
+        return dto;
+    }
+}
