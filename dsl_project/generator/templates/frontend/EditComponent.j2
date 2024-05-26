@@ -1,0 +1,341 @@
+import React, { useState,  useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import { useParams } from 'react-router-dom';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service from '../../services/{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service';
+import { useNavigate } from 'react-router-dom';
+import NativeSelect from '@mui/material/NativeSelect';
+
+{% for property in current_class.reference_properties %}
+import {{property.name|lower}}Service from '../../services/{{property.name[0]|capitalize}}{{property.name[1:]}}Service';
+{% endfor %}
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    width: '100%',
+    marginLeft: '50px',
+    marginRight: 'auto',
+  },
+  formGroup: {
+    marginBottom: theme.spacing(2),
+  },
+  buttonGroup: {
+    marginTop: theme.spacing(2),
+  },
+}));
+
+const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () => {
+  const classes = useStyles();
+  const [formData, setFormData] = useState({
+  {% for property in current_class.attributes %}
+    {{property}}: '',
+   {%endfor%}
+  });
+  const { id } = useParams();
+  {% for property in current_class.reference_properties %}
+  {% if property.upper is defined and property.upper == -1 %}
+  const [current{{property.name[0]|capitalize}}{{property.name[1:]}}, setCurrent{{property.name[0]|capitalize}}{{property.name[1:]}}] = useState([]);
+  const [all{{property.name[0]|capitalize}}{{property.name[1:]}}, setAll{{property.name[0]|capitalize}}{{property.name[1:]}}] = useState([]);
+  {%else%}
+  const [{{property.name[0]|lower}}{{property.name[1:]}}s, set{{property.name[0]|capitalize}}{{property.name[1:]}}s] = useState([]);
+  const [selected{{property.name[0]|capitalize}}{{property.name[1:]}}, setSelected{{property.name[0]|capitalize}}{{property.name[1:]}}] = useState('');
+
+  {%endif%}
+  {%endfor%}
+
+  useEffect(() => {
+  {% for property in current_class.reference_properties %}
+  {% if property.upper is defined and property.upper != -1 %}
+  const fetchData{{property.name[0]|capitalize}}{{property.name[1:]}} = async () => {
+      try {
+          const response= await {{property.name[0]|lower}}{{property.name[1:]}}Service.get{{property.name[0]|capitalize}}{{property.name[1:]}}();
+          if (response.status === 200) {
+            set{{property.name[0]|capitalize}}{{property.name[1:]}}s(response.data);
+        }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchData{{property.name[0]|capitalize}}{{property.name[1:]}}();
+  {%endif%}
+  {%endfor%}
+
+    if (id!=null){
+    return () => {
+      const fetchData = async () => {
+        try {
+            const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
+            if (response.status === 200) {
+              setFormData({
+              {% for property in current_class.attributes %}
+                 {{property}}: response.data.{{property}},
+              {%endfor%}
+
+              })
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    fetchData();
+      console.log('Component unmounted');
+    };}
+ {% for property in current_class.reference_properties %}
+  {% if property.upper is defined and property.upper == -1 %}
+    const fetchData{{property.name}} = async () => {
+      try {
+          const response2 = await {{property.name[0]|lower}}{{property.name[1:]}}Service.get{{property.name[0]|capitalize}}{{property.name[1:]}}();
+          if (response2.status === 200) {
+            setAll{{property.name[0]|capitalize}}{{property.name[1:]}}(response2.data);
+        }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchData{{property.name}}();
+  {%endif%}
+  {%endfor%}
+  }, [id]);
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    if (id!=null){
+        e.preventDefault();
+        const fetchData = async () => {
+          try {
+               {% for property in current_class.reference_properties %}
+                {% if property.upper is defined and property.upper == -1 %}
+
+                {% if not  "_" in property.mapped_by|string %}
+              let li{{property.name}} = [];
+              for (let a of current{{property.name[0]|capitalize}}{{property.name[1:]}}){
+                li{{property.name}}.push(a.id);
+              }
+              formData['{{property.name[0]|lower}}{{property.name[1:]}}Ids'] = li{{property.name}};
+              {%endif%}
+              {%else%}
+              for(let j in {{property.name[0]|lower}}{{property.name[1:]}}s){
+                if (parseInt(selected{{property.name[0]|capitalize}}{{property.name[1:]}})===parseInt({{property.name[0]|lower}}{{property.name[1:]}}s[j].id)){
+                  formData['{{property.name[0]|lower}}{{property.name[1:]}}'] = {{property.name[0]|lower}}{{property.name[1:]}}s[j];
+                  break;
+                }
+              }
+              {%endif%}
+              {%endfor%}
+              const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.update{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(formData, id);
+              if (response.status === 200) {
+                navigate(`/table-{{current_class.name[0]|lower}}{{current_class.name[1:]}}`);
+              }
+          } catch (error) {
+              console.error(error);
+          }
+      };
+      fetchData();
+    }
+  else{
+    e.preventDefault();
+    console.log(formData);
+    const fetchData = async () => {
+      try {
+      {% set id = [] %}
+      {% for property in current_class.reference_properties %}
+                {% if property.upper is defined and property.upper == -1 %}
+                {%  if not "_" in property.mapped_by|string %}
+                {% set _ = id.append(0) %}
+              let li{{id | length}} = [];
+              for (let a of current{{property.name[0]|capitalize}}{{property.name[1:]}}){
+                li{{id | length}}.push(a.id);
+              }
+              formData['{{property.name[0]|lower}}{{property.name[1:]}}Ids'] = li{{id | length}};
+              {%endif%}
+              {%else%}
+              for(let j in {{property.name[0]|lower}}{{property.name[1:]}}s){
+                if (parseInt(selected{{property.name[0]|capitalize}}{{property.name[1:]}})===parseInt({{property.name[0]|lower}}{{property.name[1:]}}s[j].id)){ //todo ovde verujem da ide name
+                  formData['{{property.name[0]|lower}}{{property.name[1:]}}'] = {{property.name[0]|lower}}{{property.name[1:]}}s[j];
+                  break;
+                }
+              }
+              {%endif%}
+              {%endfor%}
+          const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.create{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(formData);
+          if (response.status === 200) {
+              navigate(`/table-{{current_class.name[0]|lower}}{{current_class.name[1:]}}`);
+          }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchData();
+  }
+  };
+
+  const handleCancel = () => {
+    console.log('Form canceled');
+  };
+
+  {% for property in current_class.reference_properties %}
+  {% if property.upper is defined and property.upper == -1 %}
+  const handleRemove{{property.name[0]|capitalize}}{{property.name[1:]}} = (id) => {
+    if (!current{{property.name[0]|capitalize}}{{property.name[1:]}} || !all{{property.name[0]|capitalize}}{{property.name[1:]}}) return;
+
+    for (const item of current{{property.name[0]|capitalize}}{{property.name[1:]}}) {
+      if (item.id === id) {
+        const updatedCurrent{{property.name[0]|capitalize}}{{property.name[1:]}} = current{{property.name[0]|capitalize}}{{property.name[1:]}}.filter({{property.name[0]|lower}}{{property.name[1:]}}Item => {{property.name[0]|lower}}{{property.name[1:]}}Item.id !== id);
+        setCurrent{{property.name[0]|capitalize}}{{property.name[1:]}}(updatedCurrent{{property.name[0]|capitalize}}{{property.name[1:]}});
+        const updatedAll{{property.name[0]|capitalize}}{{property.name[1:]}} = [...all{{property.name[0]|capitalize}}{{property.name[1:]}}, item];
+        setAll{{property.name[0]|capitalize}}{{property.name[1:]}}(updatedAll{{property.name[0]|capitalize}}{{property.name[1:]}});
+
+        break;
+      }
+    }
+  }
+
+
+  const handleAdd{{property.name[0]|capitalize}}{{property.name[1:]}} = (id) => {
+    if (!current{{property.name[0]|capitalize}}{{property.name[1:]}} || !all{{property.name[0]|capitalize}}{{property.name[1:]}}) return;
+
+    for (const item of all{{property.name[0]|capitalize}}{{property.name[1:]}}) {
+      if (item.id === id) {
+        const updatedAll{{property.name[0]|capitalize}}{{property.name[1:]}} = all{{property.name[0]|capitalize}}{{property.name[1:]}}.filter({{property.name[0]|lower}}{{property.name[1:]}}Item => {{property.name[0]|lower}}{{property.name[1:]}}Item.id !== id);
+        setAll{{property.name[0]|capitalize}}{{property.name[1:]}}(updatedAll{{property.name[0]|capitalize}}{{property.name[1:]}});
+        const updatedCurrent{{property.name[0]|capitalize}}{{property.name[1:]}} = [...current{{property.name[0]|capitalize}}{{property.name[1:]}}, item];
+        setCurrent{{property.name[0]|capitalize}}{{property.name[1:]}}(updatedCurrent{{property.name[0]|capitalize}}{{property.name[1:]}});
+
+        break;
+      }
+    }
+  }
+  {%else%}
+    const handleChange{{property.name[0]|capitalize}}{{property.name[1:]}} = (event) => {
+      console.log(event.target.value)
+        setSelected{{property.name[0]|capitalize}}{{property.name[1:]}}(event.target.value);
+    };
+  {%endif%}
+  {%endfor%}
+
+
+
+  return (
+    <form className={classes.root} onSubmit={handleSubmit}>
+      <h2  >My Form</h2>
+      <p>ID: {id}</p>
+
+      {% for property in current_class.attributes %}
+      <div className={classes.formGroup}>
+        <TextField
+          label="{{property}}"
+          name="{{property}}"
+          value={formData.{{property}}}
+          {% if property.type == 'int' or property.type == 'float' or property.type == 'byte' or property.type == 'short' or property.type == 'long' or property.type == 'double'%}
+          type="number"
+          {% endif%}
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+      {% endfor %}
+
+
+
+      {% for property in current_class.reference_properties %}
+      {% if property.upper is defined and property.upper == -1 %}
+        {% if not "_" in property.mapped_by|string %}
+        {{property.name}}
+        <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Add</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {current{{property.name[0]|capitalize}}{{property.name[1:]}}.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">
+                  {item.id}
+                </TableCell>
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleRemove{{property.name[0]|capitalize}}{{property.name[1:]}}(item.id)}>Remove</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer><br/>
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Remove</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {all{{property.name[0]|capitalize}}{{property.name[1:]}}.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">
+                  {item.id}
+                </TableCell>
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleAdd{{property.name[0]|capitalize}}{{property.name[1:]}}(item.id)}>Add</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+        {%endif%}
+      {%else%}
+
+      <div>
+            <label htmlFor="dvaSelect">Select {{property.name[0]|capitalize}}{{property.name[1:]}}: </label>
+            <NativeSelect id="dvaSelect" value={selected{{property.name[0]|capitalize}}{{property.name[1:]}}} onChange={handleChange{{property.name[0]|capitalize}}{{property.name[1:]}}}>
+                <option value="">--Please choose an option--</option>{
+                 {{property.name[0]|lower}}{{property.name[1:]}}s.map({{property.name[0]|lower}}{{property.name[1:]}} => (
+                    <option  key={
+                    {{property.name[0]|lower}}{{property.name[1:]}}.id} value={
+                    {{property.name[0]|lower}}{{property.name[1:]}}.id}>
+                        {
+                        {{property.name[0]|lower}}{{property.name[1:]}}.id}
+                    </option >
+                ))}
+            </NativeSelect>
+        </div>
+
+      {%endif%}
+      {%endfor%}
+
+
+      <div className={classes.buttonGroup}>
+        <Button variant="contained" color="primary" type="submit">
+          Submit
+        </Button>
+        <Button variant="contained" color="secondary" onClick={handleCancel}>
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+export default Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}};

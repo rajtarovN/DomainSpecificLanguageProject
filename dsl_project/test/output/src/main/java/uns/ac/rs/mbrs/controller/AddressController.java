@@ -25,33 +25,39 @@ public class AddressController {
         return ResponseEntity.ok().body(addressService.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<AddressDTO>> get() throws NotFoundException {
+        List<AddressDTO> address = addressService.get();
+        return ResponseEntity.ok().body(address);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<AddressDTO> findOne(@PathVariable Long id) throws NotFoundException {
         AddressDTO address = addressService.findOne(id);
         return ResponseEntity.ok().body(address);
     }
 
     @PostMapping
-    public ResponseEntity<AddressDTO> post(@RequestBody Address address) {
+    public ResponseEntity<AddressDTO> post(@RequestBody AddressDTO address) {
         AddressDTO address1 = addressService.save(address);
         if (address == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(address1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<AddressDTO> put(@PathVariable Long id, @RequestBody Address address) {
-        AddressDTO address1 = addressService.update(address);
+    @PutMapping("/{id}")
+    public ResponseEntity<AddressDTO> put(@PathVariable Long id, @RequestBody AddressDTO address) {
+        AddressDTO address1 = addressService.update(id, address);
         return address != null ? ResponseEntity.ok(address1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         addressService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         addressService.delete(id);
         return ResponseEntity.noContent().build();

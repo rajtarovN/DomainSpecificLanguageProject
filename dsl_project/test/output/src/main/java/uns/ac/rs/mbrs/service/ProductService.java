@@ -35,19 +35,55 @@ public class ProductService  {
 
         this.personMapper = personMapper;
     }
-    
-    public ProductDTO save(Product product) {
+
+    @Transactional
+    public ProductDTO save(ProductDTO productdto) {
+
+        Product product = productMapper.toModel(productdto);
+
+        List<Person> persons = new ArrayList<>();
+        for (Long d : productdto.getPersonIds()) {
+            Person person = personRepository.getById(d);
+            persons.add(person);
+
+
+                person.setProduct(product);
+
+
+        }
+
+        product.setPerson(persons);
         Product s = productRepository.save(product);
-       
-        return productMapper.toDTO(s);
+
+        return productMapper.toDTO(product);
     }
 
-    public ProductDTO update(Product product) {
-    
-    
-    
-        Product s = productRepository.save(product);
-        return productMapper.toDTO(s);
+    public ProductDTO update(long id,ProductDTO productdto) {
+    Optional<Product> product = productRepository.findById(id);
+    if (product.isPresent()){
+            product.get().setName(productdto.getName());
+            product.get().setPrice(productdto.getPrice());
+
+
+
+        List<Person> persons = new ArrayList<>();
+        for (Long d : productdto.getPersonIds()) {
+            Person person = personRepository.getById(d);
+            persons.add(person);
+
+
+                person.setProduct(product.get());
+
+
+        }
+
+        product.get().setPerson(persons);
+            Product s = productRepository.save(product.get());
+            return productMapper.toDTO(s);
+        }
+        return null;
+
+
        }
 
      public Optional<Product> partialUpdate(Product product) {
@@ -104,5 +140,15 @@ public void delete(Long id) {
         productRepository.save(existingProduct);
     }
 }
+
+
+     public List<ProductDTO> get() {
+        List<Product> list = productRepository.findAll();
+        List<ProductDTO> list2 = new ArrayList<>();
+        for(Product a : list){
+            list2.add(productMapper.toDTO(a));
+        }
+        return list2;
+    }
 
 }

@@ -17,4 +17,10 @@ public class DvaMapper {
         dto.setId(model.getId());
         return dto;
     }
+
+    public Dva toModel(DvaDTO dto) {
+        Dva model = new Dva();
+        model.setSds(dto.getSds());
+        return model;
+    }
 }

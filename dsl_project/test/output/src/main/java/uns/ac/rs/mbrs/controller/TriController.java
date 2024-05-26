@@ -25,33 +25,39 @@ public class TriController {
         return ResponseEntity.ok().body(triService.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<TriDTO>> get() throws NotFoundException {
+        List<TriDTO> tri = triService.get();
+        return ResponseEntity.ok().body(tri);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<TriDTO> findOne(@PathVariable Long id) throws NotFoundException {
         TriDTO tri = triService.findOne(id);
         return ResponseEntity.ok().body(tri);
     }
 
     @PostMapping
-    public ResponseEntity<TriDTO> post(@RequestBody Tri tri) {
+    public ResponseEntity<TriDTO> post(@RequestBody TriDTO tri) {
         TriDTO tri1 = triService.save(tri);
         if (tri == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(tri1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<TriDTO> put(@PathVariable Long id, @RequestBody Tri tri) {
-        TriDTO tri1 = triService.update(tri);
+    @PutMapping("/{id}")
+    public ResponseEntity<TriDTO> put(@PathVariable Long id, @RequestBody TriDTO tri) {
+        TriDTO tri1 = triService.update(id, tri);
         return tri != null ? ResponseEntity.ok(tri1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         triService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         triService.delete(id);
         return ResponseEntity.noContent().build();

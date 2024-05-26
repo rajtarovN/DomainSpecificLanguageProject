@@ -42,19 +42,54 @@ public class DvaService  {
 
         this.triMapper = triMapper;
     }
-    
-    public DvaDTO save(Dva dva) {
+
+    @Transactional
+    public DvaDTO save(DvaDTO dvadto) {
+
+        Dva dva = dvaMapper.toModel(dvadto);
+
+        List<Jedan> jedans = new ArrayList<>();
+        for (Long d : dvadto.getJedanIds()) {
+            Jedan jedan = jedanRepository.getById(d);
+            jedans.add(jedan);
+
+
+                jedan.setValjda(dva);
+
+
+        }
+
+        dva.setJedan(jedans);
         Dva s = dvaRepository.save(dva);
-       
-        return dvaMapper.toDTO(s);
+
+        return dvaMapper.toDTO(dva);
     }
 
-    public DvaDTO update(Dva dva) {
-    
-    
-    
-        Dva s = dvaRepository.save(dva);
-        return dvaMapper.toDTO(s);
+    public DvaDTO update(long id,DvaDTO dvadto) {
+    Optional<Dva> dva = dvaRepository.findById(id);
+    if (dva.isPresent()){
+            dva.get().setSds(dvadto.getSds());
+
+
+
+        List<Jedan> jedans = new ArrayList<>();
+        for (Long d : dvadto.getJedanIds()) {
+            Jedan jedan = jedanRepository.getById(d);
+            jedans.add(jedan);
+
+
+                jedan.setValjda(dva.get());
+
+
+        }
+
+        dva.get().setJedan(jedans);
+            Dva s = dvaRepository.save(dva.get());
+            return dvaMapper.toDTO(s);
+        }
+        return null;
+
+
        }
 
      public Optional<Dva> partialUpdate(Dva dva) {
@@ -113,5 +148,15 @@ public void delete(Long id) {
         dvaRepository.save(existingDva);
     }
 }
+
+
+     public List<DvaDTO> get() {
+        List<Dva> list = dvaRepository.findAll();
+        List<DvaDTO> list2 = new ArrayList<>();
+        for(Dva a : list){
+            list2.add(dvaMapper.toDTO(a));
+        }
+        return list2;
+    }
 
 }

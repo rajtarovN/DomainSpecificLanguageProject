@@ -18,4 +18,11 @@ public class ProductMapper {
         dto.setId(model.getId());
         return dto;
     }
+
+    public Product toModel(ProductDTO dto) {
+        Product model = new Product();
+        model.setName(dto.getName());
+        model.setPrice(dto.getPrice());
+        return model;
+    }
 }

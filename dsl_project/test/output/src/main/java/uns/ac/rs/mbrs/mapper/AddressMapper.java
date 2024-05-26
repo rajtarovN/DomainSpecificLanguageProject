@@ -19,4 +19,12 @@ public class AddressMapper {
         dto.setId(model.getId());
         return dto;
     }
+
+    public Address toModel(AddressDTO dto) {
+        Address model = new Address();
+        model.setStreet(dto.getStreet());
+        model.setCity(dto.getCity());
+        model.setZipCode(dto.getZipCode());
+        return model;
+    }
 }

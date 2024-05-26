@@ -42,19 +42,62 @@ public class PersonService  {
 
         this.productMapper = productMapper;
     }
-    
-    public PersonDTO save(Person person) {
+
+    @Transactional
+    public PersonDTO save(PersonDTO persondto) {
+
+        Person person = personMapper.toModel(persondto);
+
+       //ovde
+
+                    if(persondto.getAddress()!=null) {
+                    Address address =addressRepository.getById(persondto.getAddress().getId()); //tuuu
+                    person.setAddress(address);
+                    address.getProbannn().add(person);
+}
+
+       //ovde
+
+                    if(persondto.getProduct()!=null) {
+                    Product product =productRepository.getById(persondto.getProduct().getId()); //tuuu
+                    person.setProduct(product);
+                    product.getPerson().add(person);
+}
+
         Person s = personRepository.save(person);
-       
-        return personMapper.toDTO(s);
+
+        return personMapper.toDTO(person);
     }
 
-    public PersonDTO update(Person person) {
-    
-    
-    
-        Person s = personRepository.save(person);
-        return personMapper.toDTO(s);
+    public PersonDTO update(long id,PersonDTO persondto) {
+    Optional<Person> person = personRepository.findById(id);
+    if (person.isPresent()){
+            person.get().setAge(persondto.getAge());
+
+
+
+       //ovde
+                    if(persondto.getAddress()!=null) {
+
+                    Address address =addressRepository.getById(persondto.getAddress().getId());
+                    person.get().setAddress(address);
+                    address.getProbannn().add(person.get());
+}
+
+       //ovde
+                    if(persondto.getProduct()!=null) {
+
+                    Product product =productRepository.getById(persondto.getProduct().getId());
+                    person.get().setProduct(product);
+                    product.getPerson().add(person.get());
+}
+
+            Person s = personRepository.save(person.get());
+            return personMapper.toDTO(s);
+        }
+        return null;
+
+
        }
 
      public Optional<Person> partialUpdate(Person person) {
@@ -109,5 +152,15 @@ public void delete(Long id) {
         personRepository.save(existingPerson);
     }
 }
+
+
+     public List<PersonDTO> get() {
+        List<Person> list = personRepository.findAll();
+        List<PersonDTO> list2 = new ArrayList<>();
+        for(Person a : list){
+            list2.add(personMapper.toDTO(a));
+        }
+        return list2;
+    }
 
 }

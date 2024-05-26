@@ -28,7 +28,7 @@ import lombok.Setter;
 @Setter
 public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     {% for property in current_class.attributes %}
         {% if property %}
@@ -49,12 +49,15 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
         {% if property.upper is defined and property.cardinality %}
             @{{ property.cardinality }}
         {% endif %}
+        {% if "*" in property.as_part | string %}
+        @JoinColumn
+        {% endif %}
         {% if property.fetch_type is defined or property.cascade_type is defined or property.mapped_by is not none %}
         (
-            {% if property.cascade_type %}
+            {% if property.cascade_type and property.as_part!="*"%}
                 cascade = CascadeType.{{ property.cascade_type }}
             {% endif %}
-            {% if property.fetch_type %}
+            {% if property.fetch_type and property.as_part!="*"%}
                 {% if property.cascade_type %}, {% endif %}
                 fetch = FetchType.{{ property.fetch_type }}
             {% endif %}
@@ -89,7 +92,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
         {% endfor %}
 
         {% if property.type is defined and property.name is defined %}
-        private {% if property.upper is defined and property.upper == -1 %}List<{% endif %}{{ property.name[0]|capitalize }}{{ property.name[1:] }}{% if property.upper is defined and property.upper == -1 %}> {% endif %} {% if property.as_part!=""%}{{ property.as_part[0]|lower }}{{ property.as_part[1:]}}{% else %}{{ property.name[0]|lower }}{{ property.name[1:]}}{%endif%};
+        private {% if property.upper is defined and property.upper == -1 %}List<{% endif %}{{ property.name[0]|capitalize }}{{ property.name[1:] }}{% if property.upper is defined and property.upper == -1 %}> {% endif %} {% if property.as_part!="" and property.as_part!="*"%}{{ property.as_part[0]|lower }}{{ property.as_part[1:]}}{% else %}{{ property.name[0]|lower }}{{ property.name[1:]}}{%endif%};
         {% endif %}
     {% endfor %}
 
@@ -115,14 +118,14 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
 
     {% for property in current_class.reference_properties %}
         {% if property and property.type and property.name %}
-            public {% if property.upper is defined and property.upper == -1 %} List< {% endif %}{{ property.name[0]|capitalize }}{{ property.name[1:] }} {% if property.upper is defined and property.upper == -1 %}>{% endif %} get{% if property.as_part!="" %}{{ property.as_part|capitalize }}{%else%}{{ property.name }}{% endif %}() {
-                {% if property.as_part!="" %}
+            public {% if property.upper is defined and property.upper == -1 %} List< {% endif %}{{ property.name[0]|capitalize }}{{ property.name[1:] }} {% if property.upper is defined and property.upper == -1 %}>{% endif %} get{% if property.as_part!="" and property.as_part!="*"%}{{ property.as_part|capitalize }}{%else%}{{ property.name }}{% endif %}() {
+                {% if property.as_part!="" and property.as_part!="*" %}
                 return {{ property.as_part }};
                 {% else %}
                 return {{ property.name[0]|lower }}{{ property.name[1:] }};
                 {% endif %}
             }
-            public void set{% if property.as_part!="" %}{{ property.as_part|capitalize }}{%else%}{{ property.type|capitalize }}{% endif %}(
+            public void set{% if property.as_part!="" and property.as_part!="*"%}{{ property.as_part|capitalize }}{%else%}{{ property.type|capitalize }}{% endif %}(
             {% if property.upper is defined and property.upper == -1 %}
                 List<
             {% endif %}
@@ -130,13 +133,13 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
             {% if property.upper is defined and property.upper == -1 %}
                 >
             {% endif %}
-            {% if property.as_part!="" %}
+            {% if property.as_part!="" and property.as_part!="*"%}
             {{ property.as_part[0]|lower }}{{ property.as_part[1:]}}
              {% else %}
              {{ property.name[0]|lower }}{{ property.name[1:]}}
              {% endif %}
             ) {
-            {% if property.as_part!="" %}
+            {% if property.as_part!="" and property.as_part!="*"%}
                 this.{{ property.as_part[0]|lower}}{{ property.as_part[1:]}} = {{ property.as_part[0]|lower}}{{ property.as_part[1:]}};
             {% else %}
                 this.{{ property.name[0]|lower}}{{ property.name[1:]}} = {{ property.name[0]|lower}}{{ property.name[1:]}};

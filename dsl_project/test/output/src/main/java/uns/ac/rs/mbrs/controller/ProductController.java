@@ -25,33 +25,39 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<ProductDTO>> get() throws NotFoundException {
+        List<ProductDTO> product = productService.get();
+        return ResponseEntity.ok().body(product);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> findOne(@PathVariable Long id) throws NotFoundException {
         ProductDTO product = productService.findOne(id);
         return ResponseEntity.ok().body(product);
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> post(@RequestBody Product product) {
+    public ResponseEntity<ProductDTO> post(@RequestBody ProductDTO product) {
         ProductDTO product1 = productService.save(product);
         if (product == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(product1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<ProductDTO> put(@PathVariable Long id, @RequestBody Product product) {
-        ProductDTO product1 = productService.update(product);
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDTO> put(@PathVariable Long id, @RequestBody ProductDTO product) {
+        ProductDTO product1 = productService.update(id, product);
         return product != null ? ResponseEntity.ok(product1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();

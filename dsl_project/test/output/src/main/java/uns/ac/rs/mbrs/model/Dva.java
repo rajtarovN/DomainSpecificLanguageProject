@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 public class Dva {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name="sds")
@@ -33,7 +33,7 @@ public class Dva {
         (
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
-, mappedBy = "valjda"         )
+ ,mappedBy = "valjda"         )
                     @JsonIgnoreProperties(value = "tri", allowSetters = true)
 
         private List<Jedan>  jedan;
@@ -45,8 +45,8 @@ public class Dva {
          )
          @JoinTable(
                     name = "dva_tri",
-                    joinColumns = @JoinColumn(name = "dva"),
-                    inverseJoinColumns = @JoinColumn(name = "tri")
+                    joinColumns = @JoinColumn(name = "dva_id"),
+                    inverseJoinColumns = @JoinColumn(name = "tri_id")
             )
                     @JsonIgnoreProperties(value = "jedan", allowSetters = true)
 

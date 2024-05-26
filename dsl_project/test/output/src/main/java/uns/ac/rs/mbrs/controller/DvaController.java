@@ -25,33 +25,39 @@ public class DvaController {
         return ResponseEntity.ok().body(dvaService.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<DvaDTO>> get() throws NotFoundException {
+        List<DvaDTO> dva = dvaService.get();
+        return ResponseEntity.ok().body(dva);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<DvaDTO> findOne(@PathVariable Long id) throws NotFoundException {
         DvaDTO dva = dvaService.findOne(id);
         return ResponseEntity.ok().body(dva);
     }
 
     @PostMapping
-    public ResponseEntity<DvaDTO> post(@RequestBody Dva dva) {
+    public ResponseEntity<DvaDTO> post(@RequestBody DvaDTO dva) {
         DvaDTO dva1 = dvaService.save(dva);
         if (dva == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(dva1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<DvaDTO> put(@PathVariable Long id, @RequestBody Dva dva) {
-        DvaDTO dva1 = dvaService.update(dva);
+    @PutMapping("/{id}")
+    public ResponseEntity<DvaDTO> put(@PathVariable Long id, @RequestBody DvaDTO dva) {
+        DvaDTO dva1 = dvaService.update(id, dva);
         return dva != null ? ResponseEntity.ok(dva1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         dvaService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         dvaService.delete(id);
         return ResponseEntity.noContent().build();

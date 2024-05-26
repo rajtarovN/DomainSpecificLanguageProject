@@ -1,0 +1,100 @@
+import React, { useState,  useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete from './{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service from '../../services/{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    width: '100%',
+    marginLeft: '50px',
+    marginRight: 'auto',
+  },
+  formGroup: {
+    marginBottom: theme.spacing(2),
+  },
+  buttonGroup: {
+    marginTop: theme.spacing(2),
+  },
+}));
+
+const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () => {
+  const navigate = useNavigate();
+  const classes = useStyles();
+
+  const { id } = useParams();
+  const [{{current_class.name[0]|lower}}{{current_class.name[1:]}}, set{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}] = useState(NaN)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+          const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
+          if (response.status === 200) {
+              set{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(response.data);
+          }
+          const responsePerson = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchData();
+  }, [id]);
+
+  const handleEdit = (id) => {
+    navigate(`/edit-{{current_class.name|lower}}/${id}`);
+  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [delId, setDelId] = useState(-1);
+
+  const handleDelete = (id) => {
+    setDelId(id)
+    setIsDialogOpen(true);
+  };
+  const handleCancelDelete = () => {
+    setDelId(-1)
+    setIsDialogOpen(false);
+  };
+
+  const handleConfirmDelete = (coffeeId) => {
+    console.log("Deleting coffee with ID:", coffeeId);
+    setIsDialogOpen(false);
+  };
+
+  return (
+    <div className={classes.root}>
+      <h2  >Nesto</h2>
+
+      <p>ID: {id}</p>
+      {% for prop in current_class.attributes %}
+      <div className={classes.formGroup}>
+        <label>{{prop}}: </label>
+        <label>{% raw %} { {% endraw %} {{current_class.name[0]|lower}}{{current_class.name[1:]}}.{{prop}} {% raw %} } {% endraw %}</label>
+      </div>
+        {% endfor %}
+      <div className={classes.buttonGroup}>
+        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+      </div>
+      < {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete
+        open={isDialogOpen}
+        id={delId}
+        onCancel={handleCancelDelete}
+        onDelete={handleConfirmDelete}
+      />
+    </div>
+  );
+};
+
+export default {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View;

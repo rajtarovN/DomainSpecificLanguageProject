@@ -1,0 +1,18 @@
+import React from 'react';
+import CustomCard from './CustomCard';
+import Grid from '@mui/material/Grid';
+
+const Cards = () => {
+  return (
+    <div>
+      <br/>
+      <Grid container spacing={2}> {/* Add spacing between grid items */}
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}> {/* Adjust the number of cards displayed based on screen size */}
+          <CustomCard title="Card Title" content="Card Content Goes Here" />
+        </Grid>
+    </Grid>
+  </div>
+  );
+};
+
+export default Cards;

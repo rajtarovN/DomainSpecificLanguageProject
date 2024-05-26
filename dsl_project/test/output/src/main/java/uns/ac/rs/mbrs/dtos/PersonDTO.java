@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 @Data
 @Getter
@@ -17,6 +18,8 @@ public class PersonDTO {
 
             private int age;
             private AddressDTO address;
+
             private ProductDTO product;
+
 
 }

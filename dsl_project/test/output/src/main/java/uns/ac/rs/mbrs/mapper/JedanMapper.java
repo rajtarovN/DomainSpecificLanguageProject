@@ -17,4 +17,10 @@ public class JedanMapper {
         dto.setId(model.getId());
         return dto;
     }
+
+    public Jedan toModel(JedanDTO dto) {
+        Jedan model = new Jedan();
+        model.setStreet(dto.getStreet());
+        return model;
+    }
 }

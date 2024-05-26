@@ -42,19 +42,68 @@ public class TriService  {
 
         this.dvaMapper = dvaMapper;
     }
-    
-    public TriDTO save(Tri tri) {
+
+    @Transactional
+    public TriDTO save(TriDTO tridto) {
+
+        Tri tri = triMapper.toModel(tridto);
+
+       //ovde
+
+                    if(tridto.getJedan()!=null) {
+                    Jedan jedan =jedanRepository.getById(tridto.getJedan().getId()); //tuuu
+                    tri.setJedan(jedan);
+                    jedan.getTri().add(tri);
+}
+
+        List<Dva> dvas = new ArrayList<>();
+        for (Long d : tridto.getDvaIds()) {
+            Dva dva = dvaRepository.getById(d);
+            dvas.add(dva);
+
+                //todo pazi na liste
+                dva.getTri().add(tri);
+
+        }
+
+        tri.setDva(dvas);
         Tri s = triRepository.save(tri);
-       
-        return triMapper.toDTO(s);
+
+        return triMapper.toDTO(tri);
     }
 
-    public TriDTO update(Tri tri) {
-    
-    
-    
-        Tri s = triRepository.save(tri);
-        return triMapper.toDTO(s);
+    public TriDTO update(long id,TriDTO tridto) {
+    Optional<Tri> tri = triRepository.findById(id);
+    if (tri.isPresent()){
+            tri.get().setSdssdfe(tridto.getSdssdfe());
+
+
+
+       //ovde
+                    if(tridto.getJedan()!=null) {
+
+                    Jedan jedan =jedanRepository.getById(tridto.getJedan().getId());
+                    tri.get().setJedan(jedan);
+                    jedan.getTri().add(tri.get());
+}
+
+        List<Dva> dvas = new ArrayList<>();
+        for (Long d : tridto.getDvaIds()) {
+            Dva dva = dvaRepository.getById(d);
+            dvas.add(dva);
+
+                //todo pazi na liste
+                 dva.getTri().add(tri.get());
+
+        }
+
+        tri.get().setDva(dvas);
+            Tri s = triRepository.save(tri.get());
+            return triMapper.toDTO(s);
+        }
+        return null;
+
+
        }
 
      public Optional<Tri> partialUpdate(Tri tri) {
@@ -111,5 +160,15 @@ public void delete(Long id) {
         triRepository.save(existingTri);
     }
 }
+
+
+     public List<TriDTO> get() {
+        List<Tri> list = triRepository.findAll();
+        List<TriDTO> list2 = new ArrayList<>();
+        for(Tri a : list){
+            list2.add(triMapper.toDTO(a));
+        }
+        return list2;
+    }
 
 }

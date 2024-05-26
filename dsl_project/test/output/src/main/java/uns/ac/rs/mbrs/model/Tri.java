@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 public class Tri {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name="sdssdfe")
@@ -42,7 +42,7 @@ public class Tri {
         (
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
-, mappedBy = "tri"         )
+ ,mappedBy = "tri"         )
                     @JsonIgnoreProperties(value = "jedan", allowSetters = true)
 
         private List<Dva>  dva;

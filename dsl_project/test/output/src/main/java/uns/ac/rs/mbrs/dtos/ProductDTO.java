@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 @Data
 @Getter
@@ -17,5 +18,7 @@ public class ProductDTO {
 
             private String name;
             private double price;
+
+            private List<Long> personIds;
 
 }

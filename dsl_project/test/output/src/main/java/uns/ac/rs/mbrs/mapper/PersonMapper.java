@@ -17,4 +17,10 @@ public class PersonMapper {
         dto.setId(model.getId());
         return dto;
     }
+
+    public Person toModel(PersonDTO dto) {
+        Person model = new Person();
+        model.setAge(dto.getAge());
+        return model;
+    }
 }

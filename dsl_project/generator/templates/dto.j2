@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 @Data
 @Getter
@@ -26,7 +27,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO
     {% for property in current_class.reference_properties %}
         {% if property is defined and property.upper is defined and property.cardinality is defined and (property.cardinality == "OneToOne" or property.cardinality == "ManyToOne") %}
             {% if property.as_part is not none %}
-            {% if property.as_part != "" %}
+            {% if property.as_part != "" and property.as_part != "*" %}
             private {{ property.type }}DTO {{ property.as_part[0]|lower}}{{property.as_part[1:] }};
             {% set added = true %}
             {% else %}
@@ -38,10 +39,14 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO
             {% set added = true %}
             {% endif %}
         {% endif %}
+
+        {% if property.upper == -1 %}
+            private List<Long> {{ property.name[0]|lower}}{{ property.name[1:]}}Ids;
+        {%endif%}
     {% endfor %}
 
     {% if added %}
-        public {{ class.name }}DTO(long id,{% for prop in primitiveProperties %}{% if prop.isEnum == true %}String{% else %}{{ prop.type }}{% endif %} {{ prop.name[0]|lower}}{{ prop.name[1:]}}{% if prop is not loop.last %}, {% endif %}{% endfor %}){
+        public {{ current_class.name }}DTO(long id,{% for prop in primitiveProperties %}{% if prop.isEnum == true %}String{% else %}{{ prop.type }}{% endif %} {{ prop.name[0]|lower}}{{ prop.name[1:]}}{% if prop is not loop.last %}, {% endif %}{% endfor %}){
             {% for prop in current_class.attributes %}
                 this.{{ prop.name[0]|lower}}{{ prop.name[1:]}} = {{ prop.name[0]|lower}}{{ prop.name[1:]}};
             {% endfor %}

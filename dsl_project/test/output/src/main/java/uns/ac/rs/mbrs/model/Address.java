@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 public class Address {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name="street")
@@ -39,7 +39,7 @@ public class Address {
         (
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
-,                 mappedBy = "address"        )
+                 ,mappedBy = "address"        )
                     @JsonIgnoreProperties(value = "product", allowSetters = true)
 
         private List<Person>  probannn;

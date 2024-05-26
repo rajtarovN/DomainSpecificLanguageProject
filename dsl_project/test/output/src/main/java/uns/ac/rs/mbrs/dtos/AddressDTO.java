@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 @Data
 @Getter
@@ -18,5 +19,7 @@ public class AddressDTO {
             private String street;
             private String city;
             private String zipCode;
+
+            private List<Long> personIds;
 
 }

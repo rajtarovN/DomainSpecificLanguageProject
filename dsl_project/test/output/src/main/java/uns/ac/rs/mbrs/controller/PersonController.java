@@ -25,33 +25,39 @@ public class PersonController {
         return ResponseEntity.ok().body(personService.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<PersonDTO>> get() throws NotFoundException {
+        List<PersonDTO> person = personService.get();
+        return ResponseEntity.ok().body(person);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<PersonDTO> findOne(@PathVariable Long id) throws NotFoundException {
         PersonDTO person = personService.findOne(id);
         return ResponseEntity.ok().body(person);
     }
 
     @PostMapping
-    public ResponseEntity<PersonDTO> post(@RequestBody Person person) {
+    public ResponseEntity<PersonDTO> post(@RequestBody PersonDTO person) {
         PersonDTO person1 = personService.save(person);
         if (person == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(person1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<PersonDTO> put(@PathVariable Long id, @RequestBody Person person) {
-        PersonDTO person1 = personService.update(person);
+    @PutMapping("/{id}")
+    public ResponseEntity<PersonDTO> put(@PathVariable Long id, @RequestBody PersonDTO person) {
+        PersonDTO person1 = personService.update(id, person);
         return person != null ? ResponseEntity.ok(person1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         personService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         personService.delete(id);
         return ResponseEntity.noContent().build();

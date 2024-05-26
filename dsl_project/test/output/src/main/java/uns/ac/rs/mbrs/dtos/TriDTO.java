@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 @Data
 @Getter
@@ -17,5 +18,8 @@ public class TriDTO {
 
             private String sdssdfe;
             private JedanDTO jedan;
+
+
+            private List<Long> dvaIds;
 
 }

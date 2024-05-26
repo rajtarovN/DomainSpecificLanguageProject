@@ -25,33 +25,39 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
         return ResponseEntity.ok().body({{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO>> get() throws NotFoundException {
+        List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.get();
+        return ResponseEntity.ok().body({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> findOne(@PathVariable Long id) throws NotFoundException {
         {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.findOne(id);
         return ResponseEntity.ok().body({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
     }
 
     @PostMapping
-    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }} {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
         {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.save({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
         if ({{ current_class.name[0]|lower }}{{ current_class.name[1:]}} == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>({{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> put(@PathVariable Long id, @RequestBody {{ current_class.name }} {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
-        {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.update({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
+    @PutMapping("/{id}")
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> put(@PathVariable Long id, @RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
+        {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.update(id, {{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
         return {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} != null ? ResponseEntity.ok({{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
         return ResponseEntity.noContent().build();

@@ -42,19 +42,70 @@ public class JedanService  {
 
         this.dvaMapper = dvaMapper;
     }
-    
-    public JedanDTO save(Jedan jedan) {
+
+    @Transactional
+    public JedanDTO save(JedanDTO jedandto) {
+
+        Jedan jedan = jedanMapper.toModel(jedandto);
+
+        List<Tri> tris = new ArrayList<>();
+        for (Long d : jedandto.getTriIds()) {
+            Tri tri = triRepository.getById(d);
+            tris.add(tri);
+
+
+                tri.setJedan(jedan);
+
+
+        }
+
+        jedan.setTri(tris);
+       //ovde
+
+                    if(jedandto.getValjda()!=null) {
+                    Dva dva =dvaRepository.getById(jedandto.getValjda().getId()); //tuuu
+                    jedan.setValjda(dva);
+                    dva.getJedan().add(jedan);
+}
+
         Jedan s = jedanRepository.save(jedan);
-       
-        return jedanMapper.toDTO(s);
+
+        return jedanMapper.toDTO(jedan);
     }
 
-    public JedanDTO update(Jedan jedan) {
-    
-    
-    
-        Jedan s = jedanRepository.save(jedan);
-        return jedanMapper.toDTO(s);
+    public JedanDTO update(long id,JedanDTO jedandto) {
+    Optional<Jedan> jedan = jedanRepository.findById(id);
+    if (jedan.isPresent()){
+            jedan.get().setStreet(jedandto.getStreet());
+
+
+
+        List<Tri> tris = new ArrayList<>();
+        for (Long d : jedandto.getTriIds()) {
+            Tri tri = triRepository.getById(d);
+            tris.add(tri);
+
+
+                tri.setJedan(jedan.get());
+
+
+        }
+
+        jedan.get().setTri(tris);
+       //ovde
+                    if(jedandto.getValjda()!=null) {
+
+                    Dva dva =dvaRepository.getById(jedandto.getValjda().getId());
+                    jedan.get().setValjda(dva);
+                    dva.getJedan().add(jedan.get());
+}
+
+            Jedan s = jedanRepository.save(jedan.get());
+            return jedanMapper.toDTO(s);
+        }
+        return null;
+
+
        }
 
      public Optional<Jedan> partialUpdate(Jedan jedan) {
@@ -111,5 +162,15 @@ public void delete(Long id) {
         jedanRepository.save(existingJedan);
     }
 }
+
+
+     public List<JedanDTO> get() {
+        List<Jedan> list = jedanRepository.findAll();
+        List<JedanDTO> list2 = new ArrayList<>();
+        for(Jedan a : list){
+            list2.add(jedanMapper.toDTO(a));
+        }
+        return list2;
+    }
 
 }

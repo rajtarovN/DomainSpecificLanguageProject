@@ -35,19 +35,56 @@ public class AddressService  {
 
         this.personMapper = personMapper;
     }
-    
-    public AddressDTO save(Address address) {
+
+    @Transactional
+    public AddressDTO save(AddressDTO addressdto) {
+
+        Address address = addressMapper.toModel(addressdto);
+
+        List<Person> persons = new ArrayList<>();
+        for (Long d : addressdto.getPersonIds()) {
+            Person person = personRepository.getById(d);
+            persons.add(person);
+
+
+                person.setAddress(address);
+
+
+        }
+
+        address.setProbannn(persons);
         Address s = addressRepository.save(address);
-       
-        return addressMapper.toDTO(s);
+
+        return addressMapper.toDTO(address);
     }
 
-    public AddressDTO update(Address address) {
-    
-    
-    
-        Address s = addressRepository.save(address);
-        return addressMapper.toDTO(s);
+    public AddressDTO update(long id,AddressDTO addressdto) {
+    Optional<Address> address = addressRepository.findById(id);
+    if (address.isPresent()){
+            address.get().setStreet(addressdto.getStreet());
+            address.get().setCity(addressdto.getCity());
+            address.get().setZipCode(addressdto.getZipCode());
+
+
+
+        List<Person> persons = new ArrayList<>();
+        for (Long d : addressdto.getPersonIds()) {
+            Person person = personRepository.getById(d);
+            persons.add(person);
+
+
+                person.setAddress(address.get());
+
+
+        }
+
+        address.get().setProbannn(persons);
+            Address s = addressRepository.save(address.get());
+            return addressMapper.toDTO(s);
+        }
+        return null;
+
+
        }
 
      public Optional<Address> partialUpdate(Address address) {
@@ -107,5 +144,15 @@ public void delete(Long id) {
         addressRepository.save(existingAddress);
     }
 }
+
+
+     public List<AddressDTO> get() {
+        List<Address> list = addressRepository.findAll();
+        List<AddressDTO> list2 = new ArrayList<>();
+        for(Address a : list){
+            list2.add(addressMapper.toDTO(a));
+        }
+        return list2;
+    }
 
 }

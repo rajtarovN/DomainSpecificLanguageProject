@@ -25,33 +25,39 @@ public class JedanController {
         return ResponseEntity.ok().body(jedanService.findAll());
     }
 
-    @GetMapping("/id")
+    @GetMapping("/")
+    public ResponseEntity<List<JedanDTO>> get() throws NotFoundException {
+        List<JedanDTO> jedan = jedanService.get();
+        return ResponseEntity.ok().body(jedan);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<JedanDTO> findOne(@PathVariable Long id) throws NotFoundException {
         JedanDTO jedan = jedanService.findOne(id);
         return ResponseEntity.ok().body(jedan);
     }
 
     @PostMapping
-    public ResponseEntity<JedanDTO> post(@RequestBody Jedan jedan) {
+    public ResponseEntity<JedanDTO> post(@RequestBody JedanDTO jedan) {
         JedanDTO jedan1 = jedanService.save(jedan);
         if (jedan == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(jedan1, HttpStatus.CREATED);
     }
 
-    @PutMapping("/id")
-    public ResponseEntity<JedanDTO> put(@PathVariable Long id, @RequestBody Jedan jedan) {
-        JedanDTO jedan1 = jedanService.update(jedan);
+    @PutMapping("/{id}")
+    public ResponseEntity<JedanDTO> put(@PathVariable Long id, @RequestBody JedanDTO jedan) {
+        JedanDTO jedan1 = jedanService.update(id, jedan);
         return jedan != null ? ResponseEntity.ok(jedan1) : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         jedanService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/d/id")
+    @GetMapping("/d/{id}")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         jedanService.delete(id);
         return ResponseEntity.noContent().build();

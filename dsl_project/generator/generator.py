@@ -26,6 +26,7 @@ def generate(output_path):#todo
            # shutil.copy(source_path, destination_path)
 
     #create output folders
+    memorize_output_path = output_path
     output_folder = Path(output_path) / 'output'
     output_folder.mkdir(parents=True, exist_ok=True)
 
@@ -44,6 +45,137 @@ def generate(output_path):#todo
     with output_html_path.open('w', encoding="utf-8") as f:
         f.write(template.render())
 
+    template = jinja_env.get_template('tokenUtils.j2')
+    file_name = 'TokenUtils.java'
+    folder = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'utils'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'utils' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('notFoundExc.j2')
+    file_name = 'NotFoundException.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'exception'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'exception' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('userDetailsService.j2')
+    file_name = 'UserDetailsService.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'service'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'service' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('AuthenticationTokenFilter.j2')
+    file_name = 'AuthenticationTokenFilter.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('Entry.j2')
+    file_name = 'EntryPointUnauthorizedHandler.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('securityUser.j2')
+    file_name = 'SecurityUser.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('UserFactory.j2')
+    file_name = 'UserFactory.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('userRepository.j2')
+    file_name = 'UserRepository.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'repository'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'repository' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('UserRoleRepository.j2')
+    file_name = 'UserRoleRepository.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'repository'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'repository' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('authority.j2')
+    file_name = 'Authority.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'model'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'model' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('User.j2')
+    file_name = 'User.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'model'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'model' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('userRole.j2')
+    file_name = 'UserRole.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'model'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'model' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('webConfig.j2')
+    file_name = 'WebConfig.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'configuration'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'configuration' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+
+    #####################
+    template_new = jinja_env.get_template('webSecurityConfiguration.j2')
+    file_name_new = 'WebSecurityConfig.java'
+    folder_new = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'configuration'
+    folder_new.mkdir(parents=True, exist_ok=True)
+    output_path_new = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'configuration' / file_name_new
+
+    with output_path_new.open('w', encoding="utf-8") as f:
+        f.write(template_new.render(model =model))
+
+################
+
+
     template = jinja_env.get_template('pomxml.j2')
     file_name = 'pom.xml'
     output_html_path = output_folder / file_name
@@ -61,9 +193,190 @@ def generate(output_path):#todo
         f.write(template.render())
 
 
+    output_path = memorize_output_path
+    output_folder2 = Path(output_path) / 'output2'
+    # output_folder2 = output_folder / 'output2'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    print("*****************")
+    print(output_path)
+    template = jinja_env.get_template('frontend/gitignore.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = '.gitignore'
+    output_html_path = output_folder2 / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/README.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'README.md'
+    output_html_path = output_folder2 / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/packageJson.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'package.json'
+    output_html_path = output_folder2 / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/indexJs.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'index.js'
+    output_html_path = output_folder2 / 'src'/file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2' / 'public'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/indexHtml.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'index.html'
+    output_html_path = output_folder2 / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2' / 'src'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/reportWebVitals.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'reportWebVitals.js'
+    output_html_path = output_folder2 / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/package-lock.j2')
+    folder = output_folder2
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'package-lock.json'
+    output_html_path = output_folder2 / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    output_folder2 = Path(output_path) / 'output2'
+    output_folder2.mkdir(parents=True, exist_ok=True)
+    template = jinja_env.get_template('frontend/App.j2')
+    folder = output_folder2 / 'src'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'App.js'
+    output_html_path = output_folder2 / 'src' /  file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    template = jinja_env.get_template('frontend/Appcss.j2')
+    folder = output_folder2 / 'src'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'App.css'
+    output_html_path = output_folder2 / 'src' / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    template = jinja_env.get_template('frontend/indexcss.j2')
+    folder = output_folder2 / 'src'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'index.css'
+    output_html_path = output_folder2 / 'src' / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    template = jinja_env.get_template('frontend/LoginForm.j2')
+    folder = output_folder2 / 'src'/'views'/'login'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'LoginForm.js'
+    output_html_path = output_folder2 / 'src' /'views'/'login'/ file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
+    template = jinja_env.get_template('frontend/NavBar.j2')
+    folder = output_folder2 / 'src' / 'views' / 'components'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'NavBar.js'
+    output_html_path = output_folder2 / 'src' / 'views' / 'components' / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
     #  todo ovde petlja
     for cl in model.classes:
-    #render HTML template
+        #front
+        template = jinja_env.get_template('frontend/Service.j2')
+        file_name = cl.name + 'Service.js'
+        folder = output_folder2 / 'src' / 'services'
+        folder.mkdir(parents=True, exist_ok=True)
+        output_html_path = output_folder2 / 'src' / 'services' / file_name
+
+        with output_html_path.open('w') as f:
+            # print(model)
+            f.write(template.render(model=model, current_class=cl))
+
+        template = jinja_env.get_template('frontend/ViewComponent.j2')
+        file_name = cl.name + 'View.js'
+        folder = output_folder2 / 'src' / 'views' / cl.name
+        folder.mkdir(parents=True, exist_ok=True)
+        output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
+
+        with output_html_path.open('w') as f:
+            # print(model)
+            f.write(template.render(model=model, current_class=cl))
+
+        template = jinja_env.get_template('frontend/DeleteElement.j2')
+        file_name = cl.name + 'Delete.js'
+        folder = output_folder2 / 'src' / 'views' / cl.name
+        folder.mkdir(parents=True, exist_ok=True)
+        output_html_path =output_folder2 / 'src' / 'views' / cl.name  / file_name
+
+        with output_html_path.open('w') as f:
+            # print(model)
+            f.write(template.render(model=model, current_class=cl))
+
+        template = jinja_env.get_template('frontend/EditComponent.j2')
+        file_name = cl.name + 'Edit.js'
+        folder = output_folder2 / 'src' / 'views' / cl.name
+        folder.mkdir(parents=True, exist_ok=True)
+        output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
+
+        with output_html_path.open('w') as f:
+            # print(model)
+            f.write(template.render(model=model, current_class=cl))
+
+        template = jinja_env.get_template('frontend/Table.j2')
+        file_name = 'Table'+cl.name + '.js'
+        folder = output_folder2 / 'src' / 'views' / cl.name
+        folder.mkdir(parents=True, exist_ok=True)
+        output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
+
+        with output_html_path.open('w') as f:
+            # print(model)
+            f.write(template.render(model=model, current_class=cl))
+
+
+
+    #bek
         template = jinja_env.get_template('model.j2')
         file_name = cl.name+'.java'
         folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' /'model'

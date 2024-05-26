@@ -33,4 +33,16 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
         dto.setId(model.getId());
         return dto;
     }
+
+    public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} toModel({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO dto) {
+        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} model = new {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}();
+        {% for property in current_class.attributes %}
+            {% if property.isEnum %}
+        model.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(dto.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}().toString());
+            {% else %}
+        model.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(dto.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}());
+            {% endif %}
+        {% endfor %}
+        return model;
+    }
 }

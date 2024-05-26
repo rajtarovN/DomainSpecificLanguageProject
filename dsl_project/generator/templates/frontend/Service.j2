@@ -1,0 +1,67 @@
+import axios from 'axios';
+const ENDPOINTS = {
+    BASE: 'http://localhost:8080/api/{{current_class.name[0]|lower}}{{current_class.name[1:]}}/',
+};
+
+class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
+    getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+        try {
+            return await axios.get(
+                ENDPOINTS.BASE+"getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}/"+id,
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    get{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async () => {
+        try {
+            return await axios.get(
+                ENDPOINTS.BASE,
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+        try {
+            return await axios.get(
+                ENDPOINTS.BASE +id,
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    create{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async ({{current_class.name[0]|lower}}{{current_class.name[1:]}}) => {
+        try {
+            return await axios.post(
+                ENDPOINTS.BASE,
+                {{current_class.name[0]|lower}}{{current_class.name[1:]}}
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    update{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async ({{current_class.name[0]|lower}}{{current_class.name[1:]}}, id) => {
+        try {
+            return await axios.put(
+                ENDPOINTS.BASE+id,
+                {{current_class.name[0]|lower}}{{current_class.name[1:]}}
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    delete{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+        try {
+            return await axios.delete(
+                ENDPOINTS.BASE+id,
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    
+}
+
+const {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service = new {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service();
+export default {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service;

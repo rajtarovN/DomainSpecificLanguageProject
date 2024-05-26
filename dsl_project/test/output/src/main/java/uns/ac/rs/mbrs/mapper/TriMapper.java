@@ -17,4 +17,10 @@ public class TriMapper {
         dto.setId(model.getId());
         return dto;
     }
+
+    public Tri toModel(TriDTO dto) {
+        Tri model = new Tri();
+        model.setSdssdfe(dto.getSdssdfe());
+        return model;
+    }
 }

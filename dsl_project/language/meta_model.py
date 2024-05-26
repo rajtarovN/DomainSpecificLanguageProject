@@ -116,7 +116,10 @@ def add_relations(relation, clases,upper, cardinality, fetch_type, cascade_type)
                             LinkProperty(link[1], second_class, upper, cardinality, fetch_type, cascade_type, mapped_by,
                                          ""))
                     second_class_class = [c for c in clases if c.name == link[1]][0]
-                    if cardinality=="OneToMany":
+                    if cardinality == "OneToOne":
+                        second_class_class.add_ref_property(
+                            LinkProperty(link[0], cl, 0, "OneToOne", fetch_type, cascade_type, None, "*"))
+                    elif cardinality=="OneToMany":
                         second_class_class.add_ref_property(LinkProperty(link[0], cl, 0,"ManyToOne", fetch_type, cascade_type, None, ""))
                     elif cardinality=="ManyToOne":
                         if len(link)==3:

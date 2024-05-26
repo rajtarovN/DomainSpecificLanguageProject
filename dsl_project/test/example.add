@@ -21,13 +21,22 @@ class Product{
     'name' String;
     'price' double;
 }
+class Novv{
+    'name' String;
+}
+class Szagor{
+    'name' String;
+}
+
 
 enum Gender{
   'MALE';
   'FEMALE';
   'OTHER';}
 
-
+OneToOne{
+    'Novv' to: 'Szagor';
+}
 OneToMany{
 'Address' to: 'Person' as: probannn;
 'Product' to: 'Person' ;
