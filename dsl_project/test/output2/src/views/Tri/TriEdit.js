@@ -58,19 +58,7 @@ const EditTri = () => {
       }
   };
   fetchDataJedan();
-const fetchDataDva = async () => {
-      try {
-          console.log("novovoo")
-          const response2 = await dvaService.getDva();
-          console.log(response2)
-          if (response2.status === 200) {
-            setAllDva(response2.data);
-        }
-      } catch (error) {
-          console.error(error);
-      }
-  };
-  fetchDataDva();
+
     if (id!=null){
     return () => {
       const fetchData = async () => {
@@ -87,8 +75,19 @@ const fetchDataDva = async () => {
         }
     };
     fetchData();
+      console.log('Component unmounted');
     };}
-    
+    const fetchDataDva = async () => {
+      try {
+          const response2 = await dvaService.getDva();
+          if (response2.status === 200) {
+            setAllDva(response2.data);
+        }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchDataDva();
   }, [id]);
 
 
@@ -101,7 +100,6 @@ const fetchDataDva = async () => {
   };
   const navigate = useNavigate();
   const handleSubmit = (e) => {
-    console.log(id)
     if (id!=null){
         e.preventDefault();
         const fetchData = async () => {

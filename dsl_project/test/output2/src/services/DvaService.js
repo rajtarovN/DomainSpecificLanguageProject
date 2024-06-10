@@ -14,7 +14,6 @@ class DvaService {
         }
     };
     getDva = async () => {
-        console.log("idemo")
         try {
             return await axios.get(
                 ENDPOINTS.BASE,

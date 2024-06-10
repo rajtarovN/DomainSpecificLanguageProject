@@ -13,14 +13,18 @@ public class PersonMapper {
 
     public PersonDTO toDTO(Person model) {
         PersonDTO dto = new PersonDTO();
-        dto.setAge(model.getAge());
+        dto.setName(model.getName());
+        dto.setLastName(model.getLastName());
+        dto.setUsername(model.getUsername());
         dto.setId(model.getId());
         return dto;
     }
 
     public Person toModel(PersonDTO dto) {
         Person model = new Person();
-        model.setAge(dto.getAge());
+        model.setName(dto.getName());
+        model.setLastName(dto.getLastName());
+        model.setUsername(dto.getUsername());
         return model;
     }
 }

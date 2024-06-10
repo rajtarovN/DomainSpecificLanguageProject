@@ -92,7 +92,9 @@ const TablePerson = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">Index</TableCell>
-              <TableCell align="center">age</TableCell>
+              <TableCell align="center">name</TableCell>
+              <TableCell align="center">lastName</TableCell>
+              <TableCell align="center">username</TableCell>
               <TableCell align="center">view</TableCell>
               <TableCell align="center">edit</TableCell>
               <TableCell align="center">delete</TableCell>
@@ -102,7 +104,9 @@ const TablePerson = () => {
             {listPerson.map((item, index) => (
               <TableRow key={index}>
                <TableCell align="center">{index + 1}</TableCell>
-                <TableCell align="center">{item.age}</TableCell>
+                <TableCell align="center">{item.name}</TableCell>
+                <TableCell align="center">{item.lastName}</TableCell>
+                <TableCell align="center">{item.username}</TableCell>
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleView(item.id)}>View</Button>
                 </TableCell>

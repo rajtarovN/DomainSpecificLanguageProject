@@ -11,30 +11,6 @@ const NavBar = () => {
   const handleHome = () => {
     navigate(`/home`);
   };
-  const handleTablePerson = () => {
-    navigate(`/table-person`);
-  };
-  const handleTableAddress = () => {
-    navigate(`/table-address`);
-  };
-  const handleTableJedan = () => {
-    navigate(`/table-jedan`);
-  };
-  const handleTableDva = () => {
-    navigate(`/table-dva`);
-  };
-  const handleTableTri = () => {
-    navigate(`/table-tri`);
-  };
-  const handleTableProduct = () => {
-    navigate(`/table-product`);
-  };
-  const handleTableNovv = () => {
-    navigate(`/table-novv`);
-  };
-  const handleTableSzagor = () => {
-    navigate(`/table-szagor`);
-  };
   const handleSubMenuClick = () => {
     setShowSubMenu(!showSubMenu);
   };
@@ -49,14 +25,6 @@ const NavBar = () => {
           <a href="#" style={styles.navLink} onClick={handleSubMenuClick}>Elements</a>
           {showSubMenu && (
             <ul style={styles.subMenu}>
-              <li><a onClick={handleTablePerson} style={styles.navLink} href="#">Table Person</a></li>
-              <li><a onClick={handleTableAddress} style={styles.navLink} href="#">Table Address</a></li>
-              <li><a onClick={handleTableJedan} style={styles.navLink} href="#">Table Jedan</a></li>
-              <li><a onClick={handleTableDva} style={styles.navLink} href="#">Table Dva</a></li>
-              <li><a onClick={handleTableTri} style={styles.navLink} href="#">Table Tri</a></li>
-              <li><a onClick={handleTableProduct} style={styles.navLink} href="#">Table Product</a></li>
-              <li><a onClick={handleTableNovv} style={styles.navLink} href="#">Table Novv</a></li>
-              <li><a onClick={handleTableSzagor} style={styles.navLink} href="#">Table Szagor</a></li>
             </ul>
           )}
         </li>

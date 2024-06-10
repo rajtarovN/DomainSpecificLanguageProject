@@ -1,0 +1,14 @@
+{int abc=6;
+ int rn=!abc==3;
+  number apply for order.products as: o sumOf productsOnAction as: e formula e.price/2*e.kolicina where e.id==o.id;
+ o.totalPrice = o.totalPrice -number;
+ if abc>7 {
+    inta=3;
+ } elif abc<7 {
+    int jk=0;
+ } elif abc==1 {
+    int mic=2;
+ }else{
+ int m=9;
+ }
+}

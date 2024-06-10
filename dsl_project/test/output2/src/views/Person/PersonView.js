@@ -78,8 +78,16 @@ const PersonView = () => {
 
       <p>ID: {id}</p>
       <div className={classes.formGroup}>
-        <label>age: </label>
-        <label> {  person.age  } </label>
+        <label>name: </label>
+        <label> {  person.name  } </label>
+      </div>
+      <div className={classes.formGroup}>
+        <label>lastName: </label>
+        <label> {  person.lastName  } </label>
+      </div>
+      <div className={classes.formGroup}>
+        <label>username: </label>
+        <label> {  person.username  } </label>
       </div>
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>

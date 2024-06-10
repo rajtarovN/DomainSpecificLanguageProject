@@ -29,6 +29,18 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
             {% set _ = processed_types.append(property.type) %}
         {% endif %}
     {% endfor %}
+    {% for cl in model.classes%}
+        {% if cl.name not in processed_types and cl.anotation and current_class.anotation %}
+        {% if cl.anotation.name == "action" and current_class.anotation.name == "bill"%}
+    private final {{ cl.name[0] | capitalize }}{{ cl.name[1:]}}Service  {{ cl.name | lower }}Service;
+              {% set _ = processed_types.append(cl.name) %}
+            {%endif%}
+            {% if cl.anotation.name == "bying" and current_class.anotation.name == "bill"%}
+    private final {{ cl.name }}Repository {{ cl.name | lower }}Repository;
+              {% set _ = processed_types.append(cl.name) %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 
     public {{ current_class.name }}Service(
     {{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}Mapper {{ current_class.name | lower }}Mapper,
@@ -42,10 +54,25 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
             {% set _ = processed_types.append(property.type) %}
         {% endif %}
     {% endfor %}
+    {% for cl in model.classes%}
+        {% if cl.name not in processed_types and cl.anotation and current_class.anotation %}
+        {% if cl.anotation.name == "action" and current_class.anotation.name == "bill"%}
+            , {{ cl.name[0] | capitalize }}{{ cl.name[1:] }}Service  {{ cl.name | lower }}Service
+              {% set _ = processed_types.append(cl.name) %}
+            {%endif%}
+            {% if cl.anotation.name == "bying" and current_class.anotation.name == "bill"%}
+             ,{{ cl.name }}Repository {{ cl.name | lower }}Repository
+              {% set _ = processed_types.append(cl.name) %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 ) {
         this.{{ current_class.name | lower }}Mapper = {{ current_class.name | lower }}Mapper;
         this.{{ current_class.name | lower }}Repository = {{ current_class.name | lower }}Repository;
         {% set processed_types = [] %}
+        {% set basket_name = [] %}
+        {% set action_name = [] %}
+         {% set action_name_f = [] %}
         {% set _ = processed_types.append(current_class.name) %}
         {% for property in current_class.reference_properties %}
             {% if property.type not in processed_types %}
@@ -55,113 +82,176 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
                 {% set _ = processed_types.append(property.type) %}
             {% endif %}
 {% endfor %}
+        {% for cl in model.classes%}
+            {% if cl.anotation%}
+                {% if cl.anotation.name =="basket"%}
+                   {% set _ =basket_name.append(cl.name) %}
+                {%endif%}
+            {%endif%}
+        {% if cl.name not in processed_types and cl.anotation and current_class.anotation %}
+            {% if cl.anotation.name == "action" and current_class.anotation.name == "bill"%}
+            this.{{ cl.name | lower }}Service = {{ cl.name | lower }}Service;
+              {% set _ = processed_types.append(cl.name) %}
+              {% set _= action_name.append(cl.name) %}
+              {% set _= action_name_f.append(cl.anotation.name_f) %}
+            {%endif%}
+            {% if cl.anotation.name == "bying" and current_class.anotation.name == "bill"%}
+             this.{{ cl.name | lower }}Repository = {{ cl.name | lower }}Repository;
+              {% set _ = processed_types.append(cl.name) %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
     }
+//-------------------------------------------------------------
+  @Transactional
+public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO save({{ current_class.name }}DTO {{ current_class.name | lower }}dto {%if current_class.anotation%}{%if current_class.anotation.name=="bill"%}, {{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}DTO {{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto {%endif%}{%endif%}) {
 
-    @Transactional
-    public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO save({{ current_class.name }}DTO {{ current_class.name | lower }}dto) {
+    {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} {{ current_class.name[0]|lower }}{{ current_class.name[1:] }} = {{ current_class.name|lower }}Mapper.toModel({{ current_class.name|lower }}dto);
 
-        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} {{ current_class.name[0]|lower }}{{ current_class.name[1:] }} = {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}Mapper.toModel({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}dto);
-
-        {% for prop in current_class.reference_properties %}
+    {% for prop in current_class.reference_properties %}
         {% if prop.upper == -1 %}
-        {% if not "_" in prop.mapped_by|string %}
-        List<{{ prop.type | capitalize }}> {{ prop.name | lower }}s = new ArrayList<>();
-        for (Long d : {{ current_class.name | lower }}dto.get{{ prop.name[0] | capitalize }}{{ prop.name[1:] }}Ids()) {
-            {{ prop.type | capitalize }} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById(d);
-            {{ prop.name | lower }}s.add({{ prop.type | lower }});
+            {% if not "_" in prop.mapped_by|string %}
+                List<{{ prop.type | capitalize }}> {{ prop.name | lower }}s = new ArrayList<>();
+                for (Long d : {{ current_class.name | lower }}dto.get{{ prop.name[0] | capitalize }}{{ prop.name[1:] }}Ids()) {
+                    {{ prop.type | capitalize }} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById(d);
+                    {{ prop.name | lower }}s.add({{ prop.type | lower }});
 
-{% set found = [] %}
-{% for model_cl in model.classes if not found %}
-    {% if model_cl.name == prop.name %}
-        {% for p in model_cl.reference_properties %}
-            {% if p.name == current_class.name %}
-                {% set _ = found.append(1) %}
-                {% if prop.cardinality == 'OneToMany' %}
-
-                {{ prop.type | lower }}.set{% if p.as_part != "" and p.as_part!="*" %}{{ p.as_part[0] | capitalize }}{{ p.as_part[1:] }}{% else %}{{ p.name[0] | capitalize }}{{ p.name[1:] }}{% endif %}({{ p.name[0] | lower }}{{ p.name[1:] }});
-
-                {% else %}
-                //todo pazi na liste
-                {{ prop.type | lower }}.get{% if p.as_part != "" and p.as_part!="*"%}{{ p.as_part[0] | capitalize }}{{ p.as_part[1:] }}{% else %}{{ p.name[0] | capitalize }}{{ p.name[1:] }}{% endif %}().add({{ p.name[0] | lower }}{{ p.name[1:] }});
+                    {% set found = [] %}
+                    {% for model_cl in model.classes if not found %}
+                        {% if model_cl.name == prop.name %}
+                            {% for p in model_cl.reference_properties %}
+                                {% if p.name == current_class.name %}
+                                    {% set _ = found.append(1) %}
+                                    {% if prop.cardinality == 'OneToMany' %}
+                                        {{ prop.type | lower }}.set{% if p.as_part != "" and p.as_part!="*" %}{{ p.as_part[0] | capitalize }}{{ p.as_part[1:] }}{% else %}{{ p.name[0] | capitalize }}{{ p.name[1:] }}{% endif %}({{ p.name[0] | lower }}{{ p.name[1:] }});
+                                    {% else %}
+                                        {{ prop.type | lower }}.get{% if p.as_part != "" and p.as_part!="*"%}{{ p.as_part[0] | capitalize }}{{ p.as_part[1:] }}{% else %}{{ p.name[0] | capitalize }}{{ p.name[1:] }}{% endif %}().add({{ p.name[0] | lower }}{{ p.name[1:] }});
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if 1 not in found %}
+                                {% if prop.cardinality == 'OneToMany' %}
+                                    {{ prop.type | lower }}.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:] }}({{ current_class.name[0] | lower }}{{ current_class.name[1:] }});
+                                {%else%}
+                                    {% if prop.cardinality == 'OneToOne' %}
+                                        {{ prop.type | lower }}.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:] }}({{ current_class.name[0] | lower }}{{ current_class.name[1:] }});
+                                    {%else%}
+                                        {{ prop.type | lower }}.get{{ current_class.name[0] | capitalize }}{{ current_class.name[1:] }}().add({{ current_class.name[0] | lower }}{{ current_class.name[1:] }});
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                }
+                {{ current_class.name | lower }}.set{% if prop.as_part != "" and prop.as_part!="*"%}{{ prop.as_part | capitalize }}({{ prop.name | lower }}s){%else%}{{ prop.name | capitalize }}({{ prop.name | lower }}s){%endif%};
             {% endif %}
-            {% endif %}
-        {% endfor %}
-        {% if 1 not in found %}
-        {% if prop.cardinality == 'OneToMany' %}
-        {{ prop.type | lower }}.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:] }}({{ current_class.name[0] | lower }}{{ current_class.name[1:] }});
-        {%else%}
-        {% if prop.cardinality == 'OneToOne' %}
-        {{ prop.type | lower }}.set{{ current_class.name[0] | capitalize }}{{ current_class.name[1:] }}({{ current_class.name[0] | lower }}{{ current_class.name[1:] }});
-
-        {%else%}
-    {{ prop.type | lower }}.get{{ current_class.name[0] | capitalize }}{{ current_class.name[1:] }}().add({{ current_class.name[0] | lower }}{{ current_class.name[1:] }});
-{% endif %}{% endif %}
-{% endif %}
-    {% endif %}
-{% endfor %}
-
-        }
-
-        {{ current_class.name | lower }}.set{% if prop.as_part != "" and prop.as_part!="*"%}{{ prop.as_part | capitalize }}({{ prop.name | lower }}s){%else%}{{ prop.name | capitalize }}({{ prop.name | lower }}s){%endif%};
         {% endif %}
-{% endif %}
         {% if prop.upper != -1 %}
-        {% if not "_" in prop.mapped_by|string %}
-       //ovde
-{% set found = [] %}
-{% for model_cl in model.classes if not found %}
-    {% if model_cl.name == prop.name %}
-        {% for p in model_cl.reference_properties %}
-            {% if p.name == current_class.name %}
-                {% set _ = found.append(1) %}
+            {% if not "_" in prop.mapped_by|string %}
+                {% set found = [] %}
+                {% for model_cl in model.classes if not found %}
+                    {% if model_cl.name == prop.name %}
+                        {% for p in model_cl.reference_properties %}
+                            {% if p.name == current_class.name %}
+                                {% set _ = found.append(1) %}
+                                {% if prop.cardinality == 'OneToMany' %}
+                                    {{ prop.type | capitalize }} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.getId());
+                                    {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.set{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
+                                    {{ prop.type | lower }}.set{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+                                {% else %}
+                                    if({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}()!=null) {
+                                        {{ prop.type | capitalize }} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+                                        {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.set{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
+                                        {% if prop.cardinality != 'OneToOne' %}
+                                            {{ prop.type | lower }}.get{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}().add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+                                        {%else%}
+                                            {{ prop.type | lower }}.set{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+                                        {% endif %}
+                                    }
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if 1 not in found %}
+                            {% if prop.cardinality == 'OneToMany' %}
+                                {{ prop.type | lower }}.get{{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+                            {% else %}
+                                {% if prop.cardinality != 'OneToOne' %}
+                                    {{ prop.type | lower }}.get{{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}}().add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+                                {%else%}
+                                    {{ prop.type | lower }}.set{{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if current_class.anotation %}
+        {% if current_class.anotation.name =="bill" %}
+            {% set variable_name = [] %}
+             {% set item_name = [] %}
+            {% for m in model.classes%}
+                       {% if m.anotation%}
+                            {% if m.anotation.name == "bying" %}
+                                {% set _ =variable_name.append( m.name) %}
+                            {% endif%}
+                            {% if m.anotation.name == "item" %}
+                                 {% set _ =item_name.append( m.name) %}
+                            {% endif%}
+                       {% endif%}
+            {%endfor%}
+            {%if variable_name | length >0%}
+                {% for m in model.classes%}
+                       {% if m.anotation%}
+                            {% if m.anotation.name == "bying" %}
+                                {% if m.anotation.how_much == "more" %}
 
-                    {% if prop.cardinality == 'OneToMany' %}
+                                    List <{{m.name[0]|capitalize}}{{m.name[1:]}}> {{m.name[0]|lower}}{{m.name[1:]}} = new ArrayList<>();
+                                    double price = 0;
+                                    for(Object o : {{ basket_name[0][0] | lower }}{{ basket_name[0][1:]}}dto.get{{item_name[0][0]|capitalize}}{{item_name[0][1:]}}()){
+                                        {{m.name[0]|lower}}{{m.name[1:]}}.add({{m.name|lower}}Repository.findByItemIdAndIsCurrent(o));
+                                        price += {{m.name[0]|lower}}{{m.name[1:]}}.get({{m.name[0]|lower}}{{m.name[1:]}}.size()-1).getCurrentPrice();
+                                    }
+                                    {{ current_class.name | lower }}.setTotalPrice(price);
+                                    {{ current_class.name | lower }}.set{{m.name[0]|capitalize}}{{m.name[1:]}}({{m.name[0]|lower}}{{m.name[1:]}});
+                                     Person person = personRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getPerson());
 
-                    {{ prop.type | capitalize }} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.getId());
-                    {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.set{% if p.as_part!="" and p.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
-
-                    {{ prop.type | lower }}.set{% if p.as_part!="" and p.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
-
-                    {% else %}
-                    if({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}()!=null) {
-                    {{ prop.type | capitalize }} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId()); //tuuu
-                    {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.set{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
-                     {%if prop.cardinality != 'OneToOne'%}
-                    {{ prop.type | lower }}.get{% if p.as_part!="" and p.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}().add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
-                     {%else%}
-                     {{ prop.type | lower }}.set{% if p.as_part!="" and p.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
-
-{% endif %}
+                                    {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(person, bill);
+                                {%else%}
+                                {{ current_class.name | lower }}.set{{m.name[0]|capitalize}}{{m.name[1:]}}({{m.name[0]|lower}}{{m.name[1:]}}Repository.findByItemIdAndIsCurrent({{ current_class.name | lower }}dto.getItem.getId());
+                                 {{ current_class.name | lower }}.setTotalPrice(price);
+                                    Person person = personRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getPerson());
+                                  {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(person, bill);
+                                {% endif %}
+                            {% endif %}
+                       {% endif %}
+                 {%endfor%}
+            {% endif %}
+        {% endif %}
+        {% if current_class.anotation.name =="action" %}
+        {{ current_class.name | lower }}.setTransformedCode(this.generateCode({{ current_class.name | lower }}dto.getOriginalCode()));
+        {% endif %}
+    {% endif %}
+    {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} s = {{ current_class.name | lower }}Repository.save({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
+    return {{ current_class.name | lower }}Mapper.toDTO(s);
 }
+{% if current_class.anotation.name =="action" %}
+public String generateCode(String originalCode){
+//todo
+return "";
+}
+
+public void doAction{{current_class.anotation.name_f[0]|capitalize}}{{current_class.anotation.name_f[1:]}}(Person person, Bill current_bill ){
+
+}
+
 {% endif %}
-        {% endif %}
-        {% endfor %}
-                {% if 1 not in found %}
-                 {% if prop.cardinality == 'OneToMany' %}
-                 {{ prop.type | lower }}.get{{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
-
-                  {% else %}
-                  {% if prop.cardinality != 'OneToOne' %} //proveri ovde i gore
-        {{ prop.type | lower }}.get{{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}}().add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
-        {%else%}
-        {{ prop.type | lower }}.set{{ current_class.name[0]|capitalize }}{{ current_class.name[1:]}}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
-
-        {% endif %}
-        {% endif %}
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-        {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} s = {{ current_class.name | lower }}Repository.save({{ current_class.name | lower }});
-
-        return {{ current_class.name | lower }}Mapper.toDTO({{ current_class.name | lower }});
-    }
+//todo treba quantity smanjiti
+//-------------------------------------------------------------
 
     public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO update(long id,{{ current_class.name }}DTO {{ current_class.name | lower }}dto) {
-    Optional<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}> {{ current_class.name[0]|lower }}{{ current_class.name[1:] }} = {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}Repository.findById(id);
+    Optional<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}> {{ current_class.name[0]|lower }}{{ current_class.name[1:] }} = {{ current_class.name|lower }}Repository.findById(id);
     if ({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.isPresent()){
             {% for property in current_class.attributes %}
             {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.get().set{{property.name[0]|capitalize}}{{property.name[1:]}}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}dto.get{{property.name[0]|capitalize}}{{property.name[1:]}}());
@@ -266,8 +356,8 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
         {% endif %}
         {% endif %}
         {% endfor %}
-            {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} s = {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}Repository.save({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.get());
-            return {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}Mapper.toDTO(s);
+            {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} s = {{ current_class.name|lower }}Repository.save({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.get());
+            return {{ current_class.name|lower }}Mapper.toDTO(s);
         }
         return null;
 
@@ -379,10 +469,10 @@ public void delete(Long id) {
 {% endfor %}
 
      public List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO> get() {
-        List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}> list = {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}Repository.findAll();
+        List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}> list = {{ current_class.name|lower }}Repository.findAll();
         List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO> list2 = new ArrayList<>();
         for({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} a : list){
-            list2.add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}Mapper.toDTO(a));
+            list2.add({{ current_class.name|lower }}Mapper.toDTO(a));
         }
         return list2;
     }

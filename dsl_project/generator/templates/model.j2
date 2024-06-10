@@ -30,6 +30,212 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    {% set is_one = "one" %}
+    {% set variable_name = [] %}
+    {% set variable_name_price = [] %}
+    {% set basket_name = [] %}
+    {% for m in model.classes%}
+        {% if m.anotation%}
+            {% if m.anotation.name == "bying" %}
+                {% if m.anotation.how_much == "more" %}
+                      {% set is_one = "more" %}
+                      {% set _ = variable_name_price.append(m.name) %}
+                 {% endif%}
+            {% endif%}
+            {% if m.anotation.name == "item" %}
+                 {% set _  =variable_name.append( m.name) %}
+            {% endif%}
+            {% if m.anotation.name == "basket" %}
+                 {% set _ =basket_name.append(m.name) %}
+            {% endif%}
+        {% endif%}
+    {%endfor%}
+    {% if current_class.anotation%}
+        {% if current_class.anotation.name == "basket" %}
+
+            {%if is_one=="one"%}
+                @ManyToOne
+                (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+                 {% for m in model.classes%}
+                    {% if m.anotation%}
+                        {% if m.anotation.name == "bill" %}
+                            {% set references = [] %}
+                            {% for p in m.reference_properties %}
+                                {% if p.name != current_class.name and p.name not in references %}
+                                    {% set _ = references.append(p.name | lower) %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if references %}
+                                @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+                        {%endif%}
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+                private {{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
+
+            {%else%}
+                @ManyToMany
+
+                 (cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}"         )
+                 {% for m in model.classes%}
+                    {% if m.anotation%}
+                        {% if m.anotation.name == "bill" %}
+                            {% set references = [] %}
+                            {% for p in m.reference_properties %}
+                                {% if p.name != current_class.name and p.name not in references %}
+                                    {% set _ = references.append(p.name | lower) %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if references %}
+                                @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+                        {%endif%}
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+                private List<{{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}>  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
+            {%endif%}
+        {%endif%}
+        {% if current_class.anotation.name == "item" %}
+        {% if variable_name_price | length > 0 %}
+            @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}")
+
+            private List<{{variable_name_price[0][0]|capitalize}}{{variable_name_price[0][1:]}}>  {{variable_name_price[0][0]|lower}}{{variable_name_price[0][1:]}};
+            {%endif%}
+            {%if is_one=="one"%}
+                @OneToMany
+                (cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "{{current_class.name|lower}}"        )
+                private List<{{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}>  {{basket_name[0][0]|lower}}{{basket_name[0][1:]}};
+            {%else%}
+                @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+                @JoinTable(
+                        name = "{{current_class.name|lower}}_{{basket_name[0]| lower}}",
+                        joinColumns = @JoinColumn(name = "{{current_class.name|lower}}_id"),
+                        inverseJoinColumns = @JoinColumn(name = "{{basket_name[0]|lower}}_id")
+                )
+                {% for m in model.classes%}
+                    {% if m.anotation%}
+                        {% if m.anotation.name == "bill" %}
+                            {% set references = [] %}
+                            {% for p in m.reference_properties %}
+                                {% if p.name != current_class.name and p.name not in references %}
+                                    {% set _ = references.append(p.name | lower) %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if references %}
+                                @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+                        {%endif%}
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+                private List<{{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}>  {{basket_name[0][0]|lower}}{{basket_name[0][1:]}};
+            {%endif%}
+
+        {%endif%}
+    {% if current_class.anotation.name == "action" %}
+    @Column(name="date_from")
+    private Date dateFrom;
+
+    @Column(name="date_to")
+    private Date dateTo;
+
+    @Column(name="original_code")
+    private String originalCode;
+
+    @Column(name="transformed_code")
+    private String transformedCode;
+    {%endif%}
+    {% if current_class.anotation.name == "bying" %}
+    @Column(name="currentprice")
+    private double currentPrice;
+
+    @Column(name="iscurrent")
+    private boolean iscurrent; //is it still valid
+       {% for m in model.classes%}
+           {% if m.anotation%}
+               {% if m.anotation.name == "item" %}
+               @ManyToOne
+                (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+                {% set references = [] %}
+                {% for p in m.reference_properties %}
+                    {% if p.name != current_class.name and p.name not in references %}
+                        {% set _ = references.append(p.name | lower) %}
+                    {% endif %}
+                {% endfor %}
+                 {% if references %}
+                @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true){%endif%}
+                private {{m.name[0]|capitalize}}{{m.name[1:]}}  {{m.name[0]|lower}}{{m.name[1:]}};
+               {%endif%}
+               {% if m.anotation.name == "bill" %}
+                  {% if current_class.anotation.how_much == 'one'%}
+            @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY ,mappedBy = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}")
+            {%else%}
+
+            @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}")
+            {%endif%}
+             {% set references = [] %}
+                {% for p in m.reference_properties %}
+                    {% if p.name != current_class.name and p.name not in references %}
+                        {% set _ = references.append(p.name | lower) %}
+                    {% endif %}
+                {% endfor %}
+                 {% if references %}
+            @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+            private List<{{m.name[0]|capitalize}}{{m.name[1:]}}>  {{m.name[0]|lower}}{{m.name[1:]}};
+            {%endif%}
+
+        {%endif%}
+         {%endif%}
+        {%endfor%}
+       {%endif%}
+        {% if current_class.anotation.name == "bill" %}
+    @Column(name="total_price")
+    private double totalPrice;
+
+        {% for m in model.classes%}
+        {% if m.anotation%}
+         {% if m.anotation.name == "bying" %}
+            {% if m.anotation.how_much == "one" %}
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    {% set references = [] %}
+                {% for p in m.reference_properties %}
+                    {% if p.name != current_class.name and p.name not in references %}
+                        {% set _ = references.append(p.name | lower) %}
+                    {% endif %}
+                {% endfor %}
+                 {% if references %}
+    @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+                 {% endif %}
+
+    private {{m.name[0]|capitalize}}{{m.name[1:]}} {{m.name[0]|lower}}{{m.name[1:]}};
+
+            {%else%}
+
+            @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+            @JoinTable(
+                    name = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}_{{m.name[0]|lower}}{{m.name[1:]}}",
+                    joinColumns = @JoinColumn(name = "{{m.name[0]|lower}}{{m.name[1:]}}_id"),
+                    inverseJoinColumns = @JoinColumn(name = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}_id")
+            )
+    {% set references = [] %}
+                {% for p in m.reference_properties %}
+                    {% if p.name != current_class.name and p.name not in references %}
+                        {% set _ = references.append(p.name | lower) %}
+                    {% endif %}
+                {% endfor %}
+                 {% if references %}
+    @JsonIgnoreProperties(value = "{{ references | join(', ') }}", allowSetters = true)
+                 {% endif %}
+    private List<{{m.name[0]|capitalize}}{{m.name[1:]}}>  {{m.name[0]|lower}}{{m.name[1:]}};
+{% endif %}
+ {% endif %}
+         {%endif%}
+        {%endfor%}
+    {%endif%}
+
+    {%endif%}
     {% for property in current_class.attributes %}
         {% if property %}
 

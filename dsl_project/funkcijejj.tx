@@ -1,0 +1,64 @@
+Statement: (VariableInit | Variable | IfStatement | FunctionCall );
+
+VariableInit: Type ID "=" PosibleValuesForVariable ';';
+
+Variable: ID "=" PosibleValuesForVariable ';'?;
+
+PosibleValuesForVariable: (value |  Condition | FunctionCall |  OneLineCondition | Operations | NewObject | ShortFunctions |ChaneId);
+
+NewObject: "new" ID '(' Arguments ')';
+
+IfStatement:
+    'if' Conditions '{'
+        Statement*
+        '}'
+    *('elif' Conditions '{'
+       Statement* '}')
+    ('else' '{'
+        Statement* '}')?
+;
+
+OneLineCondition: Conditions '?' (PosibleValuesForVariable | ID ) 'or:' (PosibleValuesForVariable | ID )  ';';
+
+Conditions: Condition ( LogicalOperator Condition )*;
+
+LogicalOperator: ('&&' | '||');
+
+Negation: '!';
+
+Condition:  Negation?  ( ID |value | ShortFunctions | ChaneId) RelationOperator Negation? (ID | value | ShortFunctions | ChaneId) ;
+
+RelationOperator: ('==' | '!=' | '>' | '<' | '>=' | '<=') ;
+
+Operations: (( ID | INT | FLOAT | ChaneId) Operator Operations) | (ID | INT | FLOAT |  ChaneId);
+
+Operator: ('+' | '-' | '*' | '/' | '%' | '^');
+
+ChaneId: ID ('.' ID)*;
+
+Sum:        'sumOf' 	  PosibleLists 				(('as:' (ID | ChaneId) (UsingFormula)?   WherePart)?);
+Average:    'averageOf'   PosibleLists 				('as:' ( ChaneId | ID ) (UsingFormula)?  WherePart)?;
+SelectIn:   'selectIn' 	  PosibleLists 				'as:' ( ChaneId|ID)  WherePart;
+Count:      'countFrom'   PosibleLists 				('as:' ( ChaneId|ID))?( WherePart)? ;
+All:        'allOf' 	  PosibleLists 				('as:' ( ChaneId|ID))? ( WherePart )?;
+Any:        'anyOf' 	  PosibleLists 				('as:' ( ChaneId|ID))?( WherePart)?;
+NoOne:      'noneOf' 	  PosibleLists 				('as:' ID)?( WherePart)?;
+Min:        'min'		  PosibleLists   			('as:' ( ChaneId|ID))? ;
+Max:        'max' 		  PosibleLists   			('as:' ( ChaneId|ID))?;
+Remove:     'removeFrom'  PosibleLists 				'as:' ID  WherePart;
+
+Size:       'sizeOf' 	  PosibleLists ;
+ForEach:    'for' 		  ( ChaneId | ID) 			'as:' ( ChaneId | ID) UsingFormula? (((ForOperation)? ShortFunctions)| SetOperation);
+SelectTop:  'selectTop'   INT 'of' PosibleLists   		(WherePart)?;
+Add:        'add' 		(value | ChaneId|ID|NewObject) 		'in' PosibleLists;
+
+ForOperation: ('sum'|'average'|'product' );
+PosibleLists: (ID | ChaneId | SelectIn);
+
+WherePart: 'where'  (Conditions | All| Any | NoOne);
+UsingFormula: 'formula' Operations;
+SetOperation: 'on:' ( ChaneId | ID) 'apply' ( ChaneId | ID | Operations);
+
+ShortFunctions: ( Size | Count | All | Any | NoOne | Min | Max | Add |Remove |SelectTop| Sum |Average | SelectIn | ForEach);
+
+value: (INT | STRING | FLOAT | BOOL );

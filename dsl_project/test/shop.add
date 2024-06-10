@@ -1,0 +1,33 @@
+class Person{
+      'name' String;
+      'lastName' String;
+      'username' String;
+}
+@Bill(make, sth)
+class Bill{
+  'neki_tekst' String;
+}
+
+@Bying(more)
+class ItemWithPrice{
+}
+@Basket
+class Basket{
+    'formular' String;
+}
+@Item
+class Item{
+    'name' String;
+    'quantity' int;
+}
+@Actionmake
+class Action{
+    'name' String;
+}
+OneToOne{
+'Person' to: 'Basket';
+}
+OneToMany{
+'Person' to: 'Bill';
+}
+

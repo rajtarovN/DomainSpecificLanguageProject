@@ -1,9 +1,12 @@
 package uns.ac.rs.mbrs.repository;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import uns.ac.rs.mbrs.model.*;
 import java.util.List;
+import java.util.Date;
 
 @Repository
 public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Repository extends JpaRepository<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}, Long> {
@@ -19,7 +22,7 @@ public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}
                 {% endfor %}
                  {% if references %}
                     {% if prop.as_part is not none%}
-                        {% if prop.as_part != "" %}
+                        {% if prop.as_part != "" and prop.as_part!="*" %}
                         List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}> findAllBy{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:] }}Id(Long id);
 
                         {%else%}
@@ -34,5 +37,11 @@ public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}
 
 
 {% endfor %}
+    {%  if current_class.anotation %}
+        {% if current_class.anotation.name == "action"%}
 
+     @Query("SELECT a FROM Action a WHERE :currentDate BETWEEN a.dateFrom AND a.dateTo")
+    List<Action> findValidActions(@Param("currentDate") Date currentDate);
+{% endif %}
+{% endif %}
 }

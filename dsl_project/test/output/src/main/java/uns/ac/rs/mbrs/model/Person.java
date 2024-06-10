@@ -23,47 +23,55 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name="age")
-    private int age;
+    @Column(name="name")
+    private String name;
+
+    @Column(name="lastname")
+    private String lastName;
+
+    @Column(name="username")
+    private String username;
     @Column(name="deleted", unique = false)
     private boolean deleted;
 
 
-            @ManyToOne
+            @OneToOne
         (
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
-        )
+ ,mappedBy = "person"         )
 
-        private Address address;
+        private Basket basket;
 
-            @ManyToOne
+            @OneToMany
         (
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
-        )
+                 ,mappedBy = "person"        )
 
-        private Product product;
+        private List<Bill>  bill;
 
     public Person() {}
 
-            public Address  getAddress() {
-                return address;
+            public Basket  getBasket() {
+                return basket;
             }
-            public void setAddress(
-           Address
-             address
+            public void setBasket(
+           Basket
+             basket
             ) {
-                this.address = address;
+                this.basket = basket;
             }
-            public Product  getProduct() {
-                return product;
+            public  List< Bill > getBill() {
+                return bill;
             }
-            public void setProduct(
-           Product
-             product
+            public void setBill(
+                List<
+           Bill
+                >
+             bill
             ) {
-                this.product = product;
+                this.bill = bill;
             }
     public boolean getDeleted() {
         return deleted;

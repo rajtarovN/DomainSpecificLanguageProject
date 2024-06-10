@@ -1,11 +1,11 @@
 package uns.ac.rs.mbrs.dtos;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
+import java.util.Date;
 
 @Data
 @Getter
@@ -16,10 +16,13 @@ public class PersonDTO {
 
     private long id;
 
-            private int age;
-            private AddressDTO address;
+            private String name;
+            private String lastName;
+            private String username;
+            private BasketDTO basket;
 
-            private ProductDTO product;
+
+            private List<Long> billIds;
 
 
 }

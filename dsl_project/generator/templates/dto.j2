@@ -1,13 +1,33 @@
 {# Assignments #}
 {% set hasType = "long" %}
 package uns.ac.rs.mbrs.dtos;
-
+{% set is_one = ["one"] %}
+    {% set variable_name = [] %}
+    {% set variable_name_price = [] %}
+    {% set basket_name = [] %}
+    {% for m in model.classes%}
+        {% if m.anotation%}
+            {% if m.anotation.name == "bying" %}
+                {% if m.anotation.how_much == "more" %}
+                      {% set _ =is_one.append("more") %}
+                      {% set _ = variable_name_price.append(m.name) %}
+                 {% endif%}
+            {% endif%}
+            {% if m.anotation.name == "item" %}
+                 {% set _  =variable_name.append( m.name) %}
+            {% endif%}
+            {% if m.anotation.name == "basket" %}
+                 {% set _ =basket_name.append(m.name) %}
+            {% endif%}
+        {% endif%}
+    {%endfor%}
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
+import java.util.Date;
 
 @Data
 @Getter
@@ -17,6 +37,12 @@ import java.util.List;
 public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO {
 
     private {{ hasType }} id;
+    {% if current_class.anotation.name == "action" %}
+    private Date dateFrom;
+    private Date dateTo;
+    private String originalCode;
+    private String transformedCode;
+    {%endif%}
 
     {% for property in current_class.attributes %}
         {% if property %}
@@ -53,4 +79,56 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO
             this.id = id;
         }
     {% endif %}
+
+    {% if current_class.anotation%}
+        {% if current_class.anotation.name == "basket" %}
+            {%if is_one |length ==1%}
+    private {{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}DTO  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
+             {%else%}
+
+    private List<{{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}DTO>  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
+        {%endif%}
+    {%endif%}
+
+    {% if current_class.anotation.name == "bill" %}
+    private double totalPrice;
+    {% for m in model.classes%}
+        {% if m.anotation%}
+         {% if m.anotation.name == "bying" %}
+            {% if m.anotation.how_much == "one" %}
+    private {{m.name[0]|capitalize}}{{m.name[1:]}}DTO {{m.name[0]|lower}}{{m.name[1:]}};
+            {%else%}
+
+    private List<{{m.name[0]|capitalize}}{{m.name[1:]}}DTO>  {{m.name[0]|lower}}{{m.name[1:]}};
+            {% endif %}
+         {% endif %}
+         {%endif%}
+        {%endfor%}
+    {%endif%}
+
+    {% if current_class.anotation.name == "item" %}
+        {% if variable_name_price | length > 0 %}
+            private List<{{variable_name_price[0][0]|capitalize}}{{variable_name_price[0][1:]}}DTO>  {{variable_name_price[0][0]|lower}}{{variable_name_price[0][1:]}};
+        {%endif%}
+            {%if is_one|length ==1%}
+                private List<{{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}DTO>  {{basket_name[0][0]|lower}}{{basket_name[0][1:]}};
+            {%else%}
+                private List<{{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}DTO>  {{basket_name[0][0]|lower}}{{basket_name[0][1:]}};
+            {%endif%}
+
+    {%endif%}
+    {% if current_class.anotation.name == "bying" %}
+    private double currentPrice;
+
+    private boolean current; //is it still valid
+       {% for m in model.classes%}
+           {% if m.anotation%}
+               {% if m.anotation.name == "item" %}
+                private {{m.name[0]|capitalize}}{{m.name[1:]}}DTO  {{m.name[0]|lower}}{{m.name[1:]}};
+               {%endif%}
+
+            {%endif%}
+        {%endfor%}
+       {%endif%}
+{%endif%}
 }

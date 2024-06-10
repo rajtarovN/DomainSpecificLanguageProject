@@ -49,3 +49,5 @@ ManyToOne{
 ManyToMany{
     'Tri' to: 'Dva';
 }
+
+classPerson{'age'int;}classAddress{'street'String;'city'String;'zipCode'String;}

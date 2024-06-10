@@ -11,11 +11,12 @@ class Model(object):
 
 
 class Class(object):
-    def __init__(self, name, attributes):#parent, name, attributes):
+    def __init__(self, name, attributes, anotation):#parent, name, attributes):
         # self.parent = parent
         self.name = name
         self.attributes = attributes
         self.reference_properties = []
+        self.anotation = anotation
 
     def add_ref_property(self, property):
         self.reference_properties.append(property)
@@ -116,6 +117,28 @@ class LinkProperty:
     def __str__(self):
         return "ttt "+self.as_part
 
+class Anotation(object):
+    def __init__(self, name):
+        self.name = name
+
+class ByingAnotation(Anotation):
+    def __init__(self, how_much):
+        super().__init__("bying")
+        self.how_much = how_much
+
+class BillAnotation(Anotation):
+    def __init__(self, call_actions):
+        super().__init__("bill")
+        self.call_actions = call_actions
+
+class ActionAnotation(Anotation):
+    def __init__(self, name_f ):#params
+        super().__init__("action")
+        self.name_f = name_f
+        # self.params = params
+
+
+
 
 class Function(object):
     def __init__(self, name, statements, params):
@@ -203,7 +226,10 @@ class Condition(Statement):
 
 class ClassWithGeters():
     def __init__(self, variable, list_geters):
-        self.name = variable.name
+        if isinstance(variable, Variable):
+            self.name = variable.name
+        else:
+            self.name = variable
         self.variable = variable
         self.list_geters = list_geters
 
@@ -216,11 +242,12 @@ internal_classes = [
     OneToMany,
     ManyToOne,
     ManyToMany,
-    # Function,
-    # Param,
-    # Statement,
-    # Variable,
-    # ShortFunctions,
-    # IfStatement,
-    # Operations,
+    Function,
+    Param,
+    Statement,
+    Variable,
+    ShortFunctions,
+    IfStatement,
+    Operations,
+    Anotation
 ]

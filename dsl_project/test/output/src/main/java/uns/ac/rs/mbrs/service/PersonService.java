@@ -20,78 +20,87 @@ public class PersonService  {
 
     private final PersonMapper personMapper;
     private final PersonRepository personRepository;
-    private final AddressRepository addressRepository;
-    private final AddressMapper addressMapper;
-    private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
+    private final BasketRepository basketRepository;
+    private final BasketMapper basketMapper;
+    private final BillRepository billRepository;
+    private final BillMapper billMapper;
 
     public PersonService(
     PersonMapper personMapper,
     PersonRepository personRepository
-            ,AddressRepository addressRepository
-            ,AddressMapper addressMapper
-            ,ProductRepository productRepository
-            ,ProductMapper productMapper
+            ,BasketRepository basketRepository
+            ,BasketMapper basketMapper
+            ,BillRepository billRepository
+            ,BillMapper billMapper
 ) {
         this.personMapper = personMapper;
         this.personRepository = personRepository;
-        this.addressRepository = addressRepository;
+        this.basketRepository = basketRepository;
 
-        this.addressMapper = addressMapper;
-        this.productRepository = productRepository;
+        this.basketMapper = basketMapper;
+        this.billRepository = billRepository;
 
-        this.productMapper = productMapper;
+        this.billMapper = billMapper;
     }
+//-------------------------------------------------------------
+  @Transactional
+public PersonDTO save(PersonDTO persondto ) {
 
-    @Transactional
-    public PersonDTO save(PersonDTO persondto) {
+    Person person = personMapper.toModel(persondto);
 
-        Person person = personMapper.toModel(persondto);
+                                    if(persondto.getBasket()!=null) {
+                                        Basket basket = basketRepository.getById(persondto.getBasket().getId());
+                                        person.setBasket(basket);
+                                            basket.setPerson(person);
+                                    }else{
+                                        Basket basket = new Basket();
+                                        person.setBasket(basket);
+                                        basket.setPerson(person);
+                                    }
+                List<Bill> bills = new ArrayList<>();
+                for (Long d : persondto.getBillIds()) {
+                    Bill bill = billRepository.getById(d);
+                    bills.add(bill);
 
-       //ovde
-
-                    if(persondto.getAddress()!=null) {
-                    Address address =addressRepository.getById(persondto.getAddress().getId()); //tuuu
-                    person.setAddress(address);
-                    address.getProbannn().add(person);
+                                        bill.setPerson(person);
+                }
+                person.setBill(bills);
+    Person s = personRepository.save(person);
+    return personMapper.toDTO(s);
 }
-
-       //ovde
-
-                    if(persondto.getProduct()!=null) {
-                    Product product =productRepository.getById(persondto.getProduct().getId()); //tuuu
-                    person.setProduct(product);
-                    product.getPerson().add(person);
-}
-
-        Person s = personRepository.save(person);
-
-        return personMapper.toDTO(person);
-    }
+//todo treba quantity smanjiti
+//-------------------------------------------------------------
 
     public PersonDTO update(long id,PersonDTO persondto) {
     Optional<Person> person = personRepository.findById(id);
     if (person.isPresent()){
-            person.get().setAge(persondto.getAge());
+            person.get().setName(persondto.getName());
+            person.get().setLastName(persondto.getLastName());
+            person.get().setUsername(persondto.getUsername());
 
 
 
        //ovde
-                    if(persondto.getAddress()!=null) {
+                    if(persondto.getBasket()!=null) {
 
-                    Address address =addressRepository.getById(persondto.getAddress().getId());
-                    person.get().setAddress(address);
-                    address.getProbannn().add(person.get());
+                    Basket basket =basketRepository.getById(persondto.getBasket().getId());
+                    person.get().setBasket(basket);
+                    basket.setPerson(person.get());
+
 }
 
-       //ovde
-                    if(persondto.getProduct()!=null) {
+        List<Bill> bills = new ArrayList<>();
+        for (Long d : persondto.getBillIds()) {
+            Bill bill = billRepository.getById(d);
+            bills.add(bill);
 
-                    Product product =productRepository.getById(persondto.getProduct().getId());
-                    person.get().setProduct(product);
-                    product.getPerson().add(person.get());
-}
 
+                bill.setPerson(person.get());
+
+
+        }
+
+        person.get().setBill(bills);
             Person s = personRepository.save(person.get());
             return personMapper.toDTO(s);
         }
@@ -106,8 +115,14 @@ public class PersonService  {
         .findById(person.getId())
         .map(existingPerson -> {
 
-            if (person.getAge() != 0) {
-                existingPerson.setAge(person.getAge());
+            if (person.getName() != null) {
+                existingPerson.setName(person.getName());
+            }
+            if (person.getLastName() != null) {
+                existingPerson.setLastName(person.getLastName());
+            }
+            if (person.getUsername() != null) {
+                existingPerson.setUsername(person.getUsername());
             }
 
             return existingPerson;
@@ -142,11 +157,13 @@ public void delete(Long id) {
     if (maybePerson.isPresent()) {
         Person existingPerson = maybePerson.get();
         existingPerson.setDeleted(true);
-        if (existingPerson.getAddress() != null){
-            existingPerson.getAddress().setDeleted(true);
+        if (existingPerson.getBasket() != null){
+            existingPerson.getBasket().setDeleted(true);
         }
-        if (existingPerson.getProduct() != null){
-            existingPerson.getProduct().setDeleted(true);
+        if (existingPerson.getBill() != null){
+            for (Bill p: existingPerson.getBill()){
+                p.setDeleted(true);
+            }
         }
 
         personRepository.save(existingPerson);

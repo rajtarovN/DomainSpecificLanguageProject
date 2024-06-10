@@ -41,7 +41,6 @@ const TriView = () => {
     const fetchData = async () => {
       try {
           const response = await triService.getOneTri(id);
-          console.log(response)
           if (response.status === 200) {
               setTri(response.data);
           }
