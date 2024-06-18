@@ -81,9 +81,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/action/").permitAll()
                 .antMatchers("/api/bill/").permitAll()
                 .antMatchers("/api/basket/").permitAll()
+                .antMatchers("/api/bill/make-with-id/{id}").permitAll()
+                .antMatchers("/api/basket/{id}").permitAll()
                 .antMatchers("/api/itemWithPrice/").permitAll()
                 .antMatchers("/api/item/").permitAll()
+                .antMatchers("/api/item/{id}").permitAll()
+                .antMatchers("/api/item/").permitAll()
                 .antMatchers("/logout").permitAll()
+                .antMatchers("/api/basket/{basketId}/{itemId}/{quantity}").permitAll()
+                .antMatchers("/api/basket/{basketId}/{itemId}").permitAll()
                 .anyRequest().authenticated().and()
                 .cors();
 

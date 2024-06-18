@@ -12,6 +12,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import basketService from '../../services/BasketService';
+import billService from '../../services/BillService';
+import itemService from '../../services/ItemService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,19 +37,24 @@ const BasketView = () => {
   const classes = useStyles();
 
   const { id } = useParams();
-  const [basket, setBasket] = useState(NaN)
+  const [basket, setBasket] = useState(NaN);
+  const [allItem, setAllItem] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
           const response = await basketService.getOneBasket(id);
           if (response.status === 200) {
+            console.log(response.data)
               setBasket(response.data);
+              setAllItem([response.data.item]);
           }
           const responsePerson = await basketService.getPersonsByBasket(id);
       } catch (error) {
           console.error(error);
       }
+      
+    // fetchDataItem();
   };
   fetchData();
   }, [id]);
@@ -71,6 +78,33 @@ const BasketView = () => {
     console.log("Deleting coffee with ID:", coffeeId);
     setIsDialogOpen(false);
   };
+  const handleMakeBill = (e) => {
+      e.preventDefault();
+      const fetchData = async () => {
+      const response = await billService.makeBillWithId(id);
+      if (response.status === 200 || response.status === 201 ) {
+        const idSaved = response.data.id
+        navigate(`/bill-view/`+idSaved);
+      }
+       
+    };
+    fetchData();
+  }
+  const handleRemoveItem = (itemId) => {
+    if ( !allItem) return;
+
+    for (const item of allItem) {
+      if (item.id === itemId) {
+        const updatedCurrentItem = allItem.filter(itemItem => itemItem.id !== itemId);
+        setAllItem(updatedCurrentItem);
+        break;
+      }
+    }
+    const fetchData = async () => {
+    const response = await basketService.removeItem(id, itemId);
+    }
+    fetchData();
+  }
 
   return (
     <div className={classes.root}>
@@ -81,7 +115,36 @@ const BasketView = () => {
         <label>formular: </label>
         <label> {  basket.formular  } </label>
       </div>
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Remove</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {allItem.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">
+                  {item.id}
+                </TableCell>
+                <TableCell align="center">
+                  {item.name}
+                </TableCell>
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleRemoveItem(item.id)}>Remove</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer><br/>
       <div className={classes.buttonGroup}>
+        <Button variant="contained" color="primary" onClick={handleMakeBill}>
+         By
+        </Button>
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
       </div>

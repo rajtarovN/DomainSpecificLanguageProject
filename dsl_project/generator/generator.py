@@ -355,7 +355,7 @@ def generate(output_path):#todo
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('frontend/EditComponent.j2')
-        file_name = cl.name + 'Edit.js'
+        file_name = 'Edit'+cl.name + '.js'
         folder = output_folder2 / 'src' / 'views' / cl.name
         folder.mkdir(parents=True, exist_ok=True)
         output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name

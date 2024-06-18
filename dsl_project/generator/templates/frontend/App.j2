@@ -1,7 +1,7 @@
 import './App.css';
 {% for elem in model.classes %}
 import Table{{elem.name[0]|capitalize}}{{elem.name[1:]}} from './views/{{elem.name[0]|capitalize}}{{elem.name[1:]}}/Table{{elem.name[0]|capitalize}}{{elem.name[1:]}}';
-import {{elem.name[0]|capitalize}}{{elem.name[1:]}}Edit from './views/{{elem.name[0]|capitalize}}{{elem.name[1:]}}/{{elem.name[0]|capitalize}}{{elem.name[1:]}}Edit';
+import Edit{{elem.name[0]|capitalize}}{{elem.name[1:]}} from './views/{{elem.name[0]|capitalize}}{{elem.name[1:]}}/Edit{{elem.name[0]|capitalize}}{{elem.name[1:]}}';
 import {{elem.name[0]|capitalize}}{{elem.name[1:]}}View from './views/{{elem.name[0]|capitalize}}{{elem.name[1:]}}/{{elem.name[0]|capitalize}}{{elem.name[1:]}}View';
 
 {% endfor %}
@@ -25,9 +25,11 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginForm/>}/>
           {/*<Route path="/home" element={<Cards/>}/>*/}
+          {{model}}
+          {{classes}}
           {% for elem in model.classes %}
           <Route path="/table-{{elem.name|lower}}" element={<Table{{elem.name[0]|capitalize}}{{elem.name[1:]}}/>}/>
-          <Route path="/edit-{{elem.name|lower}}/:id" element={<{{elem.name[0]|capitalize}}{{elem.name[1:]}}Edit/>}/>
+          <Route path="/edit-{{elem.name|lower}}/:id" element={Edit<{{elem.name[0]|capitalize}}{{elem.name[1:]}}/>}/>
           <Route path="/add-{{elem.name|lower}}" element={<{{elem.name[0]|capitalize}}{{elem.name[1:]}}Edit/>}/>
           <Route path="/{{elem.name|lower}}-view/:id" element={<{{elem.name[0]|capitalize}}{{elem.name[1:]}}View/>}/>
 

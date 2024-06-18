@@ -28,6 +28,12 @@ public class Basket {
 
                                 @JsonIgnoreProperties(value = "person", allowSetters = true)
                 private Item  item;
+//                @ElementCollection
+//                @CollectionTable(name = "basket_quantities", joinColumns = @JoinColumn(name = "basket_id"))
+//                @Column(name = "quantity")
+//                private List<Integer> quantity;
+@Column(name="quantity")
+private Integer quantity;
 
 
 

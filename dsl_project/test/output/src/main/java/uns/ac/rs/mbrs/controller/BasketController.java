@@ -49,7 +49,7 @@ public class BasketController {
     @PutMapping("/{id}")
     public ResponseEntity<BasketDTO> put(@PathVariable Long id, @RequestBody BasketDTO basket) {
         BasketDTO basket1 = basketService.update(id, basket);
-        return basket != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build();
+        return basket1  != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build(); //todo ovdeeeee
     }
 
     @DeleteMapping("/{id}")
@@ -63,5 +63,29 @@ public class BasketController {
         basketService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
+    @PutMapping("/{basketId}/{itemId}/{quantity}")
+    public ResponseEntity<BasketDTO> put(@PathVariable Long basketId, @PathVariable Long itemId, @PathVariable int quantity) {
+        BasketDTO basket1 = null;
+        try {
+            basket1 = basketService.updateWithItem(basketId, itemId, quantity);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return basket1 != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build();
+    }
+    @PutMapping("/{basketId}/{itemId}")
+    public ResponseEntity<BasketDTO> removeItem(@PathVariable Long basketId, @PathVariable Long itemId) {
+        BasketDTO basket1 = null;
+        try {
+            basket1 = basketService.removeItem(basketId, itemId);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return basket1 != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build();
+    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<BasketDTO> getItemsByBasketId(@PathVariable Long id) throws NotFoundException {
+//        BasketDTO basket = basketService.findOne(id);
+//        return ResponseEntity.ok().body(basket);
+//    }
 }

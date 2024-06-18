@@ -18,11 +18,13 @@ public class BasketDTO {
 
             private String formular;
             private PersonDTO person;
+            private Integer quantity;
+            //prvate List<Integer> quantity;
 
 
 
-
-    private List<ItemDTO>  item;
+    private ItemDTO  item;
+//    private List<ItemDTO> items;
 
 
 }

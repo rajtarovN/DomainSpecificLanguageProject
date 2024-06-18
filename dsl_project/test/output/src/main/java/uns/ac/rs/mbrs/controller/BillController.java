@@ -40,12 +40,24 @@ public class BillController {
 
     @PostMapping
     public ResponseEntity<BillDTO> post(@RequestBody BasketDTO basket) {
-        System.out.println("uslooo");
         BillDTO bill1 = null;
         try {
             bill1 = billService.save(basket);
         } catch (Exception e) {
              return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (bill1 == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(bill1, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/make-with-id/{id}")
+    public ResponseEntity<BillDTO> post(@PathVariable long id) {
+        BillDTO bill1 = null;
+        try {
+            bill1 = billService.saveWithId(id);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if (bill1 == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

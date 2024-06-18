@@ -12,6 +12,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import itemService from '../../services/ItemService';
+import basketService from '../../services/BasketService';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,6 +73,32 @@ const ItemView = () => {
     console.log("Deleting coffee with ID:", coffeeId);
     setIsDialogOpen(false);
   };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const [formData, setFormData] = useState({
+    quantity: '',
+  });
+  const handleAddToBasket = (e) => {
+    const basketId= 1;
+        const fetchData = async () => {
+          try {
+            console.log(formData)
+            console.log(formData.quantity)
+              const response = await basketService.addItemToBasket(basketId, id,formData.quantity);
+              if (response.status === 200 || response.status === 201) {
+                navigate(`/table-item`);
+              }
+          } catch (error) {
+              console.error(error);
+          }
+      };
+      fetchData();
+  };
 
   return (
     <div className={classes.root}>
@@ -84,9 +112,22 @@ const ItemView = () => {
       <div className={classes.formGroup}>
         <label>quantity: </label>
         <label> {  item.quantity  } </label>
+      </div><label>Input quantity: </label>
+      <form className={classes.root}>
+      <div className={classes.formGroup}>
+      
+        <TextField
+          name="quantity"
+          value={formData.quantity}
+          type="number"
+          onChange={handleChange}
+          variant="outlined"
+        />
       </div>
+      </form>
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
+        <Button variant="contained" color="primary" onClick={() => handleAddToBasket(id)}>Add to basket</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
       </div>
       < ItemDelete

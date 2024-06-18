@@ -60,6 +60,25 @@ class BillService {
             return error;
         }
     };
+    makeBill = async (basket) => {
+        try {
+            return await axios.post(
+                ENDPOINTS.BASE,
+                basket
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    makeBillWithId = async (id) => {
+        try {
+            return await axios.post(
+                ENDPOINTS.BASE + `make-with-id/${id}`,
+            );
+        } catch (error) {
+            return error;
+        }
+    };
     
 }
 

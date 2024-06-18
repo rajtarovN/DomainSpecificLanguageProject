@@ -60,6 +60,24 @@ class BasketService {
             return error;
         }
     };
+    addItemToBasket= async (basket_id, item_id, quantity) => {
+        try {
+            return await axios.put(
+                ENDPOINTS.BASE+basket_id+"/"+item_id+"/"+quantity,
+            );
+        } catch (error) {
+            return error;
+        }
+    };
+    removeItem = async (basketId, itemId) => {
+        try {
+            return await axios.put(
+                ENDPOINTS.BASE+basketId+"/"+itemId,
+            );
+        } catch (error) {
+            return error;
+        }
+    }
     
 }
 

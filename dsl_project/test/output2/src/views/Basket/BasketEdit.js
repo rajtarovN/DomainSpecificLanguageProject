@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import NativeSelect from '@mui/material/NativeSelect';
 
 import personService from '../../services/PersonService';
+import billService from '../../services/BillService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -85,6 +86,30 @@ const EditBasket = () => {
     }));
   };
   const navigate = useNavigate();
+  const handleMakeBill = (e) => {
+    if (id!=null){
+      e.preventDefault();
+      const fetchData = async () => {
+        try {
+            for(let j in persons){
+              if (parseInt(selectedPerson)===parseInt(persons[j].id)){
+                formData['person'] = persons[j];
+                break;
+              }
+            }
+            const response = await billService.makeBill(formData, id);
+            if (response.status === 200 || response.status === 201 ) {
+              const idSaved = response.data.id
+              navigate(`/bill-view/`+idSaved);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    fetchData();
+  }
+
+  }
   const handleSubmit = (e) => {
     if (id!=null){
         e.preventDefault();
@@ -106,27 +131,6 @@ const EditBasket = () => {
       };
       fetchData();
     }
-  else{
-    e.preventDefault();
-    console.log(formData);
-    const fetchData = async () => {
-      try {
-              for(let j in persons){
-                if (parseInt(selectedPerson)===parseInt(persons[j].id)){ //todo ovde verujem da ide name
-                  formData['person'] = persons[j];
-                  break;
-                }
-              }
-          const response = await basketService.createBasket(formData);
-          if (response.status === 200) {
-              navigate(`/table-basket`);
-          }
-      } catch (error) {
-          console.error(error);
-      }
-  };
-  fetchData();
-  }
   };
 
   const handleCancel = () => {
@@ -177,7 +181,10 @@ const EditBasket = () => {
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
-          Submit
+          Save my basket
+        </Button>
+        <Button variant="contained" color="primary" onClick={handleMakeBill}>
+         By
         </Button>
         <Button variant="contained" color="secondary" onClick={handleCancel}>
           Cancel

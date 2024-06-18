@@ -21,19 +21,19 @@ def main_statement_generator(statements, generated_code, def_var, param_li):
 
 
 def generate_if_statement(statement, generated_code, def_var, param_list ):  # ovde moze biti problema sa get
-    generated_code += "\n if(" + statement.conditions + "){\n"
+    generated_code += " if(" + statement.conditions + "){"
     generated_code = main_statement_generator(statement.if_statements, generated_code,def_var, param_list )
-    generated_code += "\n}\n"
+    generated_code += "}"
     if statement.elifs is not None:
         i = 0
         for e in statement.elifs:
-            generated_code += "else if(" + e + "){\n" + main_statement_generator(statement.elif_statements[i],
+            generated_code += "else if(" + e + "){" + main_statement_generator(statement.elif_statements[i],
                                                                                  generated_code, param_list, def_var)
-            generated_code += "\n}\n"
+            generated_code += "}"
             i += 1
     if statement.else_statements is not None:
-        generated_code += "else{\n" + main_statement_generator(statement.else_statements, generated_code, def_var, param_list) \
-                          + "\n}\n"
+        generated_code += "else{" + main_statement_generator(statement.else_statements, generated_code, def_var, param_list) \
+                          + "}"
 
     return generated_code
 
@@ -48,16 +48,16 @@ def generate_variable_statement(statement, generated_code, main_statemant,defind
     if isinstance(statement, NewObjectStatement):
         if type_var != "":
             generated_code += type_var + " " + main_statemant.name + "=" + generate_new_object(
-                statement) + ";\n"
+                statement) + ";"
             return generated_code
-        generated_code += main_statemant.type + " " + main_statemant.name + "=" + generate_new_object(statement) + ";\n"
+        generated_code += main_statemant.type + " " + main_statemant.name + "=" + generate_new_object(statement) + ";"
         return generated_code
     elif isinstance(statement, Condition):
         if type_var != "":
             generated_code += type_var + " " + main_statemant.name + "=" + condition_generator(
-                statement) + ";\n"
+                statement) + ";"
             return generated_code
-        generated_code += main_statemant.type + " " + main_statemant.name + "=" + condition_generator(statement) + ";\n"
+        generated_code += main_statemant.type + " " + main_statemant.name + "=" + condition_generator(statement) + ";"
         return generated_code
     elif isinstance(statement, IfStatement):
         name_var = main_statemant.name
@@ -70,56 +70,56 @@ def generate_variable_statement(statement, generated_code, main_statemant,defind
         if main_statemant.type == "int" or main_statemant.type == "float":
             # todo proveri tipove da li takvi budu, i prosledi
             # neku matricu tipova
-            generated_code += "0;\n"
+            generated_code += "0;"
         elif main_statemant.type == "boolean":
-            generated_code += "true;\n"
+            generated_code += "true;"
         else:
             if name_var[-1] != "(":
-                generated_code += ";\n"
+                generated_code += ";"
             else:
-                generated_code += generate_one_line_condition(statement, main_statemant.name, definde_var, param_list) + ";\n"
+                generated_code += generate_one_line_condition(statement, main_statemant.name, definde_var, param_list) + ";"
         return generated_code
     elif isinstance(statement, Operations):
         if type_var != "":
             if isinstance(main_statemant, ClassWithGeters):
                 generated_code += generate_chane_code(main_statemant.name, False)  + generate_operation(
-                    statement) + ");\n"
+                    statement) + ");"
             else:
                 generated_code += type_var + " " + main_statemant.name + "=" + generate_operation(
-                    statement) + ";\n"
+                    statement) + ";"
             return generated_code
         if main_statemant is not None:
             if isinstance(main_statemant.name, ClassWithGeters):
                 generated_code += generate_chane_code(main_statemant.name, False)  + generate_operation(
-                    statement) + ");\n"
+                    statement) + ");"
             else:
-                generated_code += main_statemant.type + " " + main_statemant.name + "=" + generate_operation(statement) + ";\n"
+                generated_code += main_statemant.type + " " + main_statemant.name + "=" + generate_operation(statement) + ";"
         else:
             generated_code +=generate_operation(statement)
         return generated_code
     elif isinstance(statement, ForFunction) or isinstance(statement, ShortFunctions):
 
-        new_generated_text = short_func_generator(statement, main_statemant.name, 0) + ";\n"
-        # generated_code += new_generated_text + "\n" + statement.type + " " + statement.name + "=" + name + ';'
+        new_generated_text = short_func_generator(statement, main_statemant.name, 0) + ";"
+        # generated_code += new_generated_text + "" + statement.type + " " + statement.name + "=" + name + ';'
         generated_code += new_generated_text
         return generated_code
     elif isinstance(statement, ClassWithGeters):
         if type_var != "":
             generated_code += type_var + " " + main_statemant.name + "=" + generate_chane_code(
-                statement, True) + ";\n"
+                statement, True) + ";"
             return generated_code
         generated_code += main_statemant.type + " " + main_statemant.name + "=" + generate_chane_code(statement, True) \
-                          + ";\n"
+                          + ";"
         return generated_code
     elif isinstance(statement, Variable):
         if type_var != "":
-            generated_code += str(type_var) + " " + str(main_statemant.name) + "=" + str(statement) + ";\n"
+            generated_code += str(type_var) + " " + str(main_statemant.name) + "=" + str(statement) + ";"
             return generated_code
-        generated_code += str(main_statemant.type) + " " + str(main_statemant.name) + "=" + str(statement) + ";\n"
+        generated_code += str(main_statemant.type) + " " + str(main_statemant.name) + "=" + str(statement) + ";"
         return generated_code
     elif isinstance(main_statemant, Variable) and \
             (isinstance(statement, str) or isinstance(statement, float) or isinstance(statement, int)) and type_var is not None:
-        generated_code += type_var + " " + main_statemant.name + "=" + str(statement) + ";\n"
+        generated_code += type_var + " " + main_statemant.name + "=" + str(statement) + ";"
         return generated_code
     else:
         return generated_code
@@ -158,7 +158,7 @@ def condition_generator(statement):
 
 def generate_one_line_condition(statement, name, definde_var, param_list):
     # order.totalPrice=number>3?order.totalPrice-minorder.productsas:order.price;
-    generated_code = "if(" + statement.conditions + "){\n"
+    generated_code = "if(" + statement.conditions + "){"
     if isinstance(name, ClassWithGeters):
         name = generate_chane_code(name, False)
     elif isinstance(name, Param) or isinstance(name, Variable):
@@ -167,15 +167,15 @@ def generate_one_line_condition(statement, name, definde_var, param_list):
         # saving_value = "double savingVal = "
         for stmt in statement.if_statements:
             generated_code += generate_variable_statement(stmt, name, None, definde_var,param_list)
-        generated_code += ");\n}\n"
+        generated_code += ");}"
     else:
-        generated_code += name + " = " + generate_variable_statement(statement.if_statements, "", None, definde_var,param_list) + "\n}\n"
+        generated_code += name + " = " + generate_variable_statement(statement.if_statements, "", None, definde_var,param_list) + "}"
     if statement.else_statements is not None:
         if name[-1] == "(":
-            generated_code += "else{\n" + generate_variable_statement(statement.else_statements[0], name, None, definde_var,param_list) + ");\n}\n"
+            generated_code += "else{" + generate_variable_statement(statement.else_statements[0], name, None, definde_var,param_list) + ");}"
         else:
-            generated_code += "else{\n" + name + " = " + generate_variable_statement(statement.else_statements[0], name,
-                                                                             None, definde_var, param_list) + ";\n}\n"
+            generated_code += "else{" + name + " = " + generate_variable_statement(statement.else_statements[0], name,
+                                                                             None, definde_var, param_list) + ";}"
 
     return generated_code
 
@@ -247,14 +247,14 @@ def generate_sap_func(statement, name, block=0, id="", operation="a"):
     if is_avg:
         operation = "+"
     new_var = "new_var" + str(block)
-    generated_code = "double " + new_var + " = 0;\n"
+    generated_code = "double " + new_var + " = 0;"
     possible_list = statement.posible_list
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
     elif isinstance(possible_list, Variable) or isinstance(possible_list, Param):
         possible_list = possible_list.name
     elif not isinstance(possible_list, str):
-        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
 
@@ -265,9 +265,9 @@ def generate_sap_func(statement, name, block=0, id="", operation="a"):
     elif isinstance(statement.as_part, Variable) or isinstance(statement.as_part, Param):
         as_part = statement.as_part.name
 
-    generated_code += "for(Object " + as_part + " : " + possible_list + " ){\n"
+    generated_code += "for(Object " + as_part + " : " + possible_list + " ){"
     if statement.where_part is not None:
-        generated_code += "if(" + condition_generator(statement.where_part) + "){\n"
+        generated_code += "if(" + condition_generator(statement.where_part) + "){"
 
     gen_code = as_part
     if statement.formula_part is not None:
@@ -275,23 +275,23 @@ def generate_sap_func(statement, name, block=0, id="", operation="a"):
     generated_code += new_var + " = " + new_var + operation + "(" + gen_code + ")"
 
     if statement.where_part is not None:
-        generated_code += "}\n"
-    generated_code += "}\n"  # ovo je za for
+        generated_code += "}"
+    generated_code += "}"  # ovo je za for
     if is_avg:
-        generated_code +="double " + name + "=" + new_var + "/" + possible_list + ".size();\n"
+        generated_code +="double " + name + "=" + new_var + "/" + possible_list + ".size();"
     else:
-        generated_code += "double " + name + "=" + new_var + ";\n"
+        generated_code += "double " + name + "=" + new_var + ";"
     return generated_code
 
 
 def generate_select_in_top_func(statement, name, block=0, id=""):
     new_var = "new_var" + str(block)
-    generated_code = "List<Object> " + new_var + " = new ArrayList<>;\n"
+    generated_code = "List<Object> " + new_var + " = new ArrayList<>;"
     possible_list = statement.posible_list
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
     elif not isinstance(possible_list, str):
-        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
     as_part = statement.as_part
@@ -300,66 +300,66 @@ def generate_select_in_top_func(statement, name, block=0, id=""):
     elif isinstance(statement.as_part, Variable) or isinstance(statement.as_part, Param):
         as_part = statement.as_part.name
 
-    generated_code += "for(Object " + as_part + " : " + possible_list + " ){\n"
+    generated_code += "for(Object " + as_part + " : " + possible_list + " ){"
     if statement.where_part is not None:
-        generated_code += "if(" + condition_generator(statement.where_part) + "){\n"
+        generated_code += "if(" + condition_generator(statement.where_part) + "){"
 
     gen_code = as_part
-    generated_code += new_var + ".add(" + gen_code + ");\n"
+    generated_code += new_var + ".add(" + gen_code + ");"
 
     if statement.where_part is not None:
-        generated_code += "}\n"
-    generated_code += "}\n"  # ovo je za for
+        generated_code += "}"
+    generated_code += "}"  # ovo je za for
     if statement.number is not None:
         generated_code += "List<Object> " + name + "=" + new_var + ".stream().limit(" + statement.number + \
-                          ").collect(Collectors.toList());\n"
+                          ").collect(Collectors.toList());"
         return generated_code
-    generated_code +="List<Object> " + name + "=" + new_var + ";\n"
+    generated_code +="List<Object> " + name + "=" + new_var + ";"
     return generated_code
 
 
 def generate_count_in_func(statement, name, block=0, id=""):
     new_var = "new_var" + str(block)
-    generated_code = "int " + new_var + " = 0;\n"
+    generated_code = "int " + new_var + " = 0;"
     possible_list = statement.posible_list
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
     elif not isinstance(possible_list, str) and not isinstance(possible_list, Param):
-        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
     elif isinstance(possible_list, Param):
-        # generated_code += "int " + new_var + "1 = 0;\n"
+        # generated_code += "int " + new_var + "1 = 0;"
         possible_list = possible_list.name
     as_part = statement.as_part
     if isinstance(statement.as_part, Variable):
         as_part = statement.as_part.name
     elif isinstance(statement.as_part, ClassWithGeters):
         as_part = generate_chane_code(statement.as_part, True)
-    generated_code += "for(Object " + as_part + " : " + possible_list + " ){\n"
+    generated_code += "for(Object " + as_part + " : " + possible_list + " ){"
 
     if statement.where_part is not None:
-        generated_code += "if(" + condition_generator(statement.where_part) + "){\n"
+        generated_code += "if(" + condition_generator(statement.where_part) + "){"
 
-    generated_code += new_var + " = " + new_var + "+1;\n"
+    generated_code += new_var + " = " + new_var + "+1;"
 
     if statement.where_part is not None:
-        generated_code += "}\n"
-    generated_code += "}\n"
+        generated_code += "}"
+    generated_code += "}"
     if name != "":
-        generated_code += "int " + name + "=" + new_var + ";\n"
+        generated_code += "int " + name + "=" + new_var + ";"
     return generated_code
 
 
 # all true not flse, any false "" true, none true "" false
 def generate_all_any_none_func(statement, name, block=0, first="true", not_op="", second="false"):
     new_var = "new_var" + str(block)
-    generated_code = "boolean " + new_var + " = " + first + ";\n"
+    generated_code = "boolean " + new_var + " = " + first + ";"
     possible_list = statement.posible_list
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
     elif not isinstance(possible_list, str):
-        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
     as_part = statement.as_part
@@ -367,12 +367,12 @@ def generate_all_any_none_func(statement, name, block=0, first="true", not_op=""
         as_part = generate_chane_code(statement.as_part, True)
     elif isinstance(statement.as_part, Param) or isinstance(statement.as_part, Variable):
         as_part = statement.as_part.name
-    generated_code += "for(Object " + as_part + " : " + possible_list + " ){\n"
+    generated_code += "for(Object " + as_part + " : " + possible_list + " ){"
 
-    generated_code += "if(" + not_op + "(" + condition_generator(statement.where_part) + ")){\n"
-    generated_code += new_var + " = " + second + ";\nbreak;\n}\n}\n"
+    generated_code += "if(" + not_op + "(" + condition_generator(statement.where_part) + ")){"
+    generated_code += new_var + " = " + second + ";break;}}"
 
-    generated_code += name + "=" + new_var + ";\n"
+    generated_code += name + "=" + new_var + ";"
     return generated_code
 
 
@@ -383,30 +383,30 @@ def generate_min_max_func(statement, name, block=0, max_min=">"):
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
     elif not isinstance(possible_list, str):
-        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
 
     as_part = statement.as_part
     if isinstance(as_part, ClassWithGeters):
         as_part = generate_chane_code(as_part, True)
-        generated_code += "if(" + possible_list + ".size()>0){\nObject " + new_var + " = " + possible_list + \
-                          ".get(0);\n}else{\nObject " + new_var + " = null;\n}"
-        generated_code += "for(Object " + statement.as_part.name + " : " + possible_list + " ){\n"
+        generated_code += "if(" + possible_list + ".size()>0){Object " + new_var + " = " + possible_list + \
+                          ".get(0);}else{Object " + new_var + " = null;}"
+        generated_code += "for(Object " + statement.as_part.name + " : " + possible_list + " ){"
     else:
-        generated_code += "if(" + possible_list + ".size()>0){\ndouble " + new_var + " = " + possible_list + \
-                          ".get(0);\n}else{\nObject " + new_var + " = null;\n}"
-        generated_code += "for(Object " + as_part + " : " + possible_list + " ){\n"
+        generated_code += "if(" + possible_list + ".size()>0){double " + new_var + " = " + possible_list + \
+                          ".get(0);}else{Object " + new_var + " = null;}"
+        generated_code += "for(Object " + as_part + " : " + possible_list + " ){"
     if statement.where_part is not None:
-        generated_code += "if(" + condition_generator(statement.where_part) + "){\n"
+        generated_code += "if(" + condition_generator(statement.where_part) + "){"
 
-    # generated_code += new_var + "if(" + as_part + max_min + new_var + "){\n" todo pogledaj ovo
-    generated_code += "if(" + as_part + max_min + new_var + "){\n"
+    # generated_code += new_var + "if(" + as_part + max_min + new_var + "){" todo pogledaj ovo
+    generated_code += "if(" + as_part + max_min + new_var + "){"
     if isinstance(statement.as_part, ClassWithGeters):
-        generated_code += new_var + " = " + statement.as_part.name + ";\n}\n}\n"
+        generated_code += new_var + " = " + statement.as_part.name + ";}}"
     else:
-        generated_code += new_var + " = " + as_part + ";\n}\n}\n"
-    generated_code += name + "=" + new_var + ";\n"
+        generated_code += new_var + " = " + as_part + ";}}"
+    generated_code += name + "=" + new_var + ";"
     return generated_code
 
 
@@ -416,7 +416,7 @@ def generate_size_func(statement, block=0):
     if isinstance(pl, ClassWithGeters):
         return generate_chane_code(pl, True) + ".size()"
     elif not isinstance(pl, str):
-        generated_code += "List<Object>  " + "new_var1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + "new_var1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(pl, "new_var1", block + 1, "")
     return pl + ".size()"
 
@@ -432,7 +432,7 @@ def generate_add_func(statement, block=0):
     if isinstance(possible_list, Variable) or isinstance(possible_list, Param):
         possible_list = possible_list.name
     elif not isinstance(possible_list, str) and possible_list is not None:
-        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();\n"
+        generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
 
@@ -441,7 +441,7 @@ def generate_add_func(statement, block=0):
         value = generate_chane_code(value, True)
     if isinstance(value, Variable) or isinstance(value, Param):
         value = value.name
-    generated_code += possible_list + ".add(" + value + ");\n"
+    generated_code += possible_list + ".add(" + value + ");"
     return generated_code
 
 
@@ -465,9 +465,9 @@ def generate_for_func(statement, name, block=0):  # todo ovo prodji ponovo, nije
             init_value = 1
 
         new_var = "new_var" + str(block)
-        generated_code += "double " + new_var + " = " + str(init_value) + ";\n"
+        generated_code += "double " + new_var + " = " + str(init_value) + ";"
 
-    generated_code += "for(Object " + statement.as_part.name + " : " + possible_list + " ){\n"
+    generated_code += "for(Object " + statement.as_part.name + " : " + possible_list + " ){"
     inter_code = ""
     if statement.for_func is not None:
 
@@ -477,7 +477,7 @@ def generate_for_func(statement, name, block=0):  # todo ovo prodji ponovo, nije
             inter_code = new_var + " = " + new_var + "+"
         else:
             inter_code = new_var + " = " + new_var + "*"
-    generated_code += short_func_generator(statement.short_func, "", block + 1, inter_code) + "\n}\n"
+    generated_code += short_func_generator(statement.short_func, "", block + 1, inter_code) + "}"
 
     return generated_code
 

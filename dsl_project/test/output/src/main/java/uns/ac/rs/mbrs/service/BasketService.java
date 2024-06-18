@@ -22,17 +22,19 @@ public class BasketService  {
     private final BasketRepository basketRepository;
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
+    private final ItemRepository itemRepository;
 
     public BasketService(
     BasketMapper basketMapper,
-    BasketRepository basketRepository
+    BasketRepository basketRepository,
+    ItemRepository itemRepository
             ,PersonRepository personRepository
             ,PersonMapper personMapper
 ) {
         this.basketMapper = basketMapper;
         this.basketRepository = basketRepository;
         this.personRepository = personRepository;
-
+        this.itemRepository = itemRepository;
         this.personMapper = personMapper;
     }
 //-------------------------------------------------------------
@@ -136,4 +138,49 @@ public void delete(Long id) {
         return list2;
     }
 
+    public BasketDTO updateWithItem(Long basketId, Long itemId, int quantity) throws NotFoundException {
+        Optional<Basket> maybeBasket = basketRepository.findById(basketId);
+        Optional<Item> maybeItem = itemRepository.findById(itemId);
+        if(maybeBasket.isPresent() && maybeItem.isPresent()) {
+            maybeBasket.get().setItem(maybeItem.get());
+            maybeBasket.get().setQuantity(quantity);
+            return basketMapper.toDTO(basketRepository.save(maybeBasket.get()));
+//            int ind =0;
+//            boolean found = false;
+//            for(Item i : maybeBasket.get().getItems()){
+//                if (i.getId() == itemId){
+////                    maybeBasket.get().getQuantity().get(ind)= Integer.valueOf(quantity);
+//                    found = true;
+//                }
+//            ind+=1;
+//            }
+//            if (!found){
+//                maybeBasket.get().getItems().add(maybeItem.get());
+//                maybeBasket.get().getQuantity().add(Integer.valueOf(quantity));
+//            }
+        }
+        throw new NotFoundException("Basket or item didnt found");
+    }
+
+    public BasketDTO removeItem(Long basketId, Long itemId) throws NotFoundException {
+        System.out.println("idemo/*/*/*/*/*/*");
+        Optional<Basket> maybeBasket = basketRepository.findById(basketId);
+        Optional<Item> maybeItem = itemRepository.findById(itemId);
+        if(maybeBasket.isPresent() && maybeItem.isPresent()) {
+            maybeBasket.get().setItem(null);
+            maybeBasket.get().setQuantity(0);
+            return basketMapper.toDTO(basketRepository.save(maybeBasket.get()));
+//            int ind =0;
+//            boolean found = false;
+//            for(Item i : maybeBasket.get().getItems()) {
+//                if (i.getId() == itemId) {
+//                    maybeBasket.get().getQuantity().get(ind) = Integer.valueOf(0);
+//                    maybeBasket.get().getItems().remove(ind);
+//                    break;
+//                }
+//                ind += 1;
+//            }
+        }
+        throw new NotFoundException("Basket or item didnt found");
+    }
 }

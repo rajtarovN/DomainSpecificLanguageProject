@@ -49,17 +49,19 @@ public ActionDTO save(ActionDTO actiondto ) {
 //      String tc = callPyController.callPythonGet();
 //      System.out.println(tc);
       String transformedCode = callPyController.callPythonPost(actiondto.getOriginalCode());
-      action.setTransformedCode(transformedCode.split("model\":\"")[1].split("}")[0]);
+      String part =transformedCode.split("model\":\"")[1].split("}")[0];
+
+      action.setTransformedCode(part.substring(0, part.length() - 1));
       action.setOriginalCode(actiondto.getOriginalCode());
     Action s = actionRepository.save(action);
     return actionMapper.toDTO(s);
 }
 public String generateCode(String originalCode, long id){
-    String code= "package uns.ac.rs.mbrs.service;\n" +
+    String code= "package uns.ac.rs.mbrs.gen;\nimport uns.ac.rs.mbrs.model.*;\n" +
             "\n" +
             "public class GeneratedCode"+id+" {\n" +
-            "    public  void execute(Person person, Bill, bill){\n" +originalCode +
-            "};\n" +
+            "    public  void execute(Person person, Bill bill){\n" +originalCode +
+            "}\n" +
             "\n" +
             "}";
 

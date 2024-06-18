@@ -10,7 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import itemWithPriceService from '../../services/ItemWithPriceService';
+import itemService from '../../services/ItemService';
 import { useNavigate } from 'react-router-dom';
 import NativeSelect from '@mui/material/NativeSelect';
 
@@ -32,9 +32,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditItemWithPrice = () => {
+const EditItem = () => {
   const classes = useStyles();
   const [formData, setFormData] = useState({
+    name: '',
+    quantity: '',
   });
   const { id } = useParams();
 
@@ -44,9 +46,11 @@ const EditItemWithPrice = () => {
     return () => {
       const fetchData = async () => {
         try {
-            const response = await itemWithPriceService.getOneItemWithPrice(id);
+            const response = await itemService.getOneItem(id);
             if (response.status === 200) {
               setFormData({
+                 name: response.data.name,
+                 quantity: response.data.quantity,
 
               })
             }
@@ -73,9 +77,9 @@ const EditItemWithPrice = () => {
         e.preventDefault();
         const fetchData = async () => {
           try {
-              const response = await itemWithPriceService.updateItemWithPrice(formData, id);
+              const response = await itemService.updateItem(formData, id);
               if (response.status === 200) {
-                navigate(`/table-itemWithPrice`);
+                navigate(`/table-item`);
               }
           } catch (error) {
               console.error(error);
@@ -88,9 +92,9 @@ const EditItemWithPrice = () => {
     console.log(formData);
     const fetchData = async () => {
       try {
-          const response = await itemWithPriceService.createItemWithPrice(formData);
+          const response = await itemService.createItem(formData);
           if (response.status === 200) {
-              navigate(`/table-itemWithPrice`);
+              navigate(`/table-item`);
           }
       } catch (error) {
           console.error(error);
@@ -106,12 +110,30 @@ const EditItemWithPrice = () => {
 
 
 
-
   return (
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
 
+      <div className={classes.formGroup}>
+        <TextField
+          label="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+      <div className={classes.formGroup}>
+        <TextField
+          label="quantity"
+          name="quantity"
+          value={formData.quantity}
+          type="number"
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
 
 
 
@@ -129,4 +151,4 @@ const EditItemWithPrice = () => {
   );
 };
 
-export default EditItemWithPrice;
+export default EditItem;

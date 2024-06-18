@@ -35,6 +35,9 @@ values ('pavlaka', 2, false);
 insert into item (name, quantity, deleted)
 values ('so', 3, false);
 
+insert into basket ( formular, deleted, person_id)
+values ('fff', false,1);
+
 insert into itemwithprice (currentprice, iscurrent, deleted)
 values (300, true, false);
 insert into itemwithprice (currentprice, iscurrent, deleted)
