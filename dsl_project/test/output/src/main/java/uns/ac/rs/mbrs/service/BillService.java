@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 @Service
 @Transactional
 public class BillService  {
@@ -24,7 +26,7 @@ public class BillService  {
     private final PersonMapper personMapper;
     private final ItemWithPriceRepository itemwithpriceRepository;
     private final ActionService  actionService;
-    private final BasketRepository basketRepository;
+            private final BasketRepository basketRepository; //todo ovo popravi
 
     public BillService(
     BillMapper billMapper,
@@ -32,9 +34,10 @@ public class BillService  {
             ,PersonRepository personRepository
             ,PersonMapper personMapper
              ,ItemWithPriceRepository itemwithpriceRepository
-            , ActionService  actionService,
-    BasketRepository basketRepository
+            , ActionService  actionService
+           ,BasketRepository basketRepository //todo ovo popravi
 ) {
+
         this.billMapper = billMapper;
         this.billRepository = billRepository;
         this.personRepository = personRepository;
@@ -42,50 +45,34 @@ public class BillService  {
         this.personMapper = personMapper;
              this.itemwithpriceRepository = itemwithpriceRepository;
             this.actionService = actionService;
-            this.basketRepository = basketRepository;
-    }
-//-------------------------------------------------------------
-  @Transactional
-public BillDTO save( BasketDTO basketdto ) throws Exception {
-      System.out.println("*/*/*/*/*");
-    Bill bill = new Bill();
 
-                                    if(basketdto.getPerson()!=null) {
-                                        Person person = personRepository.findByUsername(basketdto.getPerson().getUsername());
+           this.basketRepository = basketRepository;//todo ovo popravi
+    }
+  @Transactional
+public BillDTO save( BasketDTO basketdto )  throws Exception{
+
+            Bill bill = new Bill();
+                                    if( basketdto.getPerson()!=null) {
+                                        Person person = personRepository.getById( basketdto.getPerson().getId());
                                         bill.setPerson(person);
                                             person.getBill().add(bill);
                                     }
-      System.out.println("*/*/*/*/*");
+
+
                                     List <ItemWithPrice> itemWithPrice = new ArrayList<>();
                                     double price = 0;
-
-//                                    for(ItemDTO o : basketdto.getItem()){
-//                                        ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId());
-      ItemDTO o = basketdto.getItem();
-      ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId());
-                                        itemWithPrice.add(iwp);
-
-                                        if (iwp.getItem().getQuantity()-o.getQuantity()<0){
-                                            throw new Exception("Not enough items");
-                                        }
-                                        iwp.getItem().setQuantity(iwp.getItem().getQuantity()-o.getQuantity());
+                                    for(ItemDTO o : basketdto.getItem()){
+                                        itemWithPrice.add(itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId()));
                                         price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
-
-//                                    }System.out.println("*/*/*/*/*");
+                                    }
                                     bill.setTotalPrice(price);
                                     bill.setItemWithPrice(itemWithPrice);
-                                    Person person = personRepository.findByUsername(basketdto.getPerson().getUsername());
-                                    System.out.println("*/*/*/*/*");
+                                     Person person = personRepository.findByUsername(basketdto.getPerson().getUsername());
+
                                     actionService.doActionMake(person, bill);
-                                    person.getBasket().setItem(null);
-                                    person.getBasket().setQuantity(0);
-//      person.getBasket().setItem(new ArrayList<>());
-//      person.getBasket().setQuantity(new ArrayList<>());
     Bill s = billRepository.save(bill);
     return billMapper.toDTO(s);
 }
-//todo treba quantity smanjiti
-//-------------------------------------------------------------
 
     public BillDTO update(long id,BillDTO billdto) {
     Optional<Bill> bill = billRepository.findById(id);
@@ -170,50 +157,31 @@ public void delete(Long id) {
         return list2;
     }
 
-    @Transactional
-    public BillDTO saveWithId( long id) throws Exception {
+         @Transactional
+        public BillDTO saveWithId( long id) throws Exception {
         Bill bill = new Bill();
             Basket basket = basketRepository.getById(id);
             Optional<Person> person = personRepository.findById(basket.getPerson().getId());
             if (person.isPresent()){
             bill.setPerson(person.get());
             person.get().getBill().add(bill);
-
-        System.out.println("*/*/*/*/*");
         List <ItemWithPrice> itemWithPrice = new ArrayList<>();
         double price = 0;
-//        for(Item o : person.get().getBasket().getItem()){
-//            ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId());
-//            itemWithPrice.add(iwp);
-//            if (iwp.getItem().getQuantity()-o.getQuantity()<0){
-//                throw new Exception("Not enough items");
-//            }
-//            iwp.getItem().setQuantity(iwp.getItem().getQuantity()-o.getQuantity());
-//            price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
-//
-//        }System.out.println("*/*/*/*/*");
-                Item o =person.get().getBasket().getItem();
-
-                    ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(person.get().getBasket().getItem().getId());
-                    if (iwp==null){
-                        throw new NotFoundException("There is no current price");
-                    }
-                    itemWithPrice.add(iwp);
-                    if (iwp.getItem().getQuantity()-o.getQuantity()<0){
-                        System.out.println("-*-*-*-*-*-*");
-                        throw new Exception("Not enough items");
-                    }
-                    System.out.println("-----------");
-                    iwp.getItem().setQuantity(iwp.getItem().getQuantity()-o.getQuantity());
-                    price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
-                person.get().getBasket().setItem(null);
-                person.get().getBasket().setQuantity(0);
-//      person.get().getBasket().setItem(new ArrayList<>());
-//      person.get().getBasket().setQuantity(new ArrayList<>());
-                System.out.println("----//-------");
+        int counter=0;
+        for(Item o : person.get().getBasket().getItem()){
+            ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId());
+            itemWithPrice.add(iwp);
+            if (iwp.getItem().getQuantity()-person.get().getBasket().getQuantity().get(counter)<0){
+                throw new Exception("Not enough items");
+            }
+            iwp.getItem().setQuantity(iwp.getItem().getQuantity()-person.get().getBasket().getQuantity().get(counter));
+            price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
+            person.get().getBasket().setItem(new ArrayList<>());
+            person.get().getBasket().setQuantity(new ArrayList<>());
+            counter++;
+            }
         bill.setTotalPrice(price);
         bill.setItemWithPrice(itemWithPrice);
-        System.out.println("*/*/*/*/*");
         actionService.doActionMake(person.get(), bill);
         Bill s = billRepository.save(bill);
         return billMapper.toDTO(s);}

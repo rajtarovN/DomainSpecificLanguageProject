@@ -60,7 +60,7 @@ IfStatement:
 
 OneLineCondition: Conditions '?' (PosibleValuesForVariable  ) 'or:' (PosibleValuesForVariable )  ';';
 
-Conditions: Condition ( LogicalOperator Condition )*; //ovo bi trebalo dopuniti sa da moze or ime_samo, da ne bude da nemam bool promenljive
+Conditions: Condition ( LogicalOperator Condition )*;
 
 LogicalOperator: ('&&' | '||');
 
@@ -76,21 +76,21 @@ Operator: ('+' | '-' | '*' | '/' | '%' | '^');
 
 ChaneId: ID ('.' ID)*;
 
-Sum:        'sumOf' 	  PosibleLists 				(('as:' (ChaneId) (UsingFormula)?   WherePart)?);
-Average:    'averageOf'   PosibleLists 				('as:' ( ChaneId  ) (UsingFormula)?  WherePart)?;
-Product:    'productOf'   PosibleLists 				('as:' ( ChaneId  ) (UsingFormula)?  WherePart)?;
+Sum:        'sumOf' 	  PosibleLists 				(('as:' (ChaneId)   (UsingFormula)?   WherePart)?);
+Average:    'averageOf'   PosibleLists 				('as:' ( ChaneId  ) (UsingFormula)?   WherePart)?;
+Product:    'productOf'   PosibleLists 				('as:' ( ChaneId  ) (UsingFormula)?   WherePart)?;
 
-SelectTop:  'selectTop'   INT 'of' PosibleLists   	'as:'  ID (WherePart)?;
-SelectIn:   'selectIn' 	  PosibleLists 				'as:'  ID  WherePart;
-Count:      'countFrom'   PosibleLists 				('as:' ID)?( WherePart)?;
-All:        'allOf' 	  PosibleLists 				('as:' ID)?  WherePart ;
-Any:        'anyOf' 	  PosibleLists 				('as:' ID)? WherePart;
-NoOne:      'noneOf' 	  PosibleLists 				('as:' ID)? WherePart;
-Min:        'min'		  PosibleLists   			('as:' ( ChaneId))? ( WherePart)?;
-Max:        'max' 		  PosibleLists   			('as:' ( ChaneId))? ( WherePart)?;
+SelectTop:  'selectTop'   INT 'of' PosibleLists   	'as:'  ID           (WherePart)?;
+SelectIn:   'selectIn' 	  PosibleLists 				'as:'  ID            WherePart;
+Count:      'countFrom'   PosibleLists 				('as:' ID)?         (WherePart)?;
+All:        'allOf' 	  PosibleLists 				('as:' ID)?          WherePart ;
+Any:        'anyOf' 	  PosibleLists 				('as:' ID)?          WherePart;
+NoOne:      'noneOf' 	  PosibleLists 				('as:' ID)?          WherePart;
+Min:        'min'		  PosibleLists   			('as:' (ChaneId))?  (WherePart)?;
+Max:        'max' 		  PosibleLists   			('as:' (ChaneId))?  (WherePart)?;
 
 Size:       'sizeOf' 	  PosibleLists ;
-Add:        'add' 		  (ChaneId)              'in:' PosibleLists;
+Add:        'add' 		  (ChaneId)                 'in:' PosibleLists;
 
 ForEach:    'for' 		  ( ChaneId) 			 'as:' ( ChaneId) (ForOperation)?  ShortFunctions;
 

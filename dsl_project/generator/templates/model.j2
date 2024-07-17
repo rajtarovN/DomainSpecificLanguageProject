@@ -30,7 +30,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    {% set is_one = "one" %}
+    {% set is_one = ["one"] %}
     {% set variable_name = [] %}
     {% set variable_name_price = [] %}
     {% set basket_name = [] %}
@@ -38,7 +38,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
         {% if m.anotation%}
             {% if m.anotation.name == "bying" %}
                 {% if m.anotation.how_much == "more" %}
-                      {% set is_one = "more" %}
+                      {% set _ = is_one.append("more") %}
                       {% set _ = variable_name_price.append(m.name) %}
                  {% endif%}
             {% endif%}
@@ -53,7 +53,28 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
     {% if current_class.anotation%}
         {% if current_class.anotation.name == "basket" %}
 
-            {%if is_one=="one"%}
+{% for m in model.classes%}
+    {% if m.anotation%}
+        {% if m.anotation.name == "bying" %}
+            {% if m.anotation.how_much == "more" %}
+                  {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="basket"%}
+                @ElementCollection
+                @CollectionTable(name = "basket_quantities", joinColumns = @JoinColumn(name = "basket_id"))
+                @Column(name = "quantity")
+                private List<Integer> quantity;
+                     {%else%}
+                     private Integer quantity;
+ {%endif%}
+        {%endif%}
+             {%endif%}
+        {%endif%}
+    {%endif%}
+{%endfor%}
+
+            {%if is_one| length ==1%}
+
+
                 @ManyToOne
                 (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
                  {% for m in model.classes%}
@@ -103,7 +124,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
 
             private List<{{variable_name_price[0][0]|capitalize}}{{variable_name_price[0][1:]}}>  {{variable_name_price[0][0]|lower}}{{variable_name_price[0][1:]}};
             {%endif%}
-            {%if is_one=="one"%}
+            {%if is_one| length ==1%}
                 @OneToMany
                 (cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "{{current_class.name|lower}}"        )
                 private List<{{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}>  {{basket_name[0][0]|lower}}{{basket_name[0][1:]}};
@@ -216,8 +237,8 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
             @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
             @JoinTable(
                     name = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}_{{m.name[0]|lower}}{{m.name[1:]}}",
-                    joinColumns = @JoinColumn(name = "{{m.name[0]|lower}}{{m.name[1:]}}_id"),
-                    inverseJoinColumns = @JoinColumn(name = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}_id")
+                    joinColumns = @JoinColumn(name = "{{current_class.name[0]|lower}}{{current_class.name[1:]}}_id"),
+                    inverseJoinColumns = @JoinColumn(name = "{{m.name[0]|lower}}{{m.name[1:]}}_id")
             )
     {% set references = [] %}
                 {% for p in m.reference_properties %}

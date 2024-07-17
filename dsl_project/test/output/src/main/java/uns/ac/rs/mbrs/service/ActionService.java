@@ -6,8 +6,6 @@ import uns.ac.rs.mbrs.repository.*;
 import uns.ac.rs.mbrs.model.*;
 import uns.ac.rs.mbrs.mapper.*;
 import uns.ac.rs.mbrs.dtos.*;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uns.ac.rs.mbrs.utils.CallPyController;
 import uns.ac.rs.mbrs.utils.DynamicCodeExecution;
+import java.util.Date;
+
 
 @Service
 @Transactional
@@ -25,34 +25,32 @@ public class ActionService  {
 
     private final ActionMapper actionMapper;
     private final ActionRepository actionRepository;
-    private final CallPyController callPyController;
-    private final DynamicCodeExecution dynamicCodeExecution;
+             private final CallPyController callPyController;
+             private final DynamicCodeExecution dynamicCodeExecution;
 
     public ActionService(
     ActionMapper actionMapper,
-    ActionRepository actionRepository,
-    CallPyController callPyController,
+    ActionRepository actionRepository
+            , CallPyController callPyController,
     DynamicCodeExecution dynamicCodeExecution
 ) {
+
         this.actionMapper = actionMapper;
         this.actionRepository = actionRepository;
+
         this.callPyController = callPyController;
         this.dynamicCodeExecution = dynamicCodeExecution;
     }
-//-------------------------------------------------------------
   @Transactional
-public ActionDTO save(ActionDTO actiondto ) {
+public ActionDTO save( ActionDTO actiondto) {
 
-    Action action = actionMapper.toModel(actiondto);
-//        action.setTransformedCode(this.generateCode(actiondto.getOriginalCode()));
-      System.out.println("-------------------------------");
-//      String tc = callPyController.callPythonGet();
-//      System.out.println(tc);
-      String transformedCode = callPyController.callPythonPost(actiondto.getOriginalCode());
-      String part =transformedCode.split("model\":\"")[1].split("}")[0];
+            Action action = actionMapper.toModel(actiondto);
+        String transformedCode = callPyController.callPythonPost(actiondto.getOriginalCode());
+        String part =transformedCode.split("model\":\"")[1].split("}")[0];
 
-      action.setTransformedCode(part.substring(0, part.length() - 1));
-      action.setOriginalCode(actiondto.getOriginalCode());
+        action.setTransformedCode(part.substring(0, part.length() - 1));
+        action.setOriginalCode(actiondto.getOriginalCode());
+
     Action s = actionRepository.save(action);
     return actionMapper.toDTO(s);
 }
@@ -69,7 +67,6 @@ return code;
 }
 
 public void doActionMake(Person person, Bill current_bill ) throws Exception {
-
         List<Action> actions = actionRepository.findValidActions(new Date());
         for (Action a : actions){
             dynamicCodeExecution.execute(generateCode(a.getTransformedCode(), a.getId()), a.getId(), person, current_bill);
@@ -77,8 +74,6 @@ public void doActionMake(Person person, Bill current_bill ) throws Exception {
 
 }
 
-//todo treba quantity smanjiti
-//-------------------------------------------------------------
 
     public ActionDTO update(long id,ActionDTO actiondto) {
     Optional<Action> action = actionRepository.findById(id);

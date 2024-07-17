@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import BillDelete from './BillDelete';
 import { useNavigate } from 'react-router-dom';
 import billService from '../../services/BillService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   table: {
@@ -80,12 +82,10 @@ const TableBill = () => {
   const classes = useStyles();
 
   return (
+  <div>
+    <ToastContainer />
     <div>
       <br/>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Button variant="contained" color="primary" onClick={ handleAdd }>Add</Button>
-          <h3 style={{ flexGrow: 1, textAlign: 'center' }}>Address</h3>
-      </div>
       <br/>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
@@ -123,6 +123,7 @@ const TableBill = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+    </div>
     </div>
   );
 };

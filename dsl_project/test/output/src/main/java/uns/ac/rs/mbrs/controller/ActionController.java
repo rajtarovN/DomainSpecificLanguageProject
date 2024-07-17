@@ -1,7 +1,7 @@
 package uns.ac.rs.mbrs.controller;
 
 import javassist.NotFoundException;
-import uns.ac.rs.mbrs.model.Action;
+import uns.ac.rs.mbrs.model.*;
 import uns.ac.rs.mbrs.service.*;
 import uns.ac.rs.mbrs.dtos.*;
 import org.springframework.http.HttpStatus;
@@ -46,6 +46,11 @@ public class ActionController {
 
     }
 
+
+
+
+
+
     @PutMapping("/{id}")
     public ResponseEntity<ActionDTO> put(@PathVariable Long id, @RequestBody ActionDTO action) {
         ActionDTO action1 = actionService.update(id, action);
@@ -63,5 +68,6 @@ public class ActionController {
         actionService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 
 }

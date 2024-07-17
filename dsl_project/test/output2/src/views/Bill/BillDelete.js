@@ -4,10 +4,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const BillDelete = ({ open, id, onCancel, onDelete }) => {
   return (
+
     <Dialog open={open} onClose={onCancel}>
+    <div>
+    <ToastContainer />
       <DialogTitle>Confirmation of deleting</DialogTitle>
       <DialogContent>
         <p>
@@ -22,7 +27,9 @@ const BillDelete = ({ open, id, onCancel, onDelete }) => {
           Delete
         </Button>
       </DialogActions>
+    </div>
     </Dialog>
+
   );
 };
 

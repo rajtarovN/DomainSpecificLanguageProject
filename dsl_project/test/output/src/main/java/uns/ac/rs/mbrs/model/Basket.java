@@ -23,18 +23,17 @@ public class Basket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-                @ManyToOne
-                (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+                @ElementCollection
+                @CollectionTable(name = "basket_quantities", joinColumns = @JoinColumn(name = "basket_id"))
+                @Column(name = "quantity")
+                private List<Integer> quantity;
+
+                @ManyToMany
+
+                 (cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "basket"         )
 
                                 @JsonIgnoreProperties(value = "person", allowSetters = true)
-                private Item  item;
-//                @ElementCollection
-//                @CollectionTable(name = "basket_quantities", joinColumns = @JoinColumn(name = "basket_id"))
-//                @Column(name = "quantity")
-//                private List<Integer> quantity;
-@Column(name="quantity")
-private Integer quantity;
-
+                private List<Item>  item;
 
 
     @Column(name="formular")

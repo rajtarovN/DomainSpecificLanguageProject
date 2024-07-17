@@ -14,34 +14,42 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 @Service
 @Transactional
 public class ItemWithPriceService  {
 
     private final ItemWithPriceMapper itemwithpriceMapper;
     private final ItemWithPriceRepository itemwithpriceRepository;
-    private final ItemRepository itemRepository;
+     private final ItemRepository itemRepository;
 
     public ItemWithPriceService(
     ItemWithPriceMapper itemwithpriceMapper,
-    ItemWithPriceRepository itemwithpriceRepository,
-    ItemRepository itemRepository
+    ItemWithPriceRepository itemwithpriceRepository
+     ,ItemRepository itemRepository
 ) {
+
         this.itemwithpriceMapper = itemwithpriceMapper;
         this.itemwithpriceRepository = itemwithpriceRepository;
-        this.itemRepository = itemRepository;
-    }
-//-------------------------------------------------------------
-  @Transactional
-public ItemWithPriceDTO save(ItemWithPriceDTO itemwithpricedto ) {
+         this.itemRepository =itemRepository;
 
-    ItemWithPrice itemWithPrice = itemwithpriceMapper.toModel(itemwithpricedto);
-    itemWithPrice.setItem(itemRepository.getById(itemwithpricedto.getItem().getId()));
+    }
+  @Transactional
+public ItemWithPriceDTO save( ItemWithPriceDTO itemwithpricedto) {
+
+            ItemWithPrice itemWithPrice = itemwithpriceMapper.toModel(itemwithpricedto);
+    ItemWithPrice old = itemwithpriceRepository.findByItemIdAndIsCurrent(itemwithpricedto.getItem().getId());
+      if (old!=null){
+          old.setIscurrent(false);
+          itemwithpriceRepository.save(old);
+      }
+      Item item = itemRepository.getById(itemwithpricedto.getItem().getId());
+      item.getItemWithPrice().add(itemWithPrice);
+      itemWithPrice.setItem(item);
     ItemWithPrice s = itemwithpriceRepository.save(itemWithPrice);
     return itemwithpriceMapper.toDTO(s);
 }
-//todo treba quantity smanjiti
-//-------------------------------------------------------------
 
     public ItemWithPriceDTO update(long id,ItemWithPriceDTO itemwithpricedto) {
     Optional<ItemWithPrice> itemWithPrice = itemwithpriceRepository.findById(id);

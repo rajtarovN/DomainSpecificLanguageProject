@@ -287,6 +287,7 @@ def generate_sap_func(statement, name, block=0, id="", operation="a"):
 def generate_select_in_top_func(statement, name, block=0, id=""):
     new_var = "new_var" + str(block)
     generated_code = "List<Object> " + new_var + " = new ArrayList<>;"
+    print(statement.name)
     possible_list = statement.posible_list
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
@@ -322,15 +323,18 @@ def generate_count_in_func(statement, name, block=0, id=""):
     new_var = "new_var" + str(block)
     generated_code = "int " + new_var + " = 0;"
     possible_list = statement.posible_list
+    print(type(possible_list))
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
+    elif isinstance(possible_list, Variable):
+        possible_list = possible_list.name
+    elif isinstance(possible_list, Param):
+        # generated_code += "int " + new_var + "1 = 0;"
+        possible_list = possible_list.name
     elif not isinstance(possible_list, str) and not isinstance(possible_list, Param):
         generated_code += "List<Object>  " + new_var + "1 = new ArrayList<>();"
         generated_code += generate_select_in_top_func(possible_list, new_var + "1", block + 1, "")
         possible_list = new_var + "1"
-    elif isinstance(possible_list, Param):
-        # generated_code += "int " + new_var + "1 = 0;"
-        possible_list = possible_list.name
     as_part = statement.as_part
     if isinstance(statement.as_part, Variable):
         as_part = statement.as_part.name

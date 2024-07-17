@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import ActionDelete from './ActionDelete';
 import { useNavigate } from 'react-router-dom';
 import actionService from '../../services/ActionService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   table: {
@@ -80,6 +82,8 @@ const TableAction = () => {
   const classes = useStyles();
 
   return (
+  <div>
+    <ToastContainer />
     <div>
       <br/>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -123,6 +127,7 @@ const TableAction = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+    </div>
     </div>
   );
 };

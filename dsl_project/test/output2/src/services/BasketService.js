@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const ENDPOINTS = {
     BASE: 'http://localhost:8080/api/basket/',
 };
@@ -10,6 +12,7 @@ class BasketService {
                 ENDPOINTS.BASE+"getPersonsByBasket/"+id,
             );
         } catch (error) {
+         toast.error('Failed to get element.');
             return error;
         }
     };
@@ -19,6 +22,7 @@ class BasketService {
                 ENDPOINTS.BASE,
             );
         } catch (error) {
+        toast.error('Failed to get element.');
             return error;
         }
     };
@@ -28,6 +32,7 @@ class BasketService {
                 ENDPOINTS.BASE +id,
             );
         } catch (error) {
+        toast.error('Failed to get element.');
             return error;
         }
     };
@@ -38,6 +43,7 @@ class BasketService {
                 basket
             );
         } catch (error) {
+        toast.error('Failed to create element.');
             return error;
         }
     };
@@ -48,6 +54,7 @@ class BasketService {
                 basket
             );
         } catch (error) {
+        toast.error('Failed to update element.');
             return error;
         }
     };
@@ -57,24 +64,27 @@ class BasketService {
                 ENDPOINTS.BASE+id,
             );
         } catch (error) {
+        toast.error('Failed to delete element.');
             return error;
         }
     };
     addItemToBasket= async (basket_id, item_id, quantity) => {
         try {
             return await axios.put(
-                ENDPOINTS.BASE+basket_id+"/"+item_id+"/"+quantity,
+                ENDPOINTS.BASE+basket_id+"/"+item_id+"/"+quantity, //todo
             );
         } catch (error) {
+        toast.error('Failed to add item to basket element.');
             return error;
         }
     };
     removeItem = async (basketId, itemId) => {
         try {
             return await axios.put(
-                ENDPOINTS.BASE+basketId+"/"+itemId,
+                ENDPOINTS.BASE+basketId+"/"+itemId, //todo
             );
         } catch (error) {
+        toast.error('Failed to remove item from basket element.');
             return error;
         }
     }

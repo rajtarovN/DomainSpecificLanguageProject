@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import ItemWithPriceDelete from './ItemWithPriceDelete';
 import { useNavigate } from 'react-router-dom';
 import itemWithPriceService from '../../services/ItemWithPriceService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   table: {
@@ -80,6 +82,8 @@ const TableItemWithPrice = () => {
   const classes = useStyles();
 
   return (
+  <div>
+    <ToastContainer />
     <div>
       <br/>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -121,6 +125,7 @@ const TableItemWithPrice = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+    </div>
     </div>
   );
 };

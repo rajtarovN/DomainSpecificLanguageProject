@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import PersonDelete from './PersonDelete';
 import { useNavigate } from 'react-router-dom';
 import personService from '../../services/PersonService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   table: {
@@ -80,6 +82,8 @@ const TablePerson = () => {
   const classes = useStyles();
 
   return (
+  <div>
+    <ToastContainer />
     <div>
       <br/>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -127,6 +131,7 @@ const TablePerson = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+    </div>
     </div>
   );
 };

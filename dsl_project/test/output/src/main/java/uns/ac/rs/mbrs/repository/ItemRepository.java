@@ -11,4 +11,5 @@ import java.util.Date;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
+
 }

@@ -11,8 +11,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import actionService from '../../services/ActionService';
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -33,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
 const ActionView = () => {
   const navigate = useNavigate();
   const classes = useStyles();
-
   const { id } = useParams();
   const [action, setAction] = useState(NaN)
 
@@ -72,7 +72,12 @@ const ActionView = () => {
     setIsDialogOpen(false);
   };
 
+ //todo
+
+
   return (
+  <div>
+    <ToastContainer />
     <div className={classes.root}>
       <h2  >Nesto</h2>
 
@@ -81,9 +86,11 @@ const ActionView = () => {
         <label>name: </label>
         <label> {  action.name  } </label>
       </div>
+
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+
       </div>
       < ActionDelete
         open={isDialogOpen}
@@ -91,7 +98,7 @@ const ActionView = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
-    </div>
+    </div></div>
   );
 };
 

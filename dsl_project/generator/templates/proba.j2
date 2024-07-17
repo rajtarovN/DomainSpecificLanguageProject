@@ -1,0 +1,61 @@
+    @Transactional
+    public BillDTO saveWithId( long id) throws Exception {
+        Bill bill = new Bill();
+        Basket basket = basketRepository.getById(id);
+        Optional<Person> person = personRepository.findById(basket.getPerson().getId());
+        if (person.isPresent()){
+            bill.setPerson(person.get());
+            person.get().getBill().add(bill);
+            List <ItemWithPrice> itemWithPrice = new ArrayList<>();
+            double price = 0;
+            Item o =person.get().getBasket().getItem();
+            ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(person.get().getBasket().getItem().getId());
+            if (iwp==null){
+                throw new NotFoundException("There is no current price");
+            }
+            itemWithPrice.add(iwp);
+            if (iwp.getItem().getQuantity()-o.getQuantity()<0){
+                            throw new Exception("Not enough items");
+            }
+            iwp.getItem().setQuantity(iwp.getItem().getQuantity()-o.getQuantity());
+            price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
+            person.get().getBasket().setItem(null);
+            person.get().getBasket().setQuantity(0);
+            bill.setTotalPrice(price);
+            bill.setItemWithPrice(itemWithPrice);
+            actionService.doActionMake(person.get(), bill);
+            Bill s = billRepository.save(bill);
+            return billMapper.toDTO(s);
+        }
+        throw new Exception("There is no person with that id");
+    }
+
+
+
+     @Transactional
+    public BillDTO saveWithId( long id) throws Exception {
+        Bill bill = new Bill();
+        Basket basket = basketRepository.getById(id);
+        Optional<Person> person = personRepository.findById(basket.getPerson().getId());
+        if (person.isPresent()){
+            bill.setPerson(person.get());
+            person.get().getBill().add(bill);
+        List <ItemWithPrice> itemWithPrice = new ArrayList<>();
+        double price = 0;
+        for(Item o : person.get().getBasket().getItem()){
+            ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId());
+            itemWithPrice.add(iwp);
+            if (iwp.getItem().getQuantity()-o.getQuantity()<0){
+                throw new Exception("Not enough items");
+            }
+            iwp.getItem().setQuantity(iwp.getItem().getQuantity()-o.getQuantity());
+            price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
+      person.get().getBasket().setItem(new ArrayList<>());
+      person.get().getBasket().setQuantity(new ArrayList<>());
+        bill.setTotalPrice(price);
+        bill.setItemWithPrice(itemWithPrice);
+        actionService.doActionMake(person.get(), bill);
+        Bill s = billRepository.save(bill);
+        return billMapper.toDTO(s);}
+        throw new Exception("There is no person with that id");
+    }

@@ -13,16 +13,33 @@ package uns.ac.rs.mbrs.mapper;
 import uns.ac.rs.mbrs.model.*;
 import uns.ac.rs.mbrs.dtos.*;
 import org.springframework.stereotype.Component;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}Mapper {
 
+ {% if current_class.anotation.name == "basket" or current_class.anotation.name == "bying" %}
+ private final ItemMapper itemMapper;
+     public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}Mapper(
+                ItemMapper itemMapper
+        ) {
+            this.itemMapper = itemMapper;}
+ {% endif %}
 
     public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO toDTO({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} model) {
         {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO dto = new {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO();
+         {% if current_class.anotation%}
+            {% if current_class.anotation.name == "basket" %}
+            if (model.getQuantity()!=null){
+                dto.setQuantity(model.getQuantity());
+            }
+            if (model.getItem()!=null){
+                dto.setItem(itemMapper.toDTO(model.getItem()));
+            }
+            {% endif %}
+        {% endif %}
         {% for property in current_class.attributes %}
             {% if property.isEnum %}
         dto.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(model.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}().toString());
@@ -31,7 +48,50 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
             {% endif %}
         {% endfor %}
         dto.setId(model.getId());
+        {% if current_class.anotation%}
+            {% if current_class.anotation.name=="bying"%}
+        dto.setCurrentPrice(model.getCurrentPrice());
+        dto.setCurrent(model.isIscurrent());
+         dto.setItem(model.getItem()!=null?itemMapper.toDTO(model.getItem()):new ItemDTO());
+          {%endif%}
+        {%endif%}
         return dto;
+    }
+
+     public List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO> toDTO(List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}> models) {
+        List<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO> dtos = new ArrayList<{{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO>();
+         for({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} model : models){
+          {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO dto = new {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO();
+
+         {% if current_class.anotation%}
+            {% if current_class.anotation.name == "basket" %}
+            if (model.getQuantity()!=null){
+                dto.setQuantity(model.getQuantity());
+            }
+            if (model.getItem()!=null){
+                dto.setItem(itemMapper.toDTO(model.getItem()));
+            }
+            {% endif %}
+        {% endif %}
+        {% for property in current_class.attributes %}
+            {% if property.isEnum %}
+        dto.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(model.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}().toString());
+            {% else %}
+        dto.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(model.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}());
+            {% endif %}
+        {% endfor %}
+        dto.setId(model.getId());
+        {% if current_class.anotation%}
+            {% if current_class.anotation.name=="bying"%}
+        dto.setCurrentPrice(model.getCurrentPrice());
+        dto.setCurrent(model.isIscurrent());
+         dto.setItem(model.getItem()!=null?itemMapper.toDTO(model.getItem()):new ItemDTO());
+          {%endif%}
+        {%endif%}
+        dtos.add(dto);
+        }
+
+        return dtos;
     }
 
     public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} toModel({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO dto) {
@@ -43,6 +103,15 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
         model.set{{ property.name[0]|capitalize }}{{ property.name[1:]}}(dto.get{{ property.name[0]|capitalize }}{{ property.name[1:]}}());
             {% endif %}
         {% endfor %}
+        {% if current_class.anotation%}
+            {% if current_class.anotation.name=="bying"%}
+                  model.setCurrentPrice(dto.getCurrentPrice());
+                  model.setDeleted(false);
+                  model.setIscurrent(true);
+                  model.setId(dto.getId());
+                  model.setItem(itemMapper.toModel(dto.getItem()));
+            {%endif%}
+        {%endif%}
         return model;
     }
 }

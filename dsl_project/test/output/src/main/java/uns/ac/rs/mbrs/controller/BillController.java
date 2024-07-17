@@ -1,8 +1,7 @@
 package uns.ac.rs.mbrs.controller;
 
 import javassist.NotFoundException;
-import uns.ac.rs.mbrs.model.Basket;
-import uns.ac.rs.mbrs.model.Bill;
+import uns.ac.rs.mbrs.model.*;
 import uns.ac.rs.mbrs.service.*;
 import uns.ac.rs.mbrs.dtos.*;
 import org.springframework.http.HttpStatus;
@@ -37,6 +36,10 @@ public class BillController {
         BillDTO bill = billService.findOne(id);
         return ResponseEntity.ok().body(bill);
     }
+
+
+
+
 
     @PostMapping
     public ResponseEntity<BillDTO> post(@RequestBody BasketDTO basket) {
@@ -81,5 +84,6 @@ public class BillController {
         billService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 
 }

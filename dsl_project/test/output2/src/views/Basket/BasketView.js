@@ -11,10 +11,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import basketService from '../../services/BasketService';
 import billService from '../../services/BillService';
 import itemService from '../../services/ItemService';
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -35,26 +36,22 @@ const useStyles = makeStyles((theme) => ({
 const BasketView = () => {
   const navigate = useNavigate();
   const classes = useStyles();
-
+const [allItem, setAllItem] = useState([]);
   const { id } = useParams();
-  const [basket, setBasket] = useState(NaN);
-  const [allItem, setAllItem] = useState([]);
+  const [basket, setBasket] = useState(NaN)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
           const response = await basketService.getOneBasket(id);
           if (response.status === 200) {
-            console.log(response.data)
               setBasket(response.data);
-              setAllItem([response.data.item]);
+ setAllItem([response.data.item]);
           }
           const responsePerson = await basketService.getPersonsByBasket(id);
       } catch (error) {
           console.error(error);
       }
-      
-    // fetchDataItem();
   };
   fetchData();
   }, [id]);
@@ -78,6 +75,7 @@ const BasketView = () => {
     console.log("Deleting coffee with ID:", coffeeId);
     setIsDialogOpen(false);
   };
+
   const handleMakeBill = (e) => {
       e.preventDefault();
       const fetchData = async () => {
@@ -86,13 +84,12 @@ const BasketView = () => {
         const idSaved = response.data.id
         navigate(`/bill-view/`+idSaved);
       }
-       
+
     };
     fetchData();
   }
   const handleRemoveItem = (itemId) => {
     if ( !allItem) return;
-
     for (const item of allItem) {
       if (item.id === itemId) {
         const updatedCurrentItem = allItem.filter(itemItem => itemItem.id !== itemId);
@@ -105,8 +102,12 @@ const BasketView = () => {
     }
     fetchData();
   }
+ //todo
+
 
   return (
+  <div>
+    <ToastContainer />
     <div className={classes.root}>
       <h2  >Nesto</h2>
 
@@ -115,6 +116,8 @@ const BasketView = () => {
         <label>formular: </label>
         <label> {  basket.formular  } </label>
       </div>
+
+
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
@@ -144,9 +147,9 @@ const BasketView = () => {
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={handleMakeBill}>
          By
-        </Button>
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
+        </Button>        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+
       </div>
       < BasketDelete
         open={isDialogOpen}
@@ -154,7 +157,7 @@ const BasketView = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
-    </div>
+    </div></div>
   );
 };
 

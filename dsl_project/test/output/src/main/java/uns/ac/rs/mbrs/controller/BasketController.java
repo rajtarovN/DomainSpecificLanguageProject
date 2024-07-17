@@ -1,7 +1,7 @@
 package uns.ac.rs.mbrs.controller;
 
 import javassist.NotFoundException;
-import uns.ac.rs.mbrs.model.Basket;
+import uns.ac.rs.mbrs.model.*;
 import uns.ac.rs.mbrs.service.*;
 import uns.ac.rs.mbrs.dtos.*;
 import org.springframework.http.HttpStatus;
@@ -46,10 +46,15 @@ public class BasketController {
 
     }
 
+
+
+
+
+
     @PutMapping("/{id}")
     public ResponseEntity<BasketDTO> put(@PathVariable Long id, @RequestBody BasketDTO basket) {
         BasketDTO basket1 = basketService.update(id, basket);
-        return basket1  != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build(); //todo ovdeeeee
+        return basket != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
@@ -63,6 +68,7 @@ public class BasketController {
         basketService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
     @PutMapping("/{basketId}/{itemId}/{quantity}")
     public ResponseEntity<BasketDTO> put(@PathVariable Long basketId, @PathVariable Long itemId, @PathVariable int quantity) {
         BasketDTO basket1 = null;
@@ -83,9 +89,5 @@ public class BasketController {
         }
         return basket1 != null ? ResponseEntity.ok(basket1) : ResponseEntity.badRequest().build();
     }
-//    @GetMapping("/{id}")
-//    public ResponseEntity<BasketDTO> getItemsByBasketId(@PathVariable Long id) throws NotFoundException {
-//        BasketDTO basket = basketService.findOne(id);
-//        return ResponseEntity.ok().body(basket);
-//    }
+
 }

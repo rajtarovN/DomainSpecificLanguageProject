@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete from './{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete';
 import { useNavigate } from 'react-router-dom';
 import {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service from '../../services/{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   table: {
@@ -80,12 +82,23 @@ const Table{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =
   const classes = useStyles();
 
   return (
+  <div>
+    <ToastContainer />
     <div>
       <br/>
+      {% if current_class.anotation%}
+     {% if current_class.anotation.name!="bill" and current_class.anotation.name!="basket"%}
       <div style={% raw %}{{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}{% endraw %}>
           <Button variant="contained" color="primary" {% raw %}onClick={ handleAdd }{% endraw %}>Add</Button>
           <h3 {% raw %}style={{ flexGrow: 1, textAlign: 'center' }}{% endraw %}>Address</h3>
       </div>
+      {%endif%}
+      {%else%}
+      <div style={% raw %}{{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}{% endraw %}>
+          <Button variant="contained" color="primary" {% raw %}onClick={ handleAdd }{% endraw %}>Add</Button>
+          <h3 {% raw %}style={{ flexGrow: 1, textAlign: 'center' }}{% endraw %}>Address</h3>
+      </div>
+      {%endif%}
       <br/>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
@@ -128,6 +141,7 @@ const Table{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+    </div>
     </div>
   );
 };

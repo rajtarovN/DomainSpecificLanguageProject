@@ -31,7 +31,7 @@ public class Action {
     @Column(name="original_code")
     private String originalCode;
 
-    @Column(name="transformed_code", length = 500)
+    @Column(name="transformed_code")
     private String transformedCode;
 
 

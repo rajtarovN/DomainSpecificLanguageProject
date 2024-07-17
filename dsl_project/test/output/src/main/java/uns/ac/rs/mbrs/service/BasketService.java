@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 @Service
 @Transactional
 public class BasketService  {
@@ -22,37 +24,36 @@ public class BasketService  {
     private final BasketRepository basketRepository;
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
-    private final ItemRepository itemRepository;
+            private final ItemRepository itemRepository; //todo ovo popravi
 
     public BasketService(
     BasketMapper basketMapper,
-    BasketRepository basketRepository,
-    ItemRepository itemRepository
+    BasketRepository basketRepository
             ,PersonRepository personRepository
             ,PersonMapper personMapper
+           ,ItemRepository itemRepository //todo ovo popravi
 ) {
+
         this.basketMapper = basketMapper;
         this.basketRepository = basketRepository;
         this.personRepository = personRepository;
-        this.itemRepository = itemRepository;
+
         this.personMapper = personMapper;
+
+           this.itemRepository = itemRepository;//todo ovo popravi
     }
-//-------------------------------------------------------------
   @Transactional
-public BasketDTO save(BasketDTO basketdto ) {
+public BasketDTO save( BasketDTO basketdto) {
 
-    Basket basket = basketMapper.toModel(basketdto);
-
-                                    if(basketdto.getPerson()!=null) {
-                                        Person person = personRepository.getById(basketdto.getPerson().getId());
+            Basket basket = basketMapper.toModel(basketdto);
+                                    if( basketdto.getPerson()!=null) {
+                                        Person person = personRepository.getById( basketdto.getPerson().getId());
                                         basket.setPerson(person);
                                             person.setBasket(basket);
                                     }
     Basket s = basketRepository.save(basket);
     return basketMapper.toDTO(s);
 }
-//todo treba quantity smanjiti
-//-------------------------------------------------------------
 
     public BasketDTO update(long id,BasketDTO basketdto) {
     Optional<Basket> basket = basketRepository.findById(id);
@@ -138,48 +139,49 @@ public void delete(Long id) {
         return list2;
     }
 
-    public BasketDTO updateWithItem(Long basketId, Long itemId, int quantity) throws NotFoundException {
+        @Transactional
+        public BasketDTO updateWithItem(Long basketId, Long itemId, int quantity) throws NotFoundException {
         Optional<Basket> maybeBasket = basketRepository.findById(basketId);
         Optional<Item> maybeItem = itemRepository.findById(itemId);
         if(maybeBasket.isPresent() && maybeItem.isPresent()) {
-            maybeBasket.get().setItem(maybeItem.get());
-            maybeBasket.get().setQuantity(quantity);
-            return basketMapper.toDTO(basketRepository.save(maybeBasket.get()));
-//            int ind =0;
-//            boolean found = false;
-//            for(Item i : maybeBasket.get().getItems()){
-//                if (i.getId() == itemId){
-////                    maybeBasket.get().getQuantity().get(ind)= Integer.valueOf(quantity);
-//                    found = true;
-//                }
-//            ind+=1;
-//            }
-//            if (!found){
-//                maybeBasket.get().getItems().add(maybeItem.get());
-//                maybeBasket.get().getQuantity().add(Integer.valueOf(quantity));
-//            }
+            int ind =0;
+            boolean found = false;
+            for(Item i : maybeBasket.get().getItem()){
+                if (i.getId() == itemId){
+                    maybeBasket.get().getQuantity().set(ind, Integer.valueOf(quantity));
+                    found = true;
+                }
+            ind+=1;
+            }
+            if (!found){
+                maybeBasket.get().getItem().add(maybeItem.get());
+                maybeItem.get().getBasket().add(maybeBasket.get());
+                itemRepository.save(maybeItem.get());
+                maybeBasket.get().getQuantity().add(Integer.valueOf(quantity));
+            }
+return basketMapper.toDTO(basketRepository.save(maybeBasket.get()));
+
         }
         throw new NotFoundException("Basket or item didnt found");
     }
-
+    @Transactional
     public BasketDTO removeItem(Long basketId, Long itemId) throws NotFoundException {
-        System.out.println("idemo/*/*/*/*/*/*");
         Optional<Basket> maybeBasket = basketRepository.findById(basketId);
         Optional<Item> maybeItem = itemRepository.findById(itemId);
         if(maybeBasket.isPresent() && maybeItem.isPresent()) {
-            maybeBasket.get().setItem(null);
-            maybeBasket.get().setQuantity(0);
-            return basketMapper.toDTO(basketRepository.save(maybeBasket.get()));
-//            int ind =0;
-//            boolean found = false;
-//            for(Item i : maybeBasket.get().getItems()) {
-//                if (i.getId() == itemId) {
-//                    maybeBasket.get().getQuantity().get(ind) = Integer.valueOf(0);
-//                    maybeBasket.get().getItems().remove(ind);
-//                    break;
-//                }
-//                ind += 1;
-//            }
+            int ind =0;
+            boolean found = false;
+            for(Item i : maybeBasket.get().getItem()) {
+                if (i.getId() == itemId) {
+                    maybeBasket.get().getQuantity().remove(ind);
+                    maybeBasket.get().getItem().remove(ind);
+                     i.getBasket().remove(maybeBasket.get());
+                    itemRepository.save(i);
+                    break;
+                }
+                ind += 1;
+            }
+               return basketMapper.toDTO(basketRepository.save( maybeBasket.get()));
         }
         throw new NotFoundException("Basket or item didnt found");
     }

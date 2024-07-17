@@ -45,6 +45,8 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
                 {%endif%}
             {%endif%}
     {%endfor%}
+        {% if current_class.anotation%}
+            {% if current_class.anotation.name != "bill"%}
     @PostMapping
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}{% if current_class.anotation%}{% if current_class.anotation.name == "bill"%}, {{basket_name[0]}}DTO basket{%endif%}{%endif%}) {
         {% if current_class.anotation%}
@@ -74,6 +76,52 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
         {% endif %}
     }
 
+       {%endif%}
+
+    {%endif%}
+
+
+    {% if current_class.anotation==None%}
+
+    @PostMapping
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}{% if current_class.anotation%}{% if current_class.anotation.name == "bill"%}, {{basket_name[0]}}DTO basket{%endif%}{%endif%}) {
+        {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.save({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
+        if ({{ current_class.name[0]|lower }}{{ current_class.name[1:]}} == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>({{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1, HttpStatus.CREATED);
+    }
+    {%endif%}
+
+    {% if current_class.anotation%}
+            {% if current_class.anotation.name == "bill"%}
+    @PostMapping
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}DTO basket) {
+        {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 = null;
+        try {
+            {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}Service.save(basket);
+        } catch (Exception e) {
+             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ({{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>({{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/make-with-id/{id}")
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@PathVariable long id) {
+        {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 = null;
+        try {
+            {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}Service.saveWithId(id);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if ({{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(bill1, HttpStatus.CREATED);
+    }
+            {%endif%}
+    {%endif%}
+
     @PutMapping("/{id}")
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> put(@PathVariable Long id, @RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
         {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.update(id, {{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
@@ -91,5 +139,30 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
         {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    {% if current_class.anotation%}
+            {% if current_class.anotation.name == "basket"%}
+    @PutMapping("/{basketId}/{itemId}/{quantity}")
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO> put(@PathVariable Long basketId, @PathVariable Long itemId, @PathVariable int quantity) {
+        {{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 = null;
+        try {
+            {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 = {{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service.updateWithItem(basketId, itemId, quantity);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 != null ? ResponseEntity.ok({{ current_class.name[0]|lower}}{{current_class.name[1:]}}1) : ResponseEntity.badRequest().build();
+    }
+    @PutMapping("/{basketId}/{itemId}")
+    public ResponseEntity<{{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO> removeItem(@PathVariable Long basketId, @PathVariable Long itemId) {
+        {{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 = null;
+        try {
+            {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 = {{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service.removeItem({{ current_class.name[0]|lower}}{{current_class.name[1:]}}Id, itemId);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 != null ? ResponseEntity.ok({{ current_class.name[0]|lower}}{{current_class.name[1:]}}1) : ResponseEntity.badRequest().build();
+    }
+            {%endif%}
+    {%endif%}
 
 }

@@ -157,6 +157,7 @@ def statements_checker(text, defined_variables):
 def short_function_checker(line, defined_variables):
     global current_block
     name = [i for i in short_f_names if line.startswith(i)][0]
+    print(name)
     rest_line = line.split(name)[1]
     name_func_with_posible_list = ["sumOf", "averageOf", "productOf", "selectIn",  "countFrom", "allOf",
                                    "anyOf", "noneOf", "min", "max",  "sizeOf"]
@@ -195,7 +196,7 @@ def short_function_checker(line, defined_variables):
         for_function = None
 
         if rest_line.startswith("sumFrom") and not rest_line.startswith("sumOf"):
-            for_function, rest_line = "sumFrom", rest_line[3:]
+            for_function, rest_line = "sumFrom", rest_line[7:]
         elif rest_line.startswith("averageFrom"):
             for_function, rest_line = "averageFrom", rest_line[7:]
         elif rest_line.startswith("productFrom"):

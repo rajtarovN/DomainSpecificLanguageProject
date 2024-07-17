@@ -4,13 +4,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import uns.ac.rs.mbrs.dtos.PersonDTO;
 import uns.ac.rs.mbrs.model.*;
 import java.util.List;
 import java.util.Date;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
+
+
+
+
+
 
     @Query("SELECT p FROM Person p WHERE p.username = :username")
     Person findByUsername(@Param("username")String username);

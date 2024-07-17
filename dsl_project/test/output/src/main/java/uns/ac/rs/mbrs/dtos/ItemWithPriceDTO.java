@@ -15,7 +15,7 @@ import java.util.Date;
 public class ItemWithPriceDTO {
 
     private long id;
-    private boolean deleted;
+    private boolean dateFrom;
 
 
 
@@ -27,6 +27,7 @@ public class ItemWithPriceDTO {
 
 
                 private ItemDTO  item;
+
 
 
 }

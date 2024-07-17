@@ -11,8 +11,19 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service from '../../services/{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service';
-
+{% if current_class.anotation%}
+     {% if current_class.anotation.name=="basket"%}
+import billService from '../../services/BillService';
+import itemService from '../../services/ItemService';
+     {%endif%}
+       {% if current_class.anotation.name=="item"%}
+import basketService from '../../services/BasketService';
+import TextField from '@material-ui/core/TextField';
+     {%endif%}
+      {%endif%}
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -33,7 +44,11 @@ const useStyles = makeStyles((theme) => ({
 const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () => {
   const navigate = useNavigate();
   const classes = useStyles();
-
+{% if current_class.anotation%}
+     {% if current_class.anotation.name=="basket"%}
+const [allItem, setAllItem] = useState([]);
+     {%endif%}
+     {%endif%}
   const { id } = useParams();
   const [{{current_class.name[0]|lower}}{{current_class.name[1:]}}, set{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}] = useState(NaN)
 
@@ -43,6 +58,11 @@ const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () =>
           const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
           if (response.status === 200) {
               set{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(response.data);
+              {% if current_class.anotation%}
+     {% if current_class.anotation.name=="basket"%}
+ setAllItem([response.data.item]);
+     {%endif%}
+     {%endif%}
           }
           const responsePerson = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
       } catch (error) {
@@ -72,7 +92,71 @@ const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () =>
     setIsDialogOpen(false);
   };
 
+  {% if current_class.anotation%}
+     {% if current_class.anotation.name=="basket"%}
+  const handleMakeBill = (e) => {
+      e.preventDefault();
+      const fetchData = async () => {
+      const response = await billService.makeBillWithId(id);
+      if (response.status === 200 || response.status === 201 ) {
+        const idSaved = response.data.id
+        navigate(`/bill-view/`+idSaved);
+      }
+
+    };
+    fetchData();
+  }
+  const handleRemoveItem = (itemId) => {
+    if ( !allItem) return;
+    for (const item of allItem) {
+      if (item.id === itemId) {
+        const updatedCurrentItem = allItem.filter(itemItem => itemItem.id !== itemId);
+        setAllItem(updatedCurrentItem);
+        break;
+      }
+    }
+    const fetchData = async () => {
+    const response = await basketService.removeItem(id, itemId);
+    }
+    fetchData();
+  }
+     {%endif%} //todo
+     {%endif%}
+
+   {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="item"%} //todo
+
+       const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const [formData, setFormData] = useState({
+    quantity: '',
+  });
+  const handleAddToBasket = (e) => {
+    const basketId= 1;
+        const fetchData = async () => {
+          try {
+            console.log(formData)
+            console.log(formData.quantity)
+              const response = await basketService.addItemToBasket(basketId, id,formData.quantity);
+              if (response.status === 200 || response.status === 201) {
+                navigate(`/table-item`);
+              }
+          } catch (error) {
+              console.error(error);
+          }
+      };
+      fetchData();
+  };
+       {%endif%}{%endif%}
+
   return (
+  <div>
+    <ToastContainer />
     <div className={classes.root}>
       <h2  >Nesto</h2>
 
@@ -83,9 +167,67 @@ const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () =>
         <label>{% raw %} { {% endraw %} {{current_class.name[0]|lower}}{{current_class.name[1:]}}.{{prop}} {% raw %} } {% endraw %}</label>
       </div>
         {% endfor %}
+
+          {% if current_class.anotation%}
+     {% if current_class.anotation.name=="basket"%}
+
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Remove</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {allItem.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">
+                  {item.id}
+                </TableCell>
+                <TableCell align="center">
+                  {item.name}
+                </TableCell>
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleRemoveItem(item.id)}>Remove</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer><br/>
+      {%endif%}
+      {%endif%}
+         {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="item"%}
+        <label>Input quantity: </label>
+      <form className={classes.root}>
+      <div className={classes.formGroup}>
+
+        <TextField
+          name="quantity"
+          value={formData.quantity}
+          type="number"
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+      </form>
+       {%endif%}{%endif%}
       <div className={classes.buttonGroup}>
+       {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="item"%}
+       <Button variant="contained" color="primary" onClick={() => handleAddToBasket(id)}>Add to basket</Button>
+       {%endif%}{%endif%}
+       {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="basket"%}
+        <Button variant="contained" color="primary" onClick={handleMakeBill}>
+         By
+        </Button>{%endif%}{%endif%}
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+
       </div>
       < {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete
         open={isDialogOpen}
@@ -93,7 +235,7 @@ const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () =>
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
-    </div>
+    </div></div>
   );
 };
 

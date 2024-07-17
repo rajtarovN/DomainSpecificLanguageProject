@@ -13,6 +13,8 @@ import Paper from '@material-ui/core/Paper';
 import billService from '../../services/BillService';
 import { useNavigate } from 'react-router-dom';
 import NativeSelect from '@mui/material/NativeSelect';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import personService from '../../services/PersonService';
 
@@ -27,9 +29,18 @@ const useStyles = makeStyles((theme) => ({
   },
   formGroup: {
     marginBottom: theme.spacing(2),
+    margin: theme.spacing(2),
   },
   buttonGroup: {
     marginTop: theme.spacing(2),
+  },
+  textField: {
+    '& label': {
+      transform: 'translate(14px, -6px) scale(0.75)',
+    },
+    '& input': {
+      padding: '18.5px 14px',
+    },
   },
 }));
 
@@ -44,13 +55,17 @@ const EditBill = () => {
 
 
   useEffect(() => {
+
+
   const fetchDataPerson = async () => {
       try {
           const response= await personService.getPerson();
           if (response.status === 200) {
+           toast.success('Item created successfully!');
             setPersons(response.data);
         }
       } catch (error) {
+       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -62,12 +77,14 @@ const EditBill = () => {
         try {
             const response = await billService.getOneBill(id);
             if (response.status === 200) {
+ toast.success('Item created successfully!');
               setFormData({
                  neki_tekst: response.data.neki_tekst,
 
               })
             }
         } catch (error) {
+         toast.error('Failed to create item. Please try again.');
             console.error(error);
         }
     };
@@ -98,9 +115,11 @@ const EditBill = () => {
               }
               const response = await billService.updateBill(formData, id);
               if (response.status === 200) {
+               toast.success('Item created successfully!');
                 navigate(`/table-bill`);
               }
           } catch (error) {
+           toast.error('Failed to create item. Please try again.');
               console.error(error);
           }
       };
@@ -119,9 +138,11 @@ const EditBill = () => {
               }
           const response = await billService.createBill(formData);
           if (response.status === 200) {
+           toast.success('Item created successfully!');
               navigate(`/table-bill`);
           }
       } catch (error) {
+       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -139,8 +160,9 @@ const EditBill = () => {
     };
 
 
-
   return (
+  <div>
+    <ToastContainer />
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
@@ -174,7 +196,6 @@ const EditBill = () => {
         </div>
 
 
-
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
           Submit
@@ -184,6 +205,7 @@ const EditBill = () => {
         </Button>
       </div>
     </form>
+    </div>
   );
 };
 

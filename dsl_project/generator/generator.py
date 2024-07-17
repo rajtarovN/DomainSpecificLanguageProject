@@ -54,6 +54,41 @@ def generate(output_path):#todo
     with output_path.open('w', encoding="utf-8") as f:
         f.write(template.render())
 
+    template = jinja_env.get_template('ModelContent.j2')
+    file_name = 'ModelContent.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('DynamicCodeExecution.j2')
+    file_name = 'DynamicCodeExecution.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        for i in model.classes:
+            if i.anotation is not None:
+                if i.anotation.name == "bill":
+                    # if i.as_part != "":
+                    #     bill_name = i.as_part
+                    # else:
+                    bill_name = i.name
+                    f.write(template.render(billName = bill_name))
+                    break
+    template = jinja_env.get_template('CallPyController.j2')
+    file_name = 'CallPyController.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+       f.write(template.render())
+
+
     template = jinja_env.get_template('notFoundExc.j2')
     file_name = 'NotFoundException.java'
     folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'exception'
@@ -343,6 +378,18 @@ def generate(output_path):#todo
         with output_html_path.open('w') as f:
             # print(model)
             f.write(template.render(model=model, current_class=cl))
+
+        if cl.anotation is not None:
+            if cl.anotation.name=="item":
+                template = jinja_env.get_template('frontend/Card.j2')
+                file_name = cl.name + 'Card.js'
+                folder = output_folder2 / 'src' / 'views' / cl.name
+                folder.mkdir(parents=True, exist_ok=True)
+                output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
+
+                with output_html_path.open('w') as f:
+                    # print(model)
+                    f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('frontend/DeleteElement.j2')
         file_name = cl.name + 'Delete.js'

@@ -65,10 +65,8 @@ def parse_params(part):
     return parameters
 
 def class_object_checker(entity):
-    # "@Bying(one)classAddress{'street'String;'city'String;'zipCode'String;"
     possible_anotation = entity.split('class')[0]
     parts = entity.split('class')[1].split("{")
-    # classPerson:idStringageint
     attributes = parts[1].split(";")
     types = ('String', 'int', 'float', 'boolean', 'byte', 'short', 'long', 'double', 'char')
     attributes_names = []

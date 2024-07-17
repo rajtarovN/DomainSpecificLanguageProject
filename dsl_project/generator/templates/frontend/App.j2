@@ -8,7 +8,7 @@ import {{elem.name[0]|capitalize}}{{elem.name[1:]}}View from './views/{{elem.nam
 import Navbar from './views/components/NavBar';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import LoginForm from './views/login/LoginForm';
-//import Cards from './views/example/Cards';
+import CardItem from './views/Item/CardItem';
 
 const sampleData = [
   { id: 1, name: 'John', age: 30 },
@@ -24,13 +24,13 @@ function App() {
         <Navbar/>
         <Routes>
           <Route path="/" element={<LoginForm/>}/>
-          {/*<Route path="/home" element={<Cards/>}/>*/}
+           <Route path="/home" element={<CardItem/>}/>
           {{model}}
           {{classes}}
           {% for elem in model.classes %}
           <Route path="/table-{{elem.name|lower}}" element={<Table{{elem.name[0]|capitalize}}{{elem.name[1:]}}/>}/>
-          <Route path="/edit-{{elem.name|lower}}/:id" element={Edit<{{elem.name[0]|capitalize}}{{elem.name[1:]}}/>}/>
-          <Route path="/add-{{elem.name|lower}}" element={<{{elem.name[0]|capitalize}}{{elem.name[1:]}}Edit/>}/>
+          <Route path="/edit-{{elem.name|lower}}/:id" element={<Edit{{elem.name[0]|capitalize}}{{elem.name[1:]}}/>}/>
+          <Route path="/add-{{elem.name|lower}}" element={<Edit{{elem.name[0]|capitalize}}{{elem.name[1:]}}/>}/>
           <Route path="/{{elem.name|lower}}-view/:id" element={<{{elem.name[0]|capitalize}}{{elem.name[1:]}}View/>}/>
 
           {% endfor %}

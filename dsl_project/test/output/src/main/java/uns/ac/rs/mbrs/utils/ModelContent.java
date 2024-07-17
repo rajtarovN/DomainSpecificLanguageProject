@@ -1,7 +1,7 @@
 package uns.ac.rs.mbrs.utils;
 
 public class ModelContent {
-    private String model_content; // Promenjeno iz modelContent u model_content
+    private String model_content;
 
     public ModelContent() {}
 

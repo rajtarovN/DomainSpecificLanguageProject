@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 @Service
 @Transactional
 public class ItemService  {
@@ -25,20 +27,18 @@ public class ItemService  {
     ItemMapper itemMapper,
     ItemRepository itemRepository
 ) {
+
         this.itemMapper = itemMapper;
         this.itemRepository = itemRepository;
+
     }
-//-------------------------------------------------------------
   @Transactional
-public ItemDTO save(ItemDTO itemdto ) {
+public ItemDTO save( ItemDTO itemdto) {
 
-    Item item = itemMapper.toModel(itemdto);
-
+            Item item = itemMapper.toModel(itemdto);
     Item s = itemRepository.save(item);
     return itemMapper.toDTO(s);
 }
-//todo treba quantity smanjiti
-//-------------------------------------------------------------
 
     public ItemDTO update(long id,ItemDTO itemdto) {
     Optional<Item> item = itemRepository.findById(id);

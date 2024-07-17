@@ -13,6 +13,8 @@ import Paper from '@material-ui/core/Paper';
 import itemService from '../../services/ItemService';
 import { useNavigate } from 'react-router-dom';
 import NativeSelect from '@mui/material/NativeSelect';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -26,9 +28,18 @@ const useStyles = makeStyles((theme) => ({
   },
   formGroup: {
     marginBottom: theme.spacing(2),
+    margin: theme.spacing(2),
   },
   buttonGroup: {
     marginTop: theme.spacing(2),
+  },
+  textField: {
+    '& label': {
+      transform: 'translate(14px, -6px) scale(0.75)',
+    },
+    '& input': {
+      padding: '18.5px 14px',
+    },
   },
 }));
 
@@ -42,12 +53,15 @@ const EditItem = () => {
 
   useEffect(() => {
 
+
+
     if (id!=null){
     return () => {
       const fetchData = async () => {
         try {
             const response = await itemService.getOneItem(id);
             if (response.status === 200) {
+ toast.success('Item created successfully!');
               setFormData({
                  name: response.data.name,
                  quantity: response.data.quantity,
@@ -55,6 +69,7 @@ const EditItem = () => {
               })
             }
         } catch (error) {
+         toast.error('Failed to create item. Please try again.');
             console.error(error);
         }
     };
@@ -79,9 +94,11 @@ const EditItem = () => {
           try {
               const response = await itemService.updateItem(formData, id);
               if (response.status === 200) {
+               toast.success('Item created successfully!');
                 navigate(`/table-item`);
               }
           } catch (error) {
+           toast.error('Failed to create item. Please try again.');
               console.error(error);
           }
       };
@@ -94,9 +111,11 @@ const EditItem = () => {
       try {
           const response = await itemService.createItem(formData);
           if (response.status === 200) {
+           toast.success('Item created successfully!');
               navigate(`/table-item`);
           }
       } catch (error) {
+       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -111,6 +130,8 @@ const EditItem = () => {
 
 
   return (
+  <div>
+    <ToastContainer />
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
@@ -138,7 +159,6 @@ const EditItem = () => {
 
 
 
-
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
           Submit
@@ -148,6 +168,7 @@ const EditItem = () => {
         </Button>
       </div>
     </form>
+    </div>
   );
 };
 

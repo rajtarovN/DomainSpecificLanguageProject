@@ -11,8 +11,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import billService from '../../services/BillService';
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -33,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
 const BillView = () => {
   const navigate = useNavigate();
   const classes = useStyles();
-
   const { id } = useParams();
   const [bill, setBill] = useState(NaN)
 
@@ -72,7 +72,12 @@ const BillView = () => {
     setIsDialogOpen(false);
   };
 
+ //todo
+
+
   return (
+  <div>
+    <ToastContainer />
     <div className={classes.root}>
       <h2  >Nesto</h2>
 
@@ -81,9 +86,11 @@ const BillView = () => {
         <label>neki_tekst: </label>
         <label> {  bill.neki_tekst  } </label>
       </div>
+
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+
       </div>
       < BillDelete
         open={isDialogOpen}
@@ -91,7 +98,7 @@ const BillView = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
-    </div>
+    </div></div>
   );
 };
 

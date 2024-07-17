@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const ENDPOINTS = {
     BASE: 'http://localhost:8080/api/{{current_class.name[0]|lower}}{{current_class.name[1:]}}/',
 };
@@ -10,6 +12,7 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
                 ENDPOINTS.BASE+"getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}/"+id,
             );
         } catch (error) {
+         toast.error('Failed to get element.');
             return error;
         }
     };
@@ -19,6 +22,7 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
                 ENDPOINTS.BASE,
             );
         } catch (error) {
+        toast.error('Failed to get element.');
             return error;
         }
     };
@@ -28,6 +32,7 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
                 ENDPOINTS.BASE +id,
             );
         } catch (error) {
+        toast.error('Failed to get element.');
             return error;
         }
     };
@@ -38,6 +43,7 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
                 {{current_class.name[0]|lower}}{{current_class.name[1:]}}
             );
         } catch (error) {
+        toast.error('Failed to create element.');
             return error;
         }
     };
@@ -48,6 +54,7 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
                 {{current_class.name[0]|lower}}{{current_class.name[1:]}}
             );
         } catch (error) {
+        toast.error('Failed to update element.');
             return error;
         }
     };
@@ -57,9 +64,57 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
                 ENDPOINTS.BASE+id,
             );
         } catch (error) {
+        toast.error('Failed to delete element.');
             return error;
         }
     };
+     {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="basket"%}
+    addItemToBasket= async (basket_id, item_id, quantity) => {
+        try {
+            return await axios.put(
+                ENDPOINTS.BASE+basket_id+"/"+item_id+"/"+quantity, //todo
+            );
+        } catch (error) {
+        toast.error('Failed to add item to basket element.');
+            return error;
+        }
+    };
+    removeItem = async (basketId, itemId) => {
+        try {
+            return await axios.put(
+                ENDPOINTS.BASE+basketId+"/"+itemId, //todo
+            );
+        } catch (error) {
+        toast.error('Failed to remove item from basket element.');
+            return error;
+        }
+    }
+    {%endif%}
+       {% if current_class.anotation.name=="bill"%}
+    makeBill = async (basket) => {
+        try {
+            return await axios.post( //todo
+                ENDPOINTS.BASE,
+                basket
+            );
+        } catch (error) {
+        toast.error('Failed to make bill element.');
+            return error;
+        }
+    };
+    makeBillWithId = async (id) => {
+        try {
+            return await axios.post(
+                ENDPOINTS.BASE + `make-with-id/${id}`, //todo
+            );
+        } catch (error) {
+        toast.error('Failed to make bill element.');
+            return error;
+        }
+    };
+    {%endif%}
+    {%endif%}
     
 }
 

@@ -21,9 +21,9 @@ public class BillDTO {
 
 
 
-
     private double totalPrice;
 
     private List<ItemWithPriceDTO>  itemWithPrice;
+
 
 }

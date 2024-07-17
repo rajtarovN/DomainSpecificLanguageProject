@@ -25,8 +25,14 @@ public class Item {
             @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "item")
 
             private List<ItemWithPrice>  itemWithPrice;
-                @OneToMany
-                (cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "item"        )
+                @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+                @JoinTable(
+                        name = "item_basket",
+                        joinColumns = @JoinColumn(name = "item_id"),
+                        inverseJoinColumns = @JoinColumn(name = "basket_id")
+                )
+
+                                @JsonIgnoreProperties(value = "person", allowSetters = true)
                 private List<Basket>  basket;
 
 

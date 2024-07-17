@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { useParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,6 +48,8 @@ const LoginForm = () => {
   };
 
   return (
+  <div>
+    <ToastContainer />
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >Log in</h2>
       <p>ID: {id}</p>
@@ -75,6 +79,7 @@ const LoginForm = () => {
         </Button>
       </div>
     </form>
+    </div>
   );
 };
 

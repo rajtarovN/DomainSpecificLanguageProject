@@ -1,7 +1,7 @@
 package uns.ac.rs.mbrs.controller;
 
 import javassist.NotFoundException;
-import uns.ac.rs.mbrs.model.Person;
+import uns.ac.rs.mbrs.model.*;
 import uns.ac.rs.mbrs.service.*;
 import uns.ac.rs.mbrs.dtos.*;
 import org.springframework.http.HttpStatus;
@@ -37,14 +37,17 @@ public class PersonController {
         return ResponseEntity.ok().body(person);
     }
 
+
+
+
     @PostMapping
     public ResponseEntity<PersonDTO> post(@RequestBody PersonDTO person) {
         PersonDTO person1 = personService.save(person);
         if (person == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(person1, HttpStatus.CREATED);
-
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<PersonDTO> put(@PathVariable Long id, @RequestBody PersonDTO person) {
@@ -63,5 +66,6 @@ public class PersonController {
         personService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 
 }

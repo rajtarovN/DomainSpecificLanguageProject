@@ -37,11 +37,24 @@ public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}
 
 
 {% endfor %}
+
+{%  if current_class.name == "Person"%}
+    @Query("SELECT p FROM Person p WHERE p.username = :username")
+    Person findByUsername(@Param("username")String username);
+    {% endif %}
     {%  if current_class.anotation %}
         {% if current_class.anotation.name == "action"%}
 
      @Query("SELECT a FROM Action a WHERE :currentDate BETWEEN a.dateFrom AND a.dateTo")
     List<Action> findValidActions(@Param("currentDate") Date currentDate);
-{% endif %}
-{% endif %}
+        {% endif %}
+        {% if current_class.anotation.name == "bying" %}
+    @Query("SELECT iwp FROM {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} iwp WHERE iwp.item.id = :itemId AND iwp.iscurrent = true")
+     {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} findByItemIdAndIsCurrent(@Param("itemId") long itemId);
+        {% endif %}
+        {% if current_class.anotation.name == "person" %}
+        @Query("SELECT p FROM Person p WHERE p.username = :username")
+        Person findByUsername(@Param("username")String username);
+     {% endif %}
+    {% endif %}
 }

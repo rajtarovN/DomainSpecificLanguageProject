@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 @Service
 @Transactional
 public class PersonService  {
@@ -33,6 +35,7 @@ public class PersonService  {
             ,BillRepository billRepository
             ,BillMapper billMapper
 ) {
+
         this.personMapper = personMapper;
         this.personRepository = personRepository;
         this.basketRepository = basketRepository;
@@ -41,21 +44,16 @@ public class PersonService  {
         this.billRepository = billRepository;
 
         this.billMapper = billMapper;
+
     }
-//-------------------------------------------------------------
   @Transactional
-public PersonDTO save(PersonDTO persondto ) {
+public PersonDTO save( PersonDTO persondto){
 
-    Person person = personMapper.toModel(persondto);
-
+        Person person = personMapper.toModel(persondto);
                                     if(persondto.getBasket()!=null) {
                                         Basket basket = basketRepository.getById(persondto.getBasket().getId());
                                         person.setBasket(basket);
                                             basket.setPerson(person);
-                                    }else{
-                                        Basket basket = new Basket();
-                                        person.setBasket(basket);
-                                        basket.setPerson(person);
                                     }
                 List<Bill> bills = new ArrayList<>();
                 for (Long d : persondto.getBillIds()) {
@@ -68,8 +66,6 @@ public PersonDTO save(PersonDTO persondto ) {
     Person s = personRepository.save(person);
     return personMapper.toDTO(s);
 }
-//todo treba quantity smanjiti
-//-------------------------------------------------------------
 
     public PersonDTO update(long id,PersonDTO persondto) {
     Optional<Person> person = personRepository.findById(id);

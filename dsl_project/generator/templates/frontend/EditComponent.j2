@@ -13,10 +13,17 @@ import Paper from '@material-ui/core/Paper';
 import {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service from '../../services/{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service';
 import { useNavigate } from 'react-router-dom';
 import NativeSelect from '@mui/material/NativeSelect';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 {% for property in current_class.reference_properties %}
 import {{property.name|lower}}Service from '../../services/{{property.name[0]|capitalize}}{{property.name[1:]}}Service';
 {% endfor %}
+ {% if current_class.anotation%}
+     {% if current_class.anotation.name=="bying"%}
+import itemService from '../../services/ItemService';
+{%endif%}
+{%endif%}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,9 +36,18 @@ const useStyles = makeStyles((theme) => ({
   },
   formGroup: {
     marginBottom: theme.spacing(2),
+    margin: theme.spacing(2),
   },
   buttonGroup: {
     marginTop: theme.spacing(2),
+  },
+  textField: {
+    '& label': {
+      transform: 'translate(14px, -6px) scale(0.75)',
+    },
+    '& input': {
+      padding: '18.5px 14px',
+    },
   },
 }));
 
@@ -41,8 +57,26 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
   {% for property in current_class.attributes %}
     {{property}}: '',
    {%endfor%}
+{% if current_class.anotation%}
+     {% if current_class.anotation.name=="action"%}
+    dateFrom: '',
+    dateTo: '',
+    originalCode: '',
+{%endif%}
+{%endif%}
+    {% if current_class.anotation%}
+       {% if current_class.anotation.name=="bying"%}
+  currentPrice: 0,
+{%endif%}
+{%endif%}
   });
   const { id } = useParams();
+   {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="bying"%}
+  const [items, setItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState('');
+{%endif%}
+{%endif%}
   {% for property in current_class.reference_properties %}
   {% if property.upper is defined and property.upper == -1 %}
   const [current{{property.name[0]|capitalize}}{{property.name[1:]}}, setCurrent{{property.name[0]|capitalize}}{{property.name[1:]}}] = useState([]);
@@ -55,15 +89,36 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
   {%endfor%}
 
   useEffect(() => {
+
+  {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="bying"%}
+ const fetchDataItem = async () => {
+      try {
+          const response= await itemService.getItem();
+          if (response.status === 200) {
+           toast.success('Item created successfully!');
+            setItems(response.data);
+        }
+      } catch (error) {
+       toast.error('Failed to create item. Please try again.');
+          console.error(error);
+      }
+  };
+  fetchDataItem();
+{%endif%}
+{%endif%}
+
   {% for property in current_class.reference_properties %}
   {% if property.upper is defined and property.upper != -1 %}
   const fetchData{{property.name[0]|capitalize}}{{property.name[1:]}} = async () => {
       try {
           const response= await {{property.name[0]|lower}}{{property.name[1:]}}Service.get{{property.name[0]|capitalize}}{{property.name[1:]}}();
           if (response.status === 200) {
+           toast.success('Item created successfully!');
             set{{property.name[0]|capitalize}}{{property.name[1:]}}s(response.data);
         }
       } catch (error) {
+       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -77,14 +132,29 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
         try {
             const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
             if (response.status === 200) {
+ toast.success('Item created successfully!');
+             {% if current_class.anotation.name=="bying"%}
+              setSelectedItem(response.data.getItem().getId());
+              {%endif%}
               setFormData({
+               {% if current_class.anotation.name=="bying"%}
+               currentPrice: response.data.currentPrice,
+              {%endif%}
               {% for property in current_class.attributes %}
                  {{property}}: response.data.{{property}},
               {%endfor%}
+              {% if current_class.anotation%}
 
+     {% if current_class.anotation.name=="action"%}
+              name: response.data.name,
+              dateFrom: response.data.dateFrom,
+              dateTo: response.data.dateTo,
+              originalCode: response.data.originalCode
+              {%endif%}{%endif%}
               })
             }
         } catch (error) {
+         toast.error('Failed to create item. Please try again.');
             console.error(error);
         }
     };
@@ -97,9 +167,11 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
       try {
           const response2 = await {{property.name[0]|lower}}{{property.name[1:]}}Service.get{{property.name[0]|capitalize}}{{property.name[1:]}}();
           if (response2.status === 200) {
+           toast.success('Item created successfully!');
             setAll{{property.name[0]|capitalize}}{{property.name[1:]}}(response2.data);
         }
       } catch (error) {
+       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -122,6 +194,21 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
         e.preventDefault();
         const fetchData = async () => {
           try {
+          {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="bying"%}
+  for(let j in items){
+              if (parseInt(selectedItem)===parseInt(items[j].id)){
+                formData['item'] = items[j];
+
+                break;
+              }
+            }
+            setFormData({
+              currentPrice: response.data.currentPrice,
+           })
+           console.log(formData);
+{%endif%}
+{%endif%}
                {% for property in current_class.reference_properties %}
                 {% if property.upper is defined and property.upper == -1 %}
 
@@ -143,9 +230,11 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
               {%endfor%}
               const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.update{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(formData, id);
               if (response.status === 200) {
+               toast.success('Item created successfully!');
                 navigate(`/table-{{current_class.name[0]|lower}}{{current_class.name[1:]}}`);
               }
           } catch (error) {
+           toast.error('Failed to create item. Please try again.');
               console.error(error);
           }
       };
@@ -156,6 +245,15 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
     console.log(formData);
     const fetchData = async () => {
       try {
+{% if current_class.anotation%}
+                    {% if current_class.anotation.name=="bying"%}
+           for(let j in items){
+          if (parseInt(selectedItem)===parseInt(items[j].id)){ //todo ovde verujem da ide name
+            formData['item'] = items[j];
+            break;
+          }
+        }
+        {%endif%}{%endif%}
       {% set id = [] %}
       {% for property in current_class.reference_properties %}
                 {% if property.upper is defined and property.upper == -1 %}
@@ -178,9 +276,11 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
               {%endfor%}
           const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.create{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(formData);
           if (response.status === 200) {
+           toast.success('Item created successfully!');
               navigate(`/table-{{current_class.name[0]|lower}}{{current_class.name[1:]}}`);
           }
       } catch (error) {
+       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -232,9 +332,18 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
   {%endif%}
   {%endfor%}
 
-
+ {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="bying"%}
+ const handleChangeItem = (event) => {
+    console.log(event.target.value)
+      setSelectedItem(event.target.value);
+  };
+{%endif%}
+{%endif%}
 
   return (
+  <div>
+    <ToastContainer />
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
@@ -324,7 +433,66 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
 
       {%endif%}
       {%endfor%}
-
+      {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="bying"%}
+   <div className={classes.formGroup}>
+        <TextField
+          label="currentPrice"
+          name="currentPrice"
+          value={formData.currentPrice}
+          type="number"
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+      <label htmlFor="dvaSelect">Select Item: </label>
+      <NativeSelect id="dvaSelect" value={selectedItem} onChange={handleChangeItem}>
+                <option value="">--Please choose an option--</option>{
+                 items.map(item => (
+                    <option  key={
+                    item.id} value={
+                    item.id}>
+                        {
+                        item.id}
+                    </option >
+                ))}
+            </NativeSelect>
+{%endif%}
+{%endif%}
+{% if current_class.anotation%}
+     {% if current_class.anotation.name=="action"%}
+        <div className={classes.formGroup}>
+        <TextField
+          label="Original Code"
+          name="originalCode"
+          value={formData.originalCode}
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+      <div className={classes.formGroup}>
+        <TextField
+          label="Date From"
+          name="dateFrom"
+          type="date"
+          value={formData.dateFrom}
+          onChange={handleChange}
+          variant="outlined"
+          className={classes.textField}
+        />
+      </div>
+      <div className={classes.formGroup}>
+        <TextField
+          label="Date To"
+          name="dateTo"
+          type="date"
+          value={formData.dateTo}
+          onChange={handleChange}
+          variant="outlined"
+           className={classes.textField}
+        />
+      </div>
+      {%endif%}{%endif%}
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
@@ -335,6 +503,7 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
         </Button>
       </div>
     </form>
+    </div>
   );
 };
 

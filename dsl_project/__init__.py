@@ -13,9 +13,11 @@ def model_language():
         'Model': nelly_checker,
     }
     builtin_models_repository = scoping.ModelRepository()
-    metamodel = metamodel_from_file(grammar_path, classes=internal_classes, #builtin_models=builtin_models_repository,
+    metamodel = metamodel_from_file(grammar_path, classes=internal_classes,                                         #builtin_models=builtin_models_repository,
                                     global_repository=True)
     metamodel.register_obj_processors(object_checkers)
     # print()
     return metamodel
+
+
 

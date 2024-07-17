@@ -11,10 +11,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import itemService from '../../services/ItemService';
 import basketService from '../../services/BasketService';
 import TextField from '@material-ui/core/TextField';
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -35,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
 const ItemView = () => {
   const navigate = useNavigate();
   const classes = useStyles();
-
   const { id } = useParams();
   const [item, setItem] = useState(NaN)
 
@@ -73,7 +73,12 @@ const ItemView = () => {
     console.log("Deleting coffee with ID:", coffeeId);
     setIsDialogOpen(false);
   };
-  const handleChange = (e) => {
+
+ //todo
+
+ //todo
+
+       const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -101,6 +106,8 @@ const ItemView = () => {
   };
 
   return (
+  <div>
+    <ToastContainer />
     <div className={classes.root}>
       <h2  >Nesto</h2>
 
@@ -112,10 +119,12 @@ const ItemView = () => {
       <div className={classes.formGroup}>
         <label>quantity: </label>
         <label> {  item.quantity  } </label>
-      </div><label>Input quantity: </label>
+      </div>
+
+        <label>Input quantity: </label>
       <form className={classes.root}>
       <div className={classes.formGroup}>
-      
+
         <TextField
           name="quantity"
           value={formData.quantity}
@@ -126,9 +135,10 @@ const ItemView = () => {
       </div>
       </form>
       <div className={classes.buttonGroup}>
+       <Button variant="contained" color="primary" onClick={() => handleAddToBasket(id)}>Add to basket</Button>
         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="primary" onClick={() => handleAddToBasket(id)}>Add to basket</Button>
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+
       </div>
       < ItemDelete
         open={isDialogOpen}
@@ -136,7 +146,7 @@ const ItemView = () => {
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
-    </div>
+    </div></div>
   );
 };
 

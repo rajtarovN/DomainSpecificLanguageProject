@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const ENDPOINTS = {
     BASE: 'http://localhost:8080/api/bill/',
 };
@@ -10,6 +12,7 @@ class BillService {
                 ENDPOINTS.BASE+"getPersonsByBill/"+id,
             );
         } catch (error) {
+         toast.error('Failed to get element.');
             return error;
         }
     };
@@ -19,6 +22,7 @@ class BillService {
                 ENDPOINTS.BASE,
             );
         } catch (error) {
+        toast.error('Failed to get element.');
             return error;
         }
     };
@@ -28,6 +32,7 @@ class BillService {
                 ENDPOINTS.BASE +id,
             );
         } catch (error) {
+        toast.error('Failed to get element.');
             return error;
         }
     };
@@ -38,6 +43,7 @@ class BillService {
                 bill
             );
         } catch (error) {
+        toast.error('Failed to create element.');
             return error;
         }
     };
@@ -48,6 +54,7 @@ class BillService {
                 bill
             );
         } catch (error) {
+        toast.error('Failed to update element.');
             return error;
         }
     };
@@ -57,25 +64,28 @@ class BillService {
                 ENDPOINTS.BASE+id,
             );
         } catch (error) {
+        toast.error('Failed to delete element.');
             return error;
         }
     };
     makeBill = async (basket) => {
         try {
-            return await axios.post(
+            return await axios.post( //todo
                 ENDPOINTS.BASE,
                 basket
             );
         } catch (error) {
+        toast.error('Failed to make bill element.');
             return error;
         }
     };
     makeBillWithId = async (id) => {
         try {
             return await axios.post(
-                ENDPOINTS.BASE + `make-with-id/${id}`,
+                ENDPOINTS.BASE + `make-with-id/${id}`, //todo
             );
         } catch (error) {
+        toast.error('Failed to make bill element.');
             return error;
         }
     };

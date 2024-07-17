@@ -43,6 +43,9 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO
     private String originalCode;
     private String transformedCode;
     {%endif%}
+    {% if current_class.anotation.name == "bying" %}
+    private boolean dateFrom;
+    {%endif%}
 
     {% for property in current_class.attributes %}
         {% if property %}
@@ -81,15 +84,6 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO
     {% endif %}
 
     {% if current_class.anotation%}
-        {% if current_class.anotation.name == "basket" %}
-            {%if is_one |length ==1%}
-    private {{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}DTO  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
-             {%else%}
-
-    private List<{{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}DTO>  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
-        {%endif%}
-    {%endif%}
-
     {% if current_class.anotation.name == "bill" %}
     private double totalPrice;
     {% for m in model.classes%}
@@ -131,4 +125,24 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO
         {%endfor%}
        {%endif%}
 {%endif%}
+
+ {% if current_class.anotation%}
+                    {% if current_class.anotation.name=="basket"%}
+{% for m in model.classes%}
+    {% if m.anotation%}
+        {% if m.anotation.name == "bying" %}
+                    {% if m.anotation.how_much == "more" %}
+                   private List<Integer> quantity;
+                    private List<{{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}DTO>  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
+                    {%else%}
+                     private Integer quantity;
+            private {{variable_name[0][0]|capitalize}}{{variable_name[0][1:]}}DTO  {{variable_name[0][0]|lower}}{{variable_name[0][1:]}};
+
+ {%endif%}
+        {%endif%}
+             {%endif%}
+
+{%endfor%}
+{%endif%}
+    {%endif%}
 }

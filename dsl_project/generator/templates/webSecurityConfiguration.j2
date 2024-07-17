@@ -81,6 +81,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 {% for current_class in model.classes %}
                 .antMatchers("/api/{{ current_class.name[0]|lower}}{{current_class.name[1:]}}/").permitAll()
                 .antMatchers("/api/{{ current_class.name[0]|lower}}{{current_class.name[1:]}}/{id}").permitAll()
+                {% if current_class.anotation%}
+                {% if current_class.anotation.name=="basket"%}
+                .antMatchers("/api/basket/{basketId}/{itemId}/{quantity}").permitAll()
+                .antMatchers("/api/basket/{basketId}/{itemId}").permitAll()
+                {%endif%}
+                {% if current_class.anotation.name=="bill"%}
+                .antMatchers("/api/bill/make-with-id/{id}").permitAll()
+                {%endif%}
+                {%endif%}
                 {%endfor%}
                 .antMatchers("/logout").permitAll()
                 .anyRequest().authenticated().and()

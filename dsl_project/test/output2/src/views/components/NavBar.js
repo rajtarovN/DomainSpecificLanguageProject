@@ -11,6 +11,24 @@ const NavBar = () => {
   const handleHome = () => {
     navigate(`/home`);
   };
+  const handleTablePerson = () => {
+    navigate(`/table-person`);
+  };
+  const handleTableBill = () => {
+    navigate(`/table-bill`);
+  };
+  const handleTableItemWithPrice = () => {
+    navigate(`/table-itemwithprice`);
+  };
+  const handleTableBasket = () => {
+    navigate(`/table-basket`);
+  };
+  const handleTableItem = () => {
+    navigate(`/table-item`);
+  };
+  const handleTableAction = () => {
+    navigate(`/table-action`);
+  };
   const handleSubMenuClick = () => {
     setShowSubMenu(!showSubMenu);
   };
@@ -25,6 +43,12 @@ const NavBar = () => {
           <a href="#" style={styles.navLink} onClick={handleSubMenuClick}>Elements</a>
           {showSubMenu && (
             <ul style={styles.subMenu}>
+              <li><a onClick={handleTablePerson} style={styles.navLink} href="#">Table Person</a></li>
+              <li><a onClick={handleTableBill} style={styles.navLink} href="#">Table Bill</a></li>
+              <li><a onClick={handleTableItemWithPrice} style={styles.navLink} href="#">Table ItemWithPrice</a></li>
+              <li><a onClick={handleTableBasket} style={styles.navLink} href="#">Table Basket</a></li>
+              <li><a onClick={handleTableItem} style={styles.navLink} href="#">Table Item</a></li>
+              <li><a onClick={handleTableAction} style={styles.navLink} href="#">Table Action</a></li>
             </ul>
           )}
         </li>
