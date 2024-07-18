@@ -118,7 +118,7 @@ const EditAction = () => {
           if (response.status === 200) {
            toast.success('Item created successfully!');
               navigate(`/table-action`);
-          }
+          } toast.success('Item created successfully!');
       } catch (error) {
        toast.error('Failed to create item. Please try again.');
           console.error(error);

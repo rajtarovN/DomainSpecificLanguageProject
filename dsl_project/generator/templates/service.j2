@@ -586,8 +586,14 @@ public void delete(Long id) {
             boolean found = false;
             for(Item i : maybe{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}.get().getItem()){
                 if (i.getId() == itemId){
+
+                    try{
                     maybe{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}.get().getQuantity().set(ind, Integer.valueOf(quantity));
                     found = true;
+                    }catch (IndexOutOfBoundsException e){
+                        maybeBasket.get().getQuantity().add( Integer.valueOf(quantity));
+                        found = true;
+                    }
                 }
             ind+=1;
             }

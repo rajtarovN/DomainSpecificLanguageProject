@@ -96,7 +96,6 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
       try {
           const response= await itemService.getItem();
           if (response.status === 200) {
-           toast.success('Item created successfully!');
             setItems(response.data);
         }
       } catch (error) {
@@ -114,11 +113,9 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
       try {
           const response= await {{property.name[0]|lower}}{{property.name[1:]}}Service.get{{property.name[0]|capitalize}}{{property.name[1:]}}();
           if (response.status === 200) {
-           toast.success('Item created successfully!');
             set{{property.name[0]|capitalize}}{{property.name[1:]}}s(response.data);
         }
       } catch (error) {
-       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
@@ -132,7 +129,6 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
         try {
             const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
             if (response.status === 200) {
- toast.success('Item created successfully!');
              {% if current_class.anotation.name=="bying"%}
               setSelectedItem(response.data.getItem().getId());
               {%endif%}
@@ -167,7 +163,6 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
       try {
           const response2 = await {{property.name[0]|lower}}{{property.name[1:]}}Service.get{{property.name[0]|capitalize}}{{property.name[1:]}}();
           if (response2.status === 200) {
-           toast.success('Item created successfully!');
             setAll{{property.name[0]|capitalize}}{{property.name[1:]}}(response2.data);
         }
       } catch (error) {

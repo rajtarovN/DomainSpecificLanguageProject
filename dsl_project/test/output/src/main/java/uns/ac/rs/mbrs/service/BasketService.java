@@ -148,8 +148,13 @@ public void delete(Long id) {
             boolean found = false;
             for(Item i : maybeBasket.get().getItem()){
                 if (i.getId() == itemId){
+                    try{
                     maybeBasket.get().getQuantity().set(ind, Integer.valueOf(quantity));
-                    found = true;
+                    found = true;}
+                    catch (IndexOutOfBoundsException e){
+                        maybeBasket.get().getQuantity().add( Integer.valueOf(quantity));
+                        found = true;
+                    }
                 }
             ind+=1;
             }

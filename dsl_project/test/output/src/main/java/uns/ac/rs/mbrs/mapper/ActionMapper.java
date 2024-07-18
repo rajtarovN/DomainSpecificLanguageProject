@@ -15,6 +15,10 @@ public class ActionMapper {
         ActionDTO dto = new ActionDTO();
         dto.setName(model.getName());
         dto.setId(model.getId());
+
+        dto.setOriginalCode(model.getOriginalCode());
+        dto.setDateFrom(model.getDateFrom());
+        dto.setDateTo(model.getDateTo());
         return dto;
     }
 
@@ -34,6 +38,9 @@ public class ActionMapper {
     public Action toModel(ActionDTO dto) {
         Action model = new Action();
         model.setName(dto.getName());
+        model.setOriginalCode(dto.getOriginalCode());
+        model.setDateFrom(dto.getDateFrom());
+        model.setDateTo(dto.getDateTo());
         return model;
     }
 }
