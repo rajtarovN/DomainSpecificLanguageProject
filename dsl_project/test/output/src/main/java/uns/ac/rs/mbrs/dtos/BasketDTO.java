@@ -17,8 +17,7 @@ public class BasketDTO {
     private long id;
 
             private String formular;
-            private PersonDTO person;
-
+            private CustomerDTO customer;
 
 
 
@@ -27,6 +26,9 @@ public class BasketDTO {
 
                    private List<Integer> quantity;
                     private List<ItemDTO>  item;
+
+
+
 
 
 

@@ -22,23 +22,23 @@ public class BasketService  {
 
     private final BasketMapper basketMapper;
     private final BasketRepository basketRepository;
-    private final PersonRepository personRepository;
-    private final PersonMapper personMapper;
+    private final CustomerRepository customerRepository;
+    private final CustomerMapper customerMapper;
             private final ItemRepository itemRepository; //todo ovo popravi
 
     public BasketService(
     BasketMapper basketMapper,
     BasketRepository basketRepository
-            ,PersonRepository personRepository
-            ,PersonMapper personMapper
+            ,CustomerRepository customerRepository
+            ,CustomerMapper customerMapper
            ,ItemRepository itemRepository //todo ovo popravi
 ) {
 
         this.basketMapper = basketMapper;
         this.basketRepository = basketRepository;
-        this.personRepository = personRepository;
+        this.customerRepository = customerRepository;
 
-        this.personMapper = personMapper;
+        this.customerMapper = customerMapper;
 
            this.itemRepository = itemRepository;//todo ovo popravi
     }
@@ -46,10 +46,10 @@ public class BasketService  {
 public BasketDTO save( BasketDTO basketdto) {
 
             Basket basket = basketMapper.toModel(basketdto);
-                                    if( basketdto.getPerson()!=null) {
-                                        Person person = personRepository.getById( basketdto.getPerson().getId());
-                                        basket.setPerson(person);
-                                            person.setBasket(basket);
+                                    if( basketdto.getCustomer()!=null) {
+                                        Customer customer = customerRepository.getById( basketdto.getCustomer().getId());
+                                        basket.setCustomer(customer);
+                                            customer.setBasket(basket);
                                     }
     Basket s = basketRepository.save(basket);
     return basketMapper.toDTO(s);
@@ -63,11 +63,11 @@ public BasketDTO save( BasketDTO basketdto) {
 
 
        //ovde
-                    if(basketdto.getPerson()!=null) {
+                    if(basketdto.getCustomer()!=null) {
 
-                    Person person =personRepository.getById(basketdto.getPerson().getId());
-                    basket.get().setPerson(person);
-                    person.setBasket(basket.get());
+                    Customer customer =customerRepository.getById(basketdto.getCustomer().getId());
+                    basket.get().setCustomer(customer);
+                    customer.setBasket(basket.get());
 
 }
 
@@ -121,8 +121,8 @@ public void delete(Long id) {
     if (maybeBasket.isPresent()) {
         Basket existingBasket = maybeBasket.get();
         existingBasket.setDeleted(true);
-        if (existingBasket.getPerson() != null){
-            existingBasket.getPerson().setDeleted(true);
+        if (existingBasket.getCustomer() != null){
+            existingBasket.getCustomer().setDeleted(true);
         }
 
         basketRepository.save(existingBasket);
@@ -148,10 +148,11 @@ public void delete(Long id) {
             boolean found = false;
             for(Item i : maybeBasket.get().getItem()){
                 if (i.getId() == itemId){
+
                     try{
                     maybeBasket.get().getQuantity().set(ind, Integer.valueOf(quantity));
-                    found = true;}
-                    catch (IndexOutOfBoundsException e){
+                    found = true;
+                    }catch (IndexOutOfBoundsException e){
                         maybeBasket.get().getQuantity().add( Integer.valueOf(quantity));
                         found = true;
                     }

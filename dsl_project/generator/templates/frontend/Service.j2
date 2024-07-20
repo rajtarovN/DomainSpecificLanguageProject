@@ -6,10 +6,10 @@ const ENDPOINTS = {
 };
 
 class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
-    getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+    getCustomersBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
         try {
             return await axios.get(
-                ENDPOINTS.BASE+"getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}/"+id,
+                ENDPOINTS.BASE+"getCustomersBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}/"+id,
             );
         } catch (error) {
          toast.error('Failed to get element.');

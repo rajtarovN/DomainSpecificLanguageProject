@@ -1,6 +1,8 @@
 from textx import TextXSemanticError
 from .model import *
 from .meta_model_functions import *
+
+
 def nelly_checker(nelly_model):
     file_parts = nelly_model.split("file")
     clases = []
@@ -23,6 +25,9 @@ def nelly_checker(nelly_model):
                 elif 'OneToOne' in part or 'OneToMany' in part or 'ManyToOne' in part or 'ManyToMany' in part:
                     relations.append(relations_checker(part))
     add_relations_to_class(clases, relations)
+    if any([True for cl in clases if cl.anotation is not None]):
+        add_roles(clases, relations)
+
     # check_params_types_annotation(clases)
     nelly = Model("nelly", clases, enums, files, relations)
     return nelly
@@ -209,3 +214,22 @@ def check_params_types_annotation(classes):
                                     break
                             if not found:
                                 raise Exception("Type " + p.type + "doesnt exist")
+
+
+def add_roles(clases, relations):
+    seller = Class("Seller", [], None, True, 'SELLER')
+    admin = Class("Admin", [], None, True, 'ADMIN')
+    customer = Class("Customer", [], None, True, 'CUSTOMER')
+    clases.extend([seller, admin, customer])
+    for clas in clases:
+        if clas.anotation is not None:
+            if clas.anotation.name == "basket":
+                clas.add_ref_property(
+                    LinkProperty(customer.name, customer, 0, "OneToOne", 'LAZY', 'ALL', None, "customer"))
+                customer.add_ref_property(
+                    LinkProperty(clas.name, clas, 0, "OneToOne", 'LAZY', 'ALL', "customer", "basket"))
+            elif clas.anotation.name == "bill":
+                clas.add_ref_property(
+                    LinkProperty(customer.name, customer, 0, "ManyToOne", 'LAZY', 'ALL', None ,"customer"))
+                customer.add_ref_property(
+                    LinkProperty(clas.name, clas, -1, "OneToMany", 'LAZY', 'ALL', None, "bill"))

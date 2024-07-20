@@ -44,7 +44,7 @@ const ItemWithPriceView = () => {
           if (response.status === 200) {
               setItemWithPrice(response.data);
           }
-          const responsePerson = await itemWithPriceService.getPersonsByItemWithPrice(id);
+          const responseCustomer = await itemWithPriceService.getCustomersByItemWithPrice(id);
       } catch (error) {
           console.error(error);
       }

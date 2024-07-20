@@ -22,6 +22,7 @@ public class ItemWithPriceMapper {
         dto.setCurrentPrice(model.getCurrentPrice());
         dto.setCurrent(model.isIscurrent());
          dto.setItem(model.getItem()!=null?itemMapper.toDTO(model.getItem()):new ItemDTO());
+
         return dto;
     }
 
@@ -36,7 +37,6 @@ public class ItemWithPriceMapper {
          dto.setItem(model.getItem()!=null?itemMapper.toDTO(model.getItem()):new ItemDTO());
         dtos.add(dto);
         }
-
         return dtos;
     }
 

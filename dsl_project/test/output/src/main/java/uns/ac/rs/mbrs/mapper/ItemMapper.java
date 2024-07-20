@@ -16,6 +16,7 @@ public class ItemMapper {
         dto.setName(model.getName());
         dto.setQuantity(model.getQuantity());
         dto.setId(model.getId());
+
         return dto;
     }
 
@@ -29,7 +30,6 @@ public class ItemMapper {
         dto.setId(model.getId());
         dtos.add(dto);
         }
-
         return dtos;
     }
 

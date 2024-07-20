@@ -11,12 +11,14 @@ class Model(object):
 
 
 class Class(object):
-    def __init__(self, name, attributes, anotation):#parent, name, attributes):
+    def __init__(self, name, attributes, anotation, extends_user=False, role=None):#parent, name, attributes):
         # self.parent = parent
         self.name = name
         self.attributes = attributes
         self.reference_properties = []
         self.anotation = anotation
+        self.extends_user = extends_user
+        self.role = role
 
     def add_ref_property(self, property):
         self.reference_properties.append(property)

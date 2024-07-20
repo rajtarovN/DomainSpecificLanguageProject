@@ -290,14 +290,14 @@ public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO sav
                                     }
                                     {{ current_class.name | lower }}.setTotalPrice(price);
                                     {{ current_class.name | lower }}.set{{m.name[0]|capitalize}}{{m.name[1:]}}({{m.name[0]|lower}}{{m.name[1:]}});
-                                     Person person = personRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getPerson().getUsername());
+                                     Customer customer = customerRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getCustomer().getUsername());
 
-                                    {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(person, bill);
+                                    {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(customer, bill);
                                 {%else%}
                                 {{ current_class.name | lower }}.set{{m.name[0]|capitalize}}{{m.name[1:]}}({{m.name[0]|lower}}{{m.name[1:]}}Repository.findByItemIdAndIsCurrent({{ current_class.name | lower }}dto.getItem.getId());
                                  {{ current_class.name | lower }}.setTotalPrice(price);
-                                    Person person = personRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getPerson().getUsername());
-                                  {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(person, bill);
+                                    Customer customer = customerRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getCustomer().getUsername());
+                                  {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(customer, bill);
                                 {% endif %}
                             {% endif %}
                        {% endif %}
@@ -321,7 +321,7 @@ public String generateCode(String originalCode, long id){
     String code= "package uns.ac.rs.mbrs.gen;\nimport uns.ac.rs.mbrs.model.*;\n" +
             "\n" +
             "public class GeneratedCode"+id+" {\n" +
-            "    public  void execute(Person person, Bill bill){\n" +originalCode +
+            "    public  void execute(Customer customer, Bill bill){\n" +originalCode +
             "}\n" +
             "\n" +
             "}";
@@ -329,10 +329,10 @@ public String generateCode(String originalCode, long id){
 return code;
 }
 
-public void doActionMake(Person person, Bill current_bill ) throws Exception {
+public void doActionMake(Customer customer, Bill current_bill ) throws Exception {
         List<{{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}}> {{ current_class.name | lower }}s = {{ current_class.name | lower }}Repository.findValidActions(new Date());
         for ({{ current_class.name[0] | capitalize }}{{ current_class.name[1:]}} a : {{ current_class.name | lower }}s){
-            dynamicCodeExecution.execute(generateCode(a.getTransformedCode(), a.getId()), a.getId(), person, current_bill);
+            dynamicCodeExecution.execute(generateCode(a.getTransformedCode(), a.getId()), a.getId(), customer, current_bill);
         }
 
 }
@@ -651,10 +651,10 @@ return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}
         public {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO saveWithId( long id) throws Exception {
         {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {{ current_class.name[0]|lower}}{{ current_class.name[1:]}} = new {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}();
             Basket basket = basketRepository.getById(id);
-            Optional<Person> person = personRepository.findById(basket.getPerson().getId());
-            if (person.isPresent()){
-            {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setPerson(person.get());
-            person.get().get{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}().add({{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
+            Optional<Customer> customer = customerRepository.findById(basket.getCustomer().getId());
+            if (customer.isPresent()){
+            {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setCustomer(customer.get());
+            customer.get().get{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}().add({{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
         List <ItemWithPrice> itemWithPrice = new ArrayList<>();
         double price = 0;
   {% for m in model.classes%}
@@ -662,44 +662,44 @@ return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}
         {% if m.anotation.name == "bying" %}
             {% if m.anotation.how_much == "more" %}
         int counter=0;
-        for(Item o : person.get().getBasket().getItem()){
+        for(Item o : customer.get().getBasket().getItem()){
             ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(o.getId());
             itemWithPrice.add(iwp);
-            if (iwp.getItem().getQuantity()-person.get().getBasket().getQuantity().get(counter)<0){
+            if (iwp.getItem().getQuantity()-customer.get().getBasket().getQuantity().get(counter)<0){
                 throw new Exception("Not enough items");
             }
-            iwp.getItem().setQuantity(iwp.getItem().getQuantity()-person.get().getBasket().getQuantity().get(counter));
+            iwp.getItem().setQuantity(iwp.getItem().getQuantity()-customer.get().getBasket().getQuantity().get(counter));
             price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
-            person.get().getBasket().setItem(new ArrayList<>());
-            person.get().getBasket().setQuantity(new ArrayList<>());
+            customer.get().getBasket().setItem(new ArrayList<>());
+            customer.get().getBasket().setQuantity(new ArrayList<>());
             counter++;
             }
               {%else%}
 
-                Item o =person.get().getBasket().getItem();
+                Item o =customer.get().getBasket().getItem();
 
-                    ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(person.get().getBasket().getItem().getId());
+                    ItemWithPrice iwp = itemwithpriceRepository.findByItemIdAndIsCurrent(customer.get().getBasket().getItem().getId());
                     if (iwp==null){
                         throw new NotFoundException("There is no current price");
                     }
                     itemWithPrice.add(iwp);
-                    if (iwp.getItem().getQuantity()-person.get().getBasket().getQuantity()<0){
+                    if (iwp.getItem().getQuantity()-customer.get().getBasket().getQuantity()<0){
                         throw new Exception("Not enough items");
                     }
-                    iwp.getItem().setQuantity(iwp.getItem().getQuantity()-person.get().getBasket().getQuantity());
+                    iwp.getItem().setQuantity(iwp.getItem().getQuantity()-customer.get().getBasket().getQuantity());
                     price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
-                person.get().getBasket().setItem(null);
-                person.get().getBasket().setQuantity(0);
+                customer.get().getBasket().setItem(null);
+                customer.get().getBasket().setQuantity(0);
         {%endif%}
         {%endif%}
         {%endif%}
         {%endfor%}
         {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setTotalPrice(price);
         {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setItemWithPrice(itemWithPrice);
-        actionService.doActionMake(person.get(), {{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
+        actionService.doActionMake(customer.get(), {{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
         {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} s = {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}Repository.save({{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
         return {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}Mapper.toDTO(s);}
-        throw new Exception("There is no person with that id");
+        throw new Exception("There is no customer with that id");
     }
      {%endif%}
 {%endif%}

@@ -2,7 +2,7 @@ package uns.ac.rs.mbrs.utils;
 
 import org.springframework.stereotype.Component;
 import uns.ac.rs.mbrs.model.Bill;
-import uns.ac.rs.mbrs.model.Person;
+import uns.ac.rs.mbrs.model.Customer;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -14,7 +14,7 @@ import java.net.URLClassLoader;
 @Component
 public class DynamicCodeExecution {
 
-    public void execute(String textOfCode, long id, Person person, Bill bill) throws Exception {
+    public void execute(String textOfCode, long id, Customer person, Bill bill) throws Exception {
         try {
             String className = "GeneratedCode" + id;
             String relativePath = "/src/main/java/uns/ac/rs/mbrs/gen";
@@ -37,7 +37,7 @@ public class DynamicCodeExecution {
             URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{compiledClassDir.toURI().toURL()});
             Class<?> cls = Class.forName("uns.ac.rs.mbrs.gen." + className, true, classLoader);
             Object instance = cls.getDeclaredConstructor().newInstance();
-            cls.getMethod("execute", Person.class, Bill.class).invoke(instance, person, bill);
+            cls.getMethod("execute", Customer.class, Bill.class).invoke(instance, person, bill);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Code execution error: " + e.getMessage());

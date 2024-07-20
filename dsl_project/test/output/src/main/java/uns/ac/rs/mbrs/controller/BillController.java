@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Optional;
-
 @RestController
 @RequestMapping(value = "/api/bill")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -21,17 +21,20 @@ public class BillController {
     private BillService billService;
 
     @GetMapping
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<List<BillDTO>> findAll() {
         return ResponseEntity.ok().body(billService.findAll());
     }
 
     @GetMapping("/")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<List<BillDTO>> get() throws NotFoundException {
         List<BillDTO> bill = billService.get();
         return ResponseEntity.ok().body(bill);
     }
 
     @GetMapping("/{id}")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<BillDTO> findOne(@PathVariable Long id) throws NotFoundException {
         BillDTO bill = billService.findOne(id);
         return ResponseEntity.ok().body(bill);
@@ -42,7 +45,7 @@ public class BillController {
 
 
     @PostMapping
-    public ResponseEntity<BillDTO> post(@RequestBody BasketDTO basket) {
+@PreAuthorize("hasAnyRole('CUSTOMER')")    public ResponseEntity<BillDTO> post(@RequestBody BasketDTO basket) {
         BillDTO bill1 = null;
         try {
             bill1 = billService.save(basket);
@@ -55,7 +58,7 @@ public class BillController {
     }
 
     @PostMapping("/make-with-id/{id}")
-    public ResponseEntity<BillDTO> post(@PathVariable long id) {
+@PreAuthorize("hasRole( 'CUSTOMER')")    public ResponseEntity<BillDTO> post(@PathVariable long id) {
         BillDTO bill1 = null;
         try {
             bill1 = billService.saveWithId(id);
@@ -68,18 +71,22 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<BillDTO> put(@PathVariable Long id, @RequestBody BillDTO bill) {
         BillDTO bill1 = billService.update(id, bill);
         return bill != null ? ResponseEntity.ok(bill1) : ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOne(@PathVariable Long id) {
+
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         billService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/d/{id}")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         billService.delete(id);
         return ResponseEntity.noContent().build();

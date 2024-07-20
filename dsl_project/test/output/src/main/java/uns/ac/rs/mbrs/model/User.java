@@ -21,7 +21,7 @@ import static javax.persistence.InheritanceType.JOINED;
 @Entity
 @Table(name = "system_user")
 @Inheritance(strategy=JOINED)
-public class User implements UserDetails{
+public abstract class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", unique=true, nullable=false)

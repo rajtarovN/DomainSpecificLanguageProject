@@ -13,12 +13,12 @@ public class ActionMapper {
 
     public ActionDTO toDTO(Action model) {
         ActionDTO dto = new ActionDTO();
+            dto.setOriginalCode(model.getOriginalCode());
+            dto.setDateFrom(model.getDateFrom());
+            dto.setDateTo(model.getDateTo());
         dto.setName(model.getName());
         dto.setId(model.getId());
 
-        dto.setOriginalCode(model.getOriginalCode());
-        dto.setDateFrom(model.getDateFrom());
-        dto.setDateTo(model.getDateTo());
         return dto;
     }
 
@@ -31,14 +31,13 @@ public class ActionMapper {
         dto.setId(model.getId());
         dtos.add(dto);
         }
-
         return dtos;
     }
 
     public Action toModel(ActionDTO dto) {
         Action model = new Action();
         model.setName(dto.getName());
-        model.setOriginalCode(dto.getOriginalCode());
+            model.setOriginalCode(dto.getOriginalCode());
         model.setDateFrom(dto.getDateFrom());
         model.setDateTo(dto.getDateTo());
         return model;

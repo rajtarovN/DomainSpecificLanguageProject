@@ -60,6 +60,14 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
          dto.setItem(model.getItem()!=null?itemMapper.toDTO(model.getItem()):new ItemDTO());
           {%endif%}
         {%endif%}
+
+         {% if current_class.extends_user %}
+        dto.setUsername(model.getUsername());
+        dto.setPassword(model.getPassword());
+        dto.setDeleted(model.isDeleted());
+        dto.setLoggedFirstTime(model.isLoggedFirstTime());
+        dto.setRole(model.getRole().getName());
+        {%endif%}
         return dto;
     }
 
@@ -95,7 +103,6 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
         {%endif%}
         dtos.add(dto);
         }
-
         return dtos;
     }
 
@@ -122,6 +129,13 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
         model.setDateFrom(dto.getDateFrom());
         model.setDateTo(dto.getDateTo());
             {% endif %}
+            {% if current_class.extends_user %}
+        model.setUsername(dto.getUsername());
+        model.setPassword(dto.getPassword());
+        model.setDeleted(dto.isDeleted());
+        model.setLoggedFirstTime(dto.isLoggedFirstTime());
+
+        {%endif%}
         return model;
     }
 }

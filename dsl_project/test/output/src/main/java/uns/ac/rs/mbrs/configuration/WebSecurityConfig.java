@@ -78,8 +78,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/api/person/").permitAll()
-                .antMatchers("/api/person/{id}").permitAll()
                 .antMatchers("/api/bill/").permitAll()
                 .antMatchers("/api/bill/{id}").permitAll()
                 .antMatchers("/api/bill/make-with-id/{id}").permitAll()
@@ -93,6 +91,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/item/{id}").permitAll()
                 .antMatchers("/api/action/").permitAll()
                 .antMatchers("/api/action/{id}").permitAll()
+                .antMatchers("/api/seller/").permitAll()
+                .antMatchers("/api/seller/{id}").permitAll()
+                .antMatchers("/api/admin/").permitAll()
+                .antMatchers("/api/admin/{id}").permitAll()
+                .antMatchers("/api/customer/").permitAll()
+                .antMatchers("/api/customer/{id}").permitAll()
                 .antMatchers("/logout").permitAll()
                 .anyRequest().authenticated().and()
                 .cors();
@@ -107,7 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.POST, "/login");
         web.ignoring().antMatchers(HttpMethod.GET, "/logout");
 
-        web.ignoring().antMatchers(HttpMethod.PUT, "/api/person");
+        web.ignoring().antMatchers(HttpMethod.PUT, "/api/cusomer");
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/address/{id}");
         web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
                 "/**/*.css", "/**/*.js");

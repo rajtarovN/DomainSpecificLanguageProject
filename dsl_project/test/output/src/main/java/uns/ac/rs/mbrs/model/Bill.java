@@ -18,7 +18,7 @@ import lombok.Setter;
 @Table(name = "bill")
 @Getter
 @Setter
-public class Bill {
+public  class Bill  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -48,18 +48,18 @@ public class Bill {
         )
                     @JsonIgnoreProperties(value = "basket", allowSetters = true)
 
-        private Person person;
+        private Customer customer;
 
     public Bill() {}
 
-            public Person  getPerson() {
-                return person;
+            public Customer  getCustomer() {
+                return customer;
             }
-            public void setPerson(
-           Person
-             person
+            public void setCustomer(
+           Customer
+            customer
             ) {
-                this.person = person;
+                this.customer = customer;
             }
     public boolean getDeleted() {
         return deleted;

@@ -64,7 +64,7 @@ const [allItem, setAllItem] = useState([]);
      {%endif%}
      {%endif%}
           }
-          const responsePerson = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getPersonsBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
+          const responseCustomer = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getCustomersBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
       } catch (error) {
           console.error(error);
       }

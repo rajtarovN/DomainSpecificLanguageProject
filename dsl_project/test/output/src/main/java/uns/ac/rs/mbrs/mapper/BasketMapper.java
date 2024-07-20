@@ -26,6 +26,7 @@ public class BasketMapper {
             }
         dto.setFormular(model.getFormular());
         dto.setId(model.getId());
+
         return dto;
     }
 
@@ -44,7 +45,6 @@ public class BasketMapper {
         dto.setId(model.getId());
         dtos.add(dto);
         }
-
         return dtos;
     }
 

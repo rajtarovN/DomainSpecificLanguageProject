@@ -59,7 +59,6 @@ const EditItemWithPrice = () => {
       try {
           const response= await itemService.getItem();
           if (response.status === 200) {
-           toast.success('Item created successfully!');
             setItems(response.data);
         }
       } catch (error) {
@@ -76,7 +75,6 @@ const EditItemWithPrice = () => {
         try {
             const response = await itemWithPriceService.getOneItemWithPrice(id);
             if (response.status === 200) {
- toast.success('Item created successfully!');
               setSelectedItem(response.data.getItem().getId());
               setFormData({
                currentPrice: response.data.currentPrice,

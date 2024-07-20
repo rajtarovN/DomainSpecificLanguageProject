@@ -17,7 +17,7 @@ public class BillDTO {
     private long id;
 
             private String neki_tekst;
-            private PersonDTO person;
+            private CustomerDTO customer;
 
 
 

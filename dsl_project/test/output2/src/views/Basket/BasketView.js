@@ -48,7 +48,7 @@ const [allItem, setAllItem] = useState([]);
               setBasket(response.data);
  setAllItem([response.data.item]);
           }
-          const responsePerson = await basketService.getPersonsByBasket(id);
+          const responseCustomer = await basketService.getCustomersByBasket(id);
       } catch (error) {
           console.error(error);
       }

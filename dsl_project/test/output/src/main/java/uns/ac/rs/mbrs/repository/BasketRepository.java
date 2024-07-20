@@ -11,7 +11,8 @@ import java.util.Date;
 @Repository
 public interface BasketRepository extends JpaRepository<Basket, Long> {
 
-                        List<Basket> findAllByPersonId(Long id);
+                        List<Basket> findAllByCustomerId(Long id);
+
 
 
 

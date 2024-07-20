@@ -8,10 +8,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Optional;
-
+{% set roles = [] %}
+{% for cl in model.classes%}
+    {% if cl.extends_user%}
+         {% set _ =roles.append( True) %}
+    {%endif%}
+{%endfor%}
 @RestController
 @RequestMapping(value = "/api/{{ current_class.name[0]|lower}}{{current_class.name[1:]}}")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -21,17 +27,62 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
     private {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Service {{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service;
 
     @GetMapping
+    {%if roles | length >0%}
+        {% if current_class.name == 'Seller' %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                {%if current_class.anotation and current_class.anotation.name == 'basket'%}
+                    @PreAuthorize("hasRole('CUSTOMER')")
+                {%else%}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
+                {%endif%}
+            {%endif%}
+        {%endif%}
+    {%endif%}
     public ResponseEntity<List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO>> findAll() {
         return ResponseEntity.ok().body({{ current_class.name[0]|lower}}{{current_class.name[1:]}}Service.findAll());
     }
 
     @GetMapping("/")
+    {%if roles | length >0%}
+        {% if current_class.name == 'Seller' %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                {%if current_class.anotation and current_class.anotation.name == 'basket'%}
+                    @PreAuthorize("hasRole('CUSTOMER')")
+                {%else%}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
+                {%endif%}
+            {%endif%}
+        {%endif%}
+    {%endif%}
     public ResponseEntity<List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO>> get() throws NotFoundException {
         List<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.get();
         return ResponseEntity.ok().body({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
     }
 
     @GetMapping("/{id}")
+    {%if roles | length >0%}
+        {% if current_class.name == 'Seller' %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                {%if current_class.anotation and current_class.anotation.name == 'basket'%}
+                    @PreAuthorize("hasRole('CUSTOMER')")
+                {%else%}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
+                {%endif%}
+            {%endif%}
+        {%endif%}
+    {%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> findOne(@PathVariable Long id) throws NotFoundException {
         {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.findOne(id);
         return ResponseEntity.ok().body({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
@@ -48,6 +99,21 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
         {% if current_class.anotation%}
             {% if current_class.anotation.name != "bill"%}
     @PostMapping
+    {%if roles | length >0%}
+        {% if current_class.name == 'Seller' or (current_class.anotation and (current_class.anotation.name=='item' or current_class.anotation.name=='bying' or current_class.anotation.name=='action')) %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                {%if current_class.anotation and current_class.anotation.name == 'action'%}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+                {%else%}
+                    @PreAuthorize("hasRole('CUSTOMER')")
+                {%endif%}
+            {%endif%}
+        {%endif%}
+    {%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}{% if current_class.anotation%}{% if current_class.anotation.name == "bill"%}, {{basket_name[0]}}DTO basket{%endif%}{%endif%}) {
         {% if current_class.anotation%}
             {% if current_class.anotation.name == "bill"%}
@@ -84,6 +150,17 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
     {% if current_class.anotation==None%}
 
     @PostMapping
+    {%if roles | length >0%}
+        {% if current_class.name == 'Seller' or (current_class.anotation and (current_class.anotation.name=='item' or current_class.anotation.name=='bying' or current_class.anotation.name=='action')) %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+            {%endif%}
+        {%endif%}
+    {%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}{% if current_class.anotation%}{% if current_class.anotation.name == "bill"%}, {{basket_name[0]}}DTO basket{%endif%}{%endif%}) {
         {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.save({{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
         if ({{ current_class.name[0]|lower }}{{ current_class.name[1:]}} == null)
@@ -95,6 +172,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
     {% if current_class.anotation%}
             {% if current_class.anotation.name == "bill"%}
     @PostMapping
+    {%if roles | length >0%}@PreAuthorize("hasAnyRole('CUSTOMER')"){%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@RequestBody {{basket_name[0][0]|capitalize}}{{basket_name[0][1:]}}DTO basket) {
         {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 = null;
         try {
@@ -108,6 +186,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
     }
 
     @PostMapping("/make-with-id/{id}")
+    {%if roles | length >0%}@PreAuthorize("hasRole( 'CUSTOMER')"){%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> post(@PathVariable long id) {
         {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}1 = null;
         try {
@@ -123,18 +202,68 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
     {%endif%}
 
     @PutMapping("/{id}")
+    {% if roles | length > 0 %}
+        {% if current_class.name == 'Seller' or (current_class.anotation and (current_class.anotation.name=='item' or current_class.anotation.name=='bying' or current_class.anotation.name=='action')) %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                {% if current_class.anotation and current_class.anotation.name == 'bill' %}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+                {% else %}
+                    {% if current_class.anotation and current_class.anotation.name == 'basket' %}
+                        @PreAuthorize("hasAnyRole('CUSTOMER')")
+                    {% else %}
+                        @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {%endif%}
+    {%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}DTO> put(@PathVariable Long id, @RequestBody {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}) {
         {{ current_class.name }}DTO {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1 = {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.update(id, {{ current_class.name[0]|lower }}{{ current_class.name[1:]}});
         return {{ current_class.name[0]|lower }}{{ current_class.name[1:]}} != null ? ResponseEntity.ok({{ current_class.name[0]|lower }}{{ current_class.name[1:]}}1) : ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOne(@PathVariable Long id) {
+    {% if roles | length > 0 %}
+        {% if current_class.name == 'Seller' or (current_class.anotation and (current_class.anotation.name=='item' or current_class.anotation.name=='bying' or current_class.anotation.name=='action'))%}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+
+                {% if current_class.anotation and current_class.anotation.name == 'basket' %}
+                    @PreAuthorize("hasAnyRole('ADMIN')")
+                {% else %}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+                {%endif%}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/d/{id}")
+    {% if roles | length > 0 %}
+        {% if current_class.name == 'Seller' %}
+            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+        {%else%}
+            {% if current_class.name == 'Admin' %}
+                @PreAuthorize("hasRole('ADMIN')")
+            {%else%}
+                {% if current_class.anotation and current_class.anotation.name == 'basket' %}
+                    @PreAuthorize("hasAnyRole('ADMIN')")
+                {% else %}
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+                {% endif %}
+           {% endif %}
+        {% endif %}
+    {% endif %}
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         {{ current_class.name[0]|lower }}{{ current_class.name[1:]}}Service.delete(id);
         return ResponseEntity.noContent().build();
@@ -143,6 +272,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
     {% if current_class.anotation%}
             {% if current_class.anotation.name == "basket"%}
     @PutMapping("/{basketId}/{itemId}/{quantity}")
+    {%if roles | length >0%}@PreAuthorize("hasRole('CUSTOMER')"){%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO> put(@PathVariable Long basketId, @PathVariable Long itemId, @PathVariable int quantity) {
         {{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 = null;
         try {
@@ -153,6 +283,7 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Con
         return {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 != null ? ResponseEntity.ok({{ current_class.name[0]|lower}}{{current_class.name[1:]}}1) : ResponseEntity.badRequest().build();
     }
     @PutMapping("/{basketId}/{itemId}")
+    {%if roles | length >0%}@PreAuthorize("hasRole( 'CUSTOMER')"){%endif%}
     public ResponseEntity<{{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO> removeItem(@PathVariable Long basketId, @PathVariable Long itemId) {
         {{ current_class.name[0]|capitalize}}{{current_class.name[1:]}}DTO {{ current_class.name[0]|lower}}{{current_class.name[1:]}}1 = null;
         try {

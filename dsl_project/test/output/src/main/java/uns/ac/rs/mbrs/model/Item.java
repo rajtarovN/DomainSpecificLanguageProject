@@ -18,7 +18,7 @@ import lombok.Setter;
 @Table(name = "item")
 @Getter
 @Setter
-public class Item {
+public  class Item  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -32,7 +32,7 @@ public class Item {
                         inverseJoinColumns = @JoinColumn(name = "basket_id")
                 )
 
-                                @JsonIgnoreProperties(value = "person", allowSetters = true)
+                                @JsonIgnoreProperties(value = "customer", allowSetters = true)
                 private List<Basket>  basket;
 
 

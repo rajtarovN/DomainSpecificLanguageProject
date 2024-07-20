@@ -44,7 +44,7 @@ const BillView = () => {
           if (response.status === 200) {
               setBill(response.data);
           }
-          const responsePerson = await billService.getPersonsByBill(id);
+          const responseCustomer = await billService.getCustomersByBill(id);
       } catch (error) {
           console.error(error);
       }

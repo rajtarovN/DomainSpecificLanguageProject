@@ -58,7 +58,7 @@ public String generateCode(String originalCode, long id){
     String code= "package uns.ac.rs.mbrs.gen;\nimport uns.ac.rs.mbrs.model.*;\n" +
             "\n" +
             "public class GeneratedCode"+id+" {\n" +
-            "    public  void execute(Person person, Bill bill){\n" +originalCode +
+            "    public  void execute(Customer customer, Bill bill){\n" +originalCode +
             "}\n" +
             "\n" +
             "}";
@@ -66,10 +66,10 @@ public String generateCode(String originalCode, long id){
 return code;
 }
 
-public void doActionMake(Person person, Bill current_bill ) throws Exception {
+public void doActionMake(Customer customer, Bill current_bill ) throws Exception {
         List<Action> actions = actionRepository.findValidActions(new Date());
         for (Action a : actions){
-            dynamicCodeExecution.execute(generateCode(a.getTransformedCode(), a.getId()), a.getId(), person, current_bill);
+            dynamicCodeExecution.execute(generateCode(a.getTransformedCode(), a.getId()), a.getId(), customer, current_bill);
         }
 
 }

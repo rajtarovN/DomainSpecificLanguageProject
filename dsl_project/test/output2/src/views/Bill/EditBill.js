@@ -16,7 +16,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import personService from '../../services/PersonService';
+import customerService from '../../services/CustomerService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,26 +50,24 @@ const EditBill = () => {
     neki_tekst: '',
   });
   const { id } = useParams();
-  const [persons, setPersons] = useState([]);
-  const [selectedPerson, setSelectedPerson] = useState('');
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState('');
 
 
   useEffect(() => {
 
 
-  const fetchDataPerson = async () => {
+  const fetchDataCustomer = async () => {
       try {
-          const response= await personService.getPerson();
+          const response= await customerService.getCustomer();
           if (response.status === 200) {
-           toast.success('Item created successfully!');
-            setPersons(response.data);
+            setCustomers(response.data);
         }
       } catch (error) {
-       toast.error('Failed to create item. Please try again.');
           console.error(error);
       }
   };
-  fetchDataPerson();
+  fetchDataCustomer();
 
     if (id!=null){
     return () => {
@@ -77,7 +75,6 @@ const EditBill = () => {
         try {
             const response = await billService.getOneBill(id);
             if (response.status === 200) {
- toast.success('Item created successfully!');
               setFormData({
                  neki_tekst: response.data.neki_tekst,
 
@@ -107,9 +104,9 @@ const EditBill = () => {
         e.preventDefault();
         const fetchData = async () => {
           try {
-              for(let j in persons){
-                if (parseInt(selectedPerson)===parseInt(persons[j].id)){
-                  formData['person'] = persons[j];
+              for(let j in customers){
+                if (parseInt(selectedCustomer)===parseInt(customers[j].id)){
+                  formData['customer'] = customers[j];
                   break;
                 }
               }
@@ -130,9 +127,9 @@ const EditBill = () => {
     console.log(formData);
     const fetchData = async () => {
       try {
-              for(let j in persons){
-                if (parseInt(selectedPerson)===parseInt(persons[j].id)){ //todo ovde verujem da ide name
-                  formData['person'] = persons[j];
+              for(let j in customers){
+                if (parseInt(selectedCustomer)===parseInt(customers[j].id)){ //todo ovde verujem da ide name
+                  formData['customer'] = customers[j];
                   break;
                 }
               }
@@ -154,9 +151,9 @@ const EditBill = () => {
     console.log('Form canceled');
   };
 
-    const handleChangePerson = (event) => {
+    const handleChangeCustomer = (event) => {
       console.log(event.target.value)
-        setSelectedPerson(event.target.value);
+        setSelectedCustomer(event.target.value);
     };
 
 
@@ -181,15 +178,15 @@ const EditBill = () => {
 
 
       <div>
-            <label htmlFor="dvaSelect">Select Person: </label>
-            <NativeSelect id="dvaSelect" value={selectedPerson} onChange={handleChangePerson}>
+            <label htmlFor="dvaSelect">Select Customer: </label>
+            <NativeSelect id="dvaSelect" value={selectedCustomer} onChange={handleChangeCustomer}>
                 <option value="">--Please choose an option--</option>{
-                 persons.map(person => (
+                 customers.map(customer => (
                     <option  key={
-                    person.id} value={
-                    person.id}>
+                    customer.id} value={
+                    customer.id}>
                         {
-                        person.id}
+                        customer.id}
                     </option >
                 ))}
             </NativeSelect>

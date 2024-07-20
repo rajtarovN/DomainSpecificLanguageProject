@@ -46,7 +46,7 @@ const ItemView = () => {
           if (response.status === 200) {
               setItem(response.data);
           }
-          const responsePerson = await itemService.getPersonsByItem(id);
+          const responseCustomer = await itemService.getCustomersByItem(id);
       } catch (error) {
           console.error(error);
       }

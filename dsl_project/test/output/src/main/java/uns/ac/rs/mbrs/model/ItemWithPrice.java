@@ -18,7 +18,7 @@ import lombok.Setter;
 @Table(name = "itemwithprice")
 @Getter
 @Setter
-public class ItemWithPrice {
+public  class ItemWithPrice  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -29,7 +29,7 @@ public class ItemWithPrice {
     private boolean iscurrent; //is it still valid
 
             @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "itemWithPrice")
-            @JsonIgnoreProperties(value = "person", allowSetters = true)
+            @JsonIgnoreProperties(value = "customer", allowSetters = true)
             private List<Bill>  bill;
 
                @ManyToOne

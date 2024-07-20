@@ -15,6 +15,7 @@ public class BillMapper {
         BillDTO dto = new BillDTO();
         dto.setNeki_tekst(model.getNeki_tekst());
         dto.setId(model.getId());
+
         return dto;
     }
 
@@ -27,7 +28,6 @@ public class BillMapper {
         dto.setId(model.getId());
         dtos.add(dto);
         }
-
         return dtos;
     }
 

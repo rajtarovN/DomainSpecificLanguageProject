@@ -18,7 +18,7 @@ import lombok.Setter;
 @Table(name = "action")
 @Getter
 @Setter
-public class Action {
+public  class Action  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

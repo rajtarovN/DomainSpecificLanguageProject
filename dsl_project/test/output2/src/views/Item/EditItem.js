@@ -61,7 +61,6 @@ const EditItem = () => {
         try {
             const response = await itemService.getOneItem(id);
             if (response.status === 200) {
- toast.success('Item created successfully!');
               setFormData({
                  name: response.data.name,
                  quantity: response.data.quantity,

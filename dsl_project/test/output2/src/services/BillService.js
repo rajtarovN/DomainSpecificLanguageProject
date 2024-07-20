@@ -6,10 +6,10 @@ const ENDPOINTS = {
 };
 
 class BillService {
-    getPersonsByBill = async (id) => {
+    getCustomersByBill = async (id) => {
         try {
             return await axios.get(
-                ENDPOINTS.BASE+"getPersonsByBill/"+id,
+                ENDPOINTS.BASE+"getCustomersByBill/"+id,
             );
         } catch (error) {
          toast.error('Failed to get element.');

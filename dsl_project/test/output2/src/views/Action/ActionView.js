@@ -44,7 +44,7 @@ const ActionView = () => {
           if (response.status === 200) {
               setAction(response.data);
           }
-          const responsePerson = await actionService.getPersonsByAction(id);
+          const responseCustomer = await actionService.getCustomersByAction(id);
       } catch (error) {
           console.error(error);
       }

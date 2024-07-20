@@ -26,10 +26,12 @@ import lombok.Setter;
 @Table(name = "{{ current_class.name|lower }}")
 @Getter
 @Setter
-public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
+public  class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {% if current_class.extends_user%} extends User{%endif%} {
+    {% if not current_class.extends_user%}
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    {%endif%}
     {% set is_one = ["one"] %}
     {% set variable_name = [] %}
     {% set variable_name_price = [] %}
@@ -325,12 +327,14 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} {
 
     public {{ current_class.name }}() {}
     {% if hasId == false %}
+     {% if current_class.name !="Customer"%}
         public long getId(){
             return id;
         }
         public void setId(long id){
             this.id = id;
         }
+        {% endif %}
     {% endif %}
     {% for property in primitiveProperties %}
         {% if property and property.type and property.name %}
