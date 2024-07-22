@@ -10,7 +10,6 @@ def nelly_checker(nelly_model):
     files = []
     relations = []
     for fp in file_parts:
-        print(fp)
         if "[" in fp:
             pass
             # files.append(func_checker(fp))  # mislim da saljem fp, a bilo je part
@@ -19,16 +18,30 @@ def nelly_checker(nelly_model):
 
             for part in parts:
                 if 'class' in part:
-                    clases.append(class_object_checker(part))
+                    new_class = class_object_checker(part)
+                    if any([True for cl in clases if cl.name == new_class.name]):
+                        raise Exception(
+                            f'Class with the name {new_class.name} already exists! Name of classes must be unique.')
+                    clases.append(new_class)
                 elif 'enum' in part:
-                    enums.append(enums_checker(part))
+                    new_enum = enums_checker(part)
+                    if any([True for cl in enums if cl.name == new_enum.name]):
+                        raise Exception(
+                            f'Enum with the name {new_enum.name} already exists! Name of enums must be unique.')
+                    enums.append(new_enum)
                 elif 'OneToOne' in part or 'OneToMany' in part or 'ManyToOne' in part or 'ManyToMany' in part:
-                    relations.append(relations_checker(part))
+                    new_relation = relations_checker(part)
+                    if any([True for relation in relations if isinstance(relation,type(new_relation))]):
+                        raise Exception(
+                            f'Relation {type(new_relation)} already defined.')
+                    relations.append(new_relation)
+    check_one_to_many(clases, relations)
+    check_existing_class(clases, relations)
     add_relations_to_class(clases, relations)
     if any([True for cl in clases if cl.anotation is not None]):
         add_roles(clases, relations)
-
     # check_params_types_annotation(clases)
+    check_anotations(clases)
     nelly = Model("nelly", clases, enums, files, relations)
     return nelly
     # classPerson{idString;ageint;}enumGender{MALE;FEMALE;OTHER;}classAddress{streetString;cityString;zipCodeString;}OneToOne{PersontoAddress;}OneToMany{PersontoAddress;}ManyToOne{PersontoAddress;}ManyToMany{PersontoAddress;}
@@ -61,7 +74,6 @@ def parse_params(part):
             found = True
         type_param = next((t for t in types if t in p), p)
         name_param = p.split(type_param)[1]
-        print(name_param)
         if ")" in name_param:
             name_param = name_param.split(")")[0]
         parameters.append(Param(name_param, type_param))
@@ -127,8 +139,16 @@ def find_couples(tekst):
             link, as_part = link.split("as:")
         list_to = link.split("to:")
         list_to.append(as_part)
-        list_couples.append(list_to)
+        check_couple(list_to, list_couples)
     return list_couples
+
+def check_couple(list_to, list_couples):
+    for couple in list_couples:
+        if ( (couple[0] == list_to[0] and couple[1] == list_to[1]) or
+             (couple[1] == list_to[0] and couple[0] == list_to[1]) ):
+            if list_to[2] ==couple[2]:
+                raise Exception(f'Relation {couple[0]} {couple[1]} already defined.')
+    list_couples.append(list_to)
 
 
 def add_relations_to_class(clases, relations):
@@ -233,3 +253,42 @@ def add_roles(clases, relations):
                     LinkProperty(customer.name, customer, 0, "ManyToOne", 'LAZY', 'ALL', None ,"customer"))
                 customer.add_ref_property(
                     LinkProperty(clas.name, clas, -1, "OneToMany", 'LAZY', 'ALL', None, "bill"))
+
+def check_existing_class(clases, relations):
+    for relation in relations:
+        for couple in relation.list_couple:
+            if not any([True for cl in clases if cl.name == couple[0] or cl.name == couple[1] ]):
+                raise Exception(f'Class name {couple[1]} or {couple[0]} not defined ')
+
+
+def check_one_to_many(clases, relations):
+    one_to_many = [relation for relation in relations if isinstance(relation, OneToMany )]
+    many_to_one = [relation for relation in relations if isinstance(relation, ManyToOne )]
+    if len(one_to_many)>0:
+        one_to_many =one_to_many[0]
+    else:
+        return
+    if len(many_to_one)>0:
+        many_to_one =many_to_one[0]
+    else:
+        return
+    for otm in one_to_many.list_couple:
+        print(type(many_to_one))
+        for mto in many_to_one:
+            if ((otm[0] == mto[0] and otm[1] == mto[1]) or
+                    (otm[1] == mto[0] and otm[0] == mto[1])):
+                if mto[2] == otm[2]:
+                    raise Exception(f'Relation {otm[0]} {otm[1]} already defined.')
+
+def check_anotations(classes):
+    if any([True for cl in classes if cl.anotation is not None]):
+        model_anotation = [cl.anotation.name for cl in classes if cl.anotation is not None]
+        list_anotation = ['bill', 'bying', 'action', 'basket', 'item']
+        for m in model_anotation:
+            if model_anotation.count(m)>1:
+                raise Exception(f'Multiply anotation definition {m}.')
+        for antation in list_anotation:
+            if antation.lower() not in model_anotation:
+                raise Exception(f'Missing anotation  {antation}.')
+
+

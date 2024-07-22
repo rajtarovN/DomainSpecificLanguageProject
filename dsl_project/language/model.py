@@ -53,7 +53,7 @@ class OneToOne(object):
         self.list_couple = list_couple
 
     def __str__(self):
-        s = ""
+        s = "One to One:"
         for c in self.list_couple:
             if isinstance(c, list):  # Use isinstance() for type checking
                 for co in c:
@@ -67,7 +67,7 @@ class OneToMany(object):
         self.list_couple = list_couple
 
     def __str__(self):
-        s = ""
+        s = "One to many"
         for c in self.list_couple:
             if isinstance(c, list):  # Use isinstance() for type checking
                 for co in c:
@@ -82,7 +82,7 @@ class ManyToOne(object):
         self.list_couple = list_couple
 
     def __str__(self):
-        s = ""
+        s = "Many to One"
         for c in self.list_couple:
             if isinstance(c, list):  # Use isinstance() for type checking
                 for co in c:
@@ -97,7 +97,7 @@ class ManyToMany(object):
         self.list_couple = list_couple
 
     def __str__(self):
-        s = ""
+        s = "Many to Many"
         for c in self.list_couple:
             if isinstance(c, list):  # Use isinstance() for type checking
                 for co in c:
