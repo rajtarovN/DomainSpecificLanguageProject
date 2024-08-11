@@ -16,7 +16,9 @@ public class BillDTO {
 
     private long id;
 
-            private String neki_tekst;
+            private String cashier;
+            private AddressDTO address;
+
             private CustomerDTO customer;
 
 

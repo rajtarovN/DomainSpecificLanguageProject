@@ -16,7 +16,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import personService from '../../services/PersonService';
+import billService from '../../services/BillService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,19 +45,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditAddress = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
     street: '',
-    city: '',
-    zipCode: '',
+    number: '',
+    zip: '',
   });
   const { id } = useParams();
-  const [currentPerson, setCurrentPerson] = useState([]);
-  const [allPerson, setAllPerson] = useState([]);
+  const [bills, setBills] = useState([]);
+  const [selectedBill, setSelectedBill] = useState('');
+
 
   useEffect(() => {
 
 
+  const fetchDataBill = async () => {
+      try {
+          const response= await billService.getBill();
+          if (response.status === 200) {
+            setBills(response.data);
+        }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchDataBill();
 
     if (id!=null){
     return () => {
@@ -67,8 +83,8 @@ const EditAddress = () => {
             if (response.status === 200) {
               setFormData({
                  street: response.data.street,
-                 city: response.data.city,
-                 zipCode: response.data.zipCode,
+                 number: response.data.number,
+                 zip: response.data.zip,
               })
             }
         } catch (error) {
@@ -79,18 +95,6 @@ const EditAddress = () => {
     fetchData();
       console.log('Component unmounted');
     };}
-    const fetchDataPerson = async () => {
-      try {
-          const response2 = await personService.getPerson();
-          if (response2.status === 200) {
-            setAllPerson(response2.data);
-        }
-      } catch (error) {
-       toast.error('Failed to create item. Please try again.');
-          console.error(error);
-      }
-  };
-  fetchDataPerson();
   }, [id]);
 
 
@@ -107,12 +111,12 @@ const EditAddress = () => {
         e.preventDefault();
         const fetchData = async () => {
           try {
-
-              let liPerson = [];
-              for (let a of currentPerson){
-                liPerson.push(a.id);
+              for(let j in bills){
+                if (parseInt(selectedBill)===parseInt(bills[j].id)){
+                  formData['bill'] = bills[j];
+                  break;
+                }
               }
-              formData['personIds'] = liPerson;
               const response = await addressService.updateAddress(formData, id);
               if (response.status === 200) {
                toast.success('Item created successfully!');
@@ -130,11 +134,12 @@ const EditAddress = () => {
     console.log(formData);
     const fetchData = async () => {
       try {
-              let li1 = [];
-              for (let a of currentPerson){
-                li1.push(a.id);
+              for(let j in bills){
+                if (parseInt(selectedBill)===parseInt(bills[j].id)){
+                  formData['bill'] = bills[j];
+                  break;
+                }
               }
-              formData['personIds'] = li1;
           const response = await addressService.createAddress(formData);
           if (response.status === 200) {
            toast.success('Item created successfully!');
@@ -153,36 +158,10 @@ const EditAddress = () => {
     console.log('Form canceled');
   };
 
-  const handleRemovePerson = (id) => {
-    if (!currentPerson || !allPerson) return;
-
-    for (const item of currentPerson) {
-      if (item.id === id) {
-        const updatedCurrentPerson = currentPerson.filter(personItem => personItem.id !== id);
-        setCurrentPerson(updatedCurrentPerson);
-        const updatedAllPerson = [...allPerson, item];
-        setAllPerson(updatedAllPerson);
-
-        break;
-      }
-    }
-  }
-
-
-  const handleAddPerson = (id) => {
-    if (!currentPerson || !allPerson) return;
-
-    for (const item of allPerson) {
-      if (item.id === id) {
-        const updatedAllPerson = allPerson.filter(personItem => personItem.id !== id);
-        setAllPerson(updatedAllPerson);
-        const updatedCurrentPerson = [...currentPerson, item];
-        setCurrentPerson(updatedCurrentPerson);
-
-        break;
-      }
-    }
-  }
+    const handleChangeBill = (event) => {
+      console.log(event.target.value)
+        setSelectedBill(event.target.value);
+    };
 
 
   return (
@@ -203,18 +182,18 @@ const EditAddress = () => {
       </div>
       <div className={classes.formGroup}>
         <TextField
-          label="city"
-          name="city"
-          value={formData.city}
+          label="number"
+          name="number"
+          value={formData.number}
           onChange={handleChange}
           variant="outlined"
         />
       </div>
       <div className={classes.formGroup}>
         <TextField
-          label="zipCode"
-          name="zipCode"
-          value={formData.zipCode}
+          label="zip"
+          name="zip"
+          value={formData.zip}
           onChange={handleChange}
           variant="outlined"
         />
@@ -222,51 +201,21 @@ const EditAddress = () => {
 
 
 
-        Person
-        <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">Id</TableCell>
-              <TableCell align="center">Add</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentPerson.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell align="center">
-                  {item.id}
-                </TableCell>
-                <TableCell align="center">
-                  <Button variant="contained" color="primary" onClick={() => handleRemovePerson(item.id)}>Remove</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer><br/>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">Id</TableCell>
-              <TableCell align="center">Remove</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {allPerson.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell align="center">
-                  {item.id}
-                </TableCell>
-                <TableCell align="center">
-                  <Button variant="contained" color="primary" onClick={() => handleAddPerson(item.id)}>Add</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+      <div>
+            <label htmlFor="dvaSelect">Select Bill: </label>
+            <NativeSelect id="dvaSelect" value={selectedBill} onChange={handleChangeBill}>
+                <option value="">--Please choose an option--</option>{
+                 bills.map(bill => (
+                    <option  key={
+                    bill.id} value={
+                    bill.id}>
+                        {
+                        bill.id}
+                    </option >
+                ))}
+            </NativeSelect>
+        </div>
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">

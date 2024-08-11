@@ -33,18 +33,16 @@ Param: (Type| ID) ID ;
 
 Arguments: Argument (',' Argument)*;
 
-Argument: (FunctionCall |  value | ShortFunctions |Operations | ChaneId);
+Argument: (value | ShortFunctions |Operations | ChaneId);
 
-FunctionCall: ID '(' Arguments? ')' ';'?;
-
-Statement: (VariableInit | Variable | IfStatement | FunctionCall |VariableSF );
+Statement: (VariableInit | Variable | IfStatement |VariableSF );
 
 VariableInit: Type ID "=" PosibleValuesForVariable ';';
 
 Variable: ( ChaneId) "=" PosibleValuesForVariable ';'?;
 VariableSF: (Type)? ( ChaneId) 'apply' ShortFunctions ';'? ;
 
-PosibleValuesForVariable: (value |  Condition | FunctionCall |  OneLineCondition | Operations | NewObject |ChaneId);
+PosibleValuesForVariable: (value |  Condition |  OneLineCondition | Operations | NewObject |ChaneId);
 
 NewObject: "new" ID '(' Arguments ')';
 

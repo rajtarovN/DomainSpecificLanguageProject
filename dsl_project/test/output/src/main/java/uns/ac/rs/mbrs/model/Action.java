@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -41,8 +42,16 @@ public  class Action  {
     private boolean deleted;
 
 
-    public Action() {}
+            @ManyToMany
+        (
+                cascade = CascadeType.ALL
+,                 fetch = FetchType.LAZY
+                 ,mappedBy = "action"        )
+                    @JsonIgnoreProperties(value = "action", allowSetters = true)
 
+        private List<Item>  item;
+
+    public Action() {}
     public boolean getDeleted() {
         return deleted;
     }

@@ -2,7 +2,6 @@ from textx import TextXSemanticError
 from .model import *
 from .meta_model_functions import *
 
-
 def nelly_checker(nelly_model):
     file_parts = nelly_model.split("file")
     clases = []
@@ -40,6 +39,7 @@ def nelly_checker(nelly_model):
     add_relations_to_class(clases, relations)
     if any([True for cl in clases if cl.anotation is not None]):
         add_roles(clases, relations)
+        add_item_to_action(clases, relations)
     # check_params_types_annotation(clases)
     check_anotations(clases)
     nelly = Model("nelly", clases, enums, files, relations)
@@ -205,7 +205,7 @@ def add_relations(relation, clases, upper, cardinality, fetch_type, cascade_type
                             LinkProperty(link[0], cl, -1, "OneToMany", fetch_type, cascade_type, mapped_by, ""))
                     elif cardinality == "ManyToMany":
                         second_class_class.add_ref_property(
-                            LinkProperty(link[0], cl, -1, "ManyToMany", fetch_type, cascade_type,
+                            LinkProperty(link[0], cl, -1, "ManyToMany", 'LAZY', 'ALL',
                                          second_class_class.name.lower() + "_" + link[0].lower(), ""))
 
 def check_params_types_annotation(classes):
@@ -235,6 +235,27 @@ def check_params_types_annotation(classes):
                             if not found:
                                 raise Exception("Type " + p.type + "doesnt exist")
 
+def add_item_to_action(clases, relations):
+    action_class = None
+    item_class = None
+    for cl in clases:
+        if cl.anotation and cl.anotation.name.lower()=="action":
+            action_class = cl
+        if cl.anotation and cl.anotation.name.lower()=="item":
+            item_class = cl
+    action_class.reference_properties.append(LinkProperty(item_class.name, item_class,-1, "ManyToMany", 'LAZY', 'ALL',
+                                         "", ""))
+    item_class.reference_properties.append(LinkProperty(action_class.name, action_class,-1, "ManyToMany", 'LAZY', 'ALL',
+                                         action_class.name.lower() + "_" + item_class.name.lower(), ""))
+    # for cl in clases:
+    #     print("--------------------------")
+    #     print(cl.name)
+    #     print("==========================")
+    #     for ro in cl.reference_properties:
+    #         print(ro)
+    # raise Exception("Obrisi ovaj exc")
+
+
 
 def add_roles(clases, relations):
     seller = Class("Seller", [], None, True, 'SELLER')
@@ -257,8 +278,15 @@ def add_roles(clases, relations):
 def check_existing_class(clases, relations):
     for relation in relations:
         for couple in relation.list_couple:
-            if not any([True for cl in clases if cl.name == couple[0] or cl.name == couple[1] ]):
-                raise Exception(f'Class name {couple[1]} or {couple[0]} not defined ')
+            if len(couple[1]) > 1:
+                name_couple1 = couple[0]
+                if "'" in couple[0]:
+                    name_couple1=couple[0][1:-1]
+                name_couple2 = couple[0]
+                if "'" in couple[1]:
+                    name_couple2 = couple[1][1:-1]
+                if not any([True for cl in clases if cl.name.lower() == name_couple1.lower() or cl.name.lower() == name_couple2.lower() ]):
+                    raise Exception(f'Class name {couple[1][1:-1]} or {couple[0][1:-1]} not defined ')
 
 
 def check_one_to_many(clases, relations):
@@ -290,5 +318,3 @@ def check_anotations(classes):
         for antation in list_anotation:
             if antation.lower() not in model_anotation:
                 raise Exception(f'Missing anotation  {antation}.')
-
-

@@ -3,7 +3,5 @@ def applyAction (int user, int productsOnAction, int order){
 
 int number = for order.products as: p sumOf productsOnAction as: e usingFormula e.price*0.5*e.kolicina where e.id==p.id;
 p.totalPrice = p.totalPrice-number;
-
-
 }
 

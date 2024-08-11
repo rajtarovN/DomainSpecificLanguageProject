@@ -17,7 +17,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 {% for property in current_class.reference_properties %}
-import {{property.name|lower}}Service from '../../services/{{property.name[0]|capitalize}}{{property.name[1:]}}Service';
+import {{property.name[0]|lower}}{{property.name[1:]}}Service from '../../services/{{property.name[0]|capitalize}}{{property.name[1:]}}Service';
 {% endfor %}
  {% if current_class.anotation%}
      {% if current_class.anotation.name=="bying"%}
@@ -52,6 +52,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
   {% for property in current_class.attributes %}
@@ -127,7 +131,11 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
     return () => {
       const fetchData = async () => {
         try {
+            {%if current_class.anotation and current_class.anotation.name =='basket'%}
+            const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getCustomersByBasket(id);
+            {%else%}
             const response = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
+            {%endif%}
             if (response.status === 200) {
              {% if current_class.anotation.name=="bying"%}
               setSelectedItem(response.data.getItem().getId());
@@ -243,7 +251,7 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
 {% if current_class.anotation%}
                     {% if current_class.anotation.name=="bying"%}
            for(let j in items){
-          if (parseInt(selectedItem)===parseInt(items[j].id)){ //todo ovde verujem da ide name
+          if (parseInt(selectedItem)===parseInt(items[j].id)){
             formData['item'] = items[j];
             break;
           }
@@ -262,7 +270,7 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
               {%endif%}
               {%else%}
               for(let j in {{property.name[0]|lower}}{{property.name[1:]}}s){
-                if (parseInt(selected{{property.name[0]|capitalize}}{{property.name[1:]}})===parseInt({{property.name[0]|lower}}{{property.name[1:]}}s[j].id)){ //todo ovde verujem da ide name
+                if (parseInt(selected{{property.name[0]|capitalize}}{{property.name[1:]}})===parseInt({{property.name[0]|lower}}{{property.name[1:]}}s[j].id)){
                   formData['{{property.name[0]|lower}}{{property.name[1:]}}'] = {{property.name[0]|lower}}{{property.name[1:]}}s[j];
                   break;
                 }
@@ -342,6 +350,40 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
+      {% if current_class.anotation%}
+     {% if current_class.anotation.name=="action"%}
+        <div className={classes.formGroup}>
+        <TextField
+          label="Original Code"
+          name="originalCode"
+          value={formData.originalCode}
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+      <div className={classes.formGroup}>
+        <TextField
+          label="Date From"
+          name="dateFrom"
+          type="date"
+          value={formData.dateFrom}
+          onChange={handleChange}
+          variant="outlined"
+          className={classes.textField}
+        />
+      </div>
+      <div className={classes.formGroup}>
+        <TextField
+          label="Date To"
+          name="dateTo"
+          type="date"
+          value={formData.dateTo}
+          onChange={handleChange}
+          variant="outlined"
+           className={classes.textField}
+        />
+      </div>
+      {%endif%}{%endif%}
 
       {% for property in current_class.attributes %}
       <div className={classes.formGroup}>
@@ -454,41 +496,6 @@ const Edit{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =>
             </NativeSelect>
 {%endif%}
 {%endif%}
-{% if current_class.anotation%}
-     {% if current_class.anotation.name=="action"%}
-        <div className={classes.formGroup}>
-        <TextField
-          label="Original Code"
-          name="originalCode"
-          value={formData.originalCode}
-          onChange={handleChange}
-          variant="outlined"
-        />
-      </div>
-      <div className={classes.formGroup}>
-        <TextField
-          label="Date From"
-          name="dateFrom"
-          type="date"
-          value={formData.dateFrom}
-          onChange={handleChange}
-          variant="outlined"
-          className={classes.textField}
-        />
-      </div>
-      <div className={classes.formGroup}>
-        <TextField
-          label="Date To"
-          name="dateTo"
-          type="date"
-          value={formData.dateTo}
-          onChange={handleChange}
-          variant="outlined"
-           className={classes.textField}
-        />
-      </div>
-      {%endif%}{%endif%}
-
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
           Submit

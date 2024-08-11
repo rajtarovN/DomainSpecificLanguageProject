@@ -1,0 +1,58 @@
+class Student{
+    'first_name' String;
+    'last_name' String;
+    'index_number' String;
+    'email' String;
+}
+class Teacher{
+    'first_name' String;
+    'last_name' String;
+    'email' String;
+}
+class Course{
+    'name' String;
+    'description' String;
+}
+class Enrollment{
+}
+class Grade{
+    'grade' int;
+}
+class Classroom{
+    'room_number' int;
+    'building_name' String;
+    'capacity' int;
+}
+class Department{
+    'name' String;
+    'description' String;
+}
+
+class Assignment{
+    'title' String;
+    'description' String;
+}
+class AssignmentSubmission{
+}
+class Parent{
+    'first_name' String;
+    'last_name' String;
+    'email' String;
+    'phone_number' String;
+}
+
+OneToOne{
+    'Grade' to: 'Enrollment';
+    'AssignmentSubmission'  to: 'Assignment';
+    'AssignmentSubmission' to: 'Student';
+    'AssignmentSubmission' to: 'Grade';
+    'Parent' to: 'Student';
+}
+OneToMany{
+    'Enrollment' to: 'Student';
+    'Enrollment' to: 'Course';
+    'Department' to: 'Course';
+    'Classroom' to: 'Course';
+    'Teacher' to: 'Course';
+    'Course' to: 'Assignment';
+}

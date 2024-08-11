@@ -6,6 +6,15 @@ from pathlib import Path
 from shutil import copy
 from textx import metamodel_for_language, model as md
 import shutil
+from jinja2 import Environment, FileSystemLoader
+
+def is_str(value):
+    return isinstance(value, str)
+
+def custom_transform(value):
+    if len(value) > 1:
+        return value[0].lower() + value[1:]
+    return value.lower()
 
 def generate(output_path):#todo
     metamodel = metamodel_for_language('model')
@@ -50,6 +59,69 @@ def generate(output_path):#todo
     folder = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'utils'
     folder.mkdir(parents=True, exist_ok=True)
     output_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'utils' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('AuthenticationController.j2')
+    file_name = 'AuthenticationController.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'controller'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'controller' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('BadRequestException.j2')
+    file_name = 'BadRequestException.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'exception'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'exception' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('EntryPointUnauthorizedHandler.j2')
+    file_name = 'EntryPointUnauthorizedHandler.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'security' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('LoginDTO.j2')
+    file_name = 'LoginDTO.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'dtos'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'dtos' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('TokenDTO.j2')
+    file_name = 'TokenDTO.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'dtos'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'dtos' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('UserController.j2')
+    file_name = 'UserController.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'controller'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'controller' / file_name
+
+    with output_path.open('w', encoding="utf-8") as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('UserService.j2')
+    file_name = 'UserService.java'
+    folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'service'
+    folder.mkdir(parents=True, exist_ok=True)
+    output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'service' / file_name
 
     with output_path.open('w', encoding="utf-8") as f:
         f.write(template.render())
@@ -230,10 +302,8 @@ def generate(output_path):#todo
 
     output_path = memorize_output_path
     output_folder2 = Path(output_path) / 'output2'
-    # output_folder2 = output_folder / 'output2'
     output_folder2.mkdir(parents=True, exist_ok=True)
-    print("*****************")
-    print(output_path)
+
     template = jinja_env.get_template('frontend/gitignore.j2')
     folder = output_folder2
     folder.mkdir(parents=True, exist_ok=True)
@@ -347,6 +417,15 @@ def generate(output_path):#todo
     with output_html_path.open('w') as f:
         f.write(template.render(model=model))
 
+    template = jinja_env.get_template('frontend/RegisterForm.j2')
+    folder = output_folder2 / 'src' / 'views' / 'login'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'RegisterForm.js'
+    output_html_path = output_folder2 / 'src' / 'views' / 'login' / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render(model=model))
+
     template = jinja_env.get_template('frontend/NavBar.j2')
     folder = output_folder2 / 'src' / 'views' / 'components'
     folder.mkdir(parents=True, exist_ok=True)
@@ -355,6 +434,24 @@ def generate(output_path):#todo
 
     with output_html_path.open('w') as f:
         f.write(template.render(model=model))
+
+    template = jinja_env.get_template('frontend/AbstractService.j2')
+    folder = output_folder2 / 'src' / 'services'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'AbstractService.js'
+    output_html_path = output_folder2 / 'src' / 'services' / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render())
+
+    template = jinja_env.get_template('frontend/auth.service.j2')
+    folder = output_folder2 / 'src' / 'services'
+    folder.mkdir(parents=True, exist_ok=True)
+    file_name = 'auth.service.js'
+    output_html_path = output_folder2 / 'src' / 'services' / file_name
+
+    with output_html_path.open('w') as f:
+        f.write(template.render())
 
     #  todo ovde petlja
     for cl in model.classes:
@@ -432,7 +529,7 @@ def generate(output_path):#todo
 
         with output_html_path.open('w') as f:
             # print(model)
-            f.write(template.render(model=model, current_class=cl))
+            f.write(template.render(model=model, current_class=cl, custom_transform=custom_transform))
 
         template = jinja_env.get_template('dto.j2')
         file_name = cl.name + 'DTO.java'
@@ -477,14 +574,16 @@ def generate(output_path):#todo
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('service.j2')
+
         file_name = cl.name + 'Service.java'
         folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs'/ 'service'
         folder.mkdir(parents=True, exist_ok=True)
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'service' / file_name
-
+        # env = Environment(loader=FileSystemLoader('templates'))
+        # env.filters['is_str'] = is_str
         with output_html_path.open('w') as f:
             # print(model)
-            f.write(template.render(model=model, current_class=cl))
+            f.write(template.render(model=model, current_class=cl, is_str=is_str))
 
     # print(len(model.enums))
     for enum in model.enums:

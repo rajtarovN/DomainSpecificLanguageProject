@@ -13,6 +13,8 @@ public interface ActionRepository extends JpaRepository<Action, Long> {
 
 
 
+
+
      @Query("SELECT a FROM Action a WHERE :currentDate BETWEEN a.dateFrom AND a.dateTo")
     List<Action> findValidActions(@Param("currentDate") Date currentDate);
 }

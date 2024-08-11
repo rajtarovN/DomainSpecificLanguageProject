@@ -36,7 +36,10 @@ const AddressView = () => {
   const classes = useStyles();
   const { id } = useParams();
   const [address, setAddress] = useState(NaN)
-
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,7 +47,6 @@ const AddressView = () => {
           if (response.status === 200) {
               setAddress(response.data);
           }
-          const responseCustomer = await addressService.getCustomersByAddress(id);
       } catch (error) {
           console.error(error);
       }
@@ -74,6 +76,7 @@ const AddressView = () => {
 
 
 
+
   return (
   <div>
     <ToastContainer />
@@ -86,25 +89,29 @@ const AddressView = () => {
         <label> {  address.street  } </label>
       </div>
       <div className={classes.formGroup}>
-        <label>city: </label>
-        <label> {  address.city  } </label>
+        <label>number: </label>
+        <label> {  address.number  } </label>
       </div>
       <div className={classes.formGroup}>
-        <label>zipCode: </label>
-        <label> {  address.zipCode  } </label>
+        <label>zip: </label>
+        <label> {  address.zip  } </label>
       </div>
 
       <div className={classes.buttonGroup}>
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+        {(userType=='ADMIN' || userType=='SELLER') && (
+         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        {(userType=='ADMIN' || userType=='SELLER') && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
 
       </div>
+      {(userType=='ADMIN' || userType=='SELLER') && (
       < AddressDelete
         open={isDialogOpen}
         id={delId}
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+      )}
     </div></div>
   );
 };

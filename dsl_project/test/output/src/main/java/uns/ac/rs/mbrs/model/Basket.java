@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -27,41 +28,24 @@ public  class Basket  {
                 @CollectionTable(name = "basket_quantities", joinColumns = @JoinColumn(name = "basket_id"))
                 @Column(name = "quantity")
                 private List<Integer> quantity;
-
+            
                 @ManyToMany
 
                  (cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "basket"         )
 
-                                @JsonIgnoreProperties(value = "customer", allowSetters = true)
+                                @JsonIgnoreProperties(value = "address, customer", allowSetters = true)
                 private List<Item>  item;
 
-
-    @Column(name="formular")
-    private String formular;
     @Column(name="deleted", unique = false)
     private boolean deleted;
 
 
             @OneToOne
-        (
-                cascade = CascadeType.ALL
-,                 fetch = FetchType.LAZY
-        )
-                    @JsonIgnoreProperties(value = "bill", allowSetters = true)
+                    @JsonIgnoreProperties(value = "b, basket", allowSetters = true)
 
         private Customer customer;
 
     public Basket() {}
-
-            public Customer  getCustomer() {
-                return customer;
-            }
-            public void setCustomer(
-           Customer
-            customer
-            ) {
-                this.customer = customer;
-            }
     public boolean getDeleted() {
         return deleted;
     }

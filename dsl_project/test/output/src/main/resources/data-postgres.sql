@@ -26,30 +26,38 @@ VALUES (2, 'SELLER');
 INSERT INTO role_table (id, name)
 VALUES (3, 'CUSTOMER');
 insert into system_user (username, password, deleted, loggedFirstTime, role_id)
-values ('admin', 'test', 'False', 'False', 1);
+values ('admin', '$2y$10$t4NZP3qGGdzGakospEzFHOPQngmjvi7dZeZSiwfiNz.1rv/smO0Ce', 'False', 'False', 1);
 insert into admin (id)
 values (1);
 
 insert into system_user (username, password, deleted, loggedFirstTime, role_id)
-values ('seler', 'test', 'False', 'False', 2);
+values ('seler', '$2y$10$t4NZP3qGGdzGakospEzFHOPQngmjvi7dZeZSiwfiNz.1rv/smO0Ce', 'False', 'False', 2);
 insert into seller (id)
 values (2);
 insert into system_user (username, password, deleted, loggedFirstTime, role_id)
-values ('customer', 'test', 'False', 'False', 3);
+values ('customer', '$2y$10$t4NZP3qGGdzGakospEzFHOPQngmjvi7dZeZSiwfiNz.1rv/smO0Ce', 'False', 'False', 3);
 insert into customer (id)
 values (3);
 
-insert into item (name, quantity, deleted)
+insert into action(date_from, date_to, original_code, name, deleted)
+values ('2024-09-30', '2021-10-30', '{bill.totalPrice = bill.totalPrice-200;}', 'discount', false);
+
+insert into item(name, quantity, deleted)
 values ('hleb', 3, false);
 
 insert into item (name, quantity, deleted)
 values ('pavlaka', 2, false);
 
-insert into item (name, quantity, deleted)
+insert into item(name, quantity, deleted)
 values ('so', 3, false);
 
-insert into basket ( formular, deleted, customer_id)
-values ('fff', false,3);
+insert into basket(  deleted, customer_id)
+values ( false,3);
+
+INSERT INTO action_item(item_id, action_id)
+VALUES (1, 1);
+--INSERT INTO action_item(item_id, action_id)
+--VALUES (2, 1);
 
 insert into itemwithprice (currentprice, iscurrent, deleted)
 values (300, true, false);

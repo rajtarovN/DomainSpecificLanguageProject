@@ -17,10 +17,10 @@ public class AddressDTO {
     private long id;
 
             private String street;
-            private String city;
-            private String zipCode;
+            private String number;
+            private String zip;
+            private BillDTO bill;
 
-            private List<Long> personIds;
 
 
 

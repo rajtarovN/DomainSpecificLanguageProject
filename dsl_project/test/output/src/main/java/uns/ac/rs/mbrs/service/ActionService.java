@@ -25,18 +25,25 @@ public class ActionService  {
 
     private final ActionMapper actionMapper;
     private final ActionRepository actionRepository;
+    private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
              private final CallPyController callPyController;
              private final DynamicCodeExecution dynamicCodeExecution;
 
     public ActionService(
     ActionMapper actionMapper,
     ActionRepository actionRepository
+            ,ItemRepository itemRepository
+            ,ItemMapper itemMapper
             , CallPyController callPyController,
     DynamicCodeExecution dynamicCodeExecution
 ) {
 
         this.actionMapper = actionMapper;
         this.actionRepository = actionRepository;
+        this.itemRepository = itemRepository;
+
+        this.itemMapper = itemMapper;
 
         this.callPyController = callPyController;
         this.dynamicCodeExecution = dynamicCodeExecution;
@@ -45,6 +52,14 @@ public class ActionService  {
 public ActionDTO save( ActionDTO actiondto) {
 
             Action action = actionMapper.toModel(actiondto);
+                List<Item> items = new ArrayList<>();
+                for (Long d : actiondto.getItemIds()) {
+                    Item item = itemRepository.getById(d);
+                    items.add(item);
+
+                                        item.getAction().add(action);
+                }
+                action.setItem(items);
         String transformedCode = callPyController.callPythonPost(actiondto.getOriginalCode());
         String part =transformedCode.split("model\":\"")[1].split("}")[0];
 
@@ -82,6 +97,16 @@ public void doActionMake(Customer customer, Bill current_bill ) throws Exception
 
 
 
+        List<Item> items = new ArrayList<>();
+        for (Long d : actiondto.getItemIds()) {
+            Item item = itemRepository.getById(d);
+            items.add(item);
+
+                 item.getAction().add(action.get());
+
+        }
+
+        action.get().setItem(items);
             Action s = actionRepository.save(action.get());
             return actionMapper.toDTO(s);
         }
@@ -132,6 +157,11 @@ public void delete(Long id) {
     if (maybeAction.isPresent()) {
         Action existingAction = maybeAction.get();
         existingAction.setDeleted(true);
+        if (existingAction.getItem() != null){
+            for (Item p: existingAction.getItem()){
+                p.setDeleted(true);
+            }
+        }
 
         actionRepository.save(existingAction);
     }
@@ -146,5 +176,6 @@ public void delete(Long id) {
         }
         return list2;
     }
+
 
 }

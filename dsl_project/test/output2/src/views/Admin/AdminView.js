@@ -36,7 +36,10 @@ const AdminView = () => {
   const classes = useStyles();
   const { id } = useParams();
   const [admin, setAdmin] = useState(NaN)
-
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,7 +47,6 @@ const AdminView = () => {
           if (response.status === 200) {
               setAdmin(response.data);
           }
-          const responseCustomer = await adminService.getCustomersByAdmin(id);
       } catch (error) {
           console.error(error);
       }
@@ -74,6 +76,7 @@ const AdminView = () => {
 
 
 
+
   return (
   <div>
     <ToastContainer />
@@ -83,16 +86,20 @@ const AdminView = () => {
       <p>ID: {id}</p>
 
       <div className={classes.buttonGroup}>
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+        {(userType=='ADMIN' || userType=='SELLER') && (
+         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+{(userType=='ADMIN' ) && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
 
       </div>
+      {(userType=='ADMIN' ) && (
       < AdminDelete
         open={isDialogOpen}
         id={delId}
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+      )}
     </div></div>
   );
 };

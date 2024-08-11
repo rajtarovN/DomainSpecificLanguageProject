@@ -22,6 +22,8 @@ public class ActionDTO {
 
             private String name;
 
+            private List<Long> itemIds;
+
 
 
 

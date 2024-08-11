@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -29,19 +30,18 @@ public  class ItemWithPrice  {
     private boolean iscurrent; //is it still valid
 
             @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "itemWithPrice")
-            @JsonIgnoreProperties(value = "customer", allowSetters = true)
+            @JsonIgnoreProperties(value = "address, customer", allowSetters = true)
             private List<Bill>  bill;
 
                @ManyToOne
                 (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-                private Item  item;
+                @JsonIgnoreProperties(value = "action", allowSetters = true)                private Item  item;
 
     @Column(name="deleted", unique = false)
     private boolean deleted;
 
 
     public ItemWithPrice() {}
-
     public boolean getDeleted() {
         return deleted;
     }

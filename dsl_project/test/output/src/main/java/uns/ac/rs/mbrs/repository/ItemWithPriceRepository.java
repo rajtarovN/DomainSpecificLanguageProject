@@ -12,6 +12,6 @@ import java.util.Date;
 public interface ItemWithPriceRepository extends JpaRepository<ItemWithPrice, Long> {
 
 
-    @Query("SELECT iwp FROM ItemWithPrice iwp WHERE iwp.item.id = :itemId AND iwp.iscurrent = true")
+        @Query("SELECT iwp FROM ItemWithPrice iwp WHERE iwp.item.id = :itemId AND iwp.iscurrent = true")
      ItemWithPrice findByItemIdAndIsCurrent(@Param("itemId") long itemId);
 }

@@ -11,8 +11,7 @@ import java.util.Date;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
-                        List<Address> findAllByProbannnId(Long id);
-
+                        List<Address> findAllByBillId(Long id);
 
 
 

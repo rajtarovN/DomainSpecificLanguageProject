@@ -58,11 +58,6 @@ public CustomerDTO save( CustomerDTO customerdto){
                                         bill.setCustomer(customer);
                 }
                 customer.setBill(bills);
-                                    if(customerdto.getBasket()!=null) {
-                                        Basket basket = basketRepository.getById(customerdto.getBasket().getId());
-                                        customer.setBasket(basket);
-                                            basket.setCustomer(customer);
-                                    }
     Customer s = customerRepository.save(customer);
     return customerMapper.toDTO(s);
 }
@@ -85,10 +80,11 @@ public CustomerDTO save( CustomerDTO customerdto){
         }
 
         customer.get().setBill(bills);
-       //ovde
+
                     if(customerdto.getBasket()!=null) {
 
-                    Basket basket =basketRepository.getById(customerdto.getBasket().getId());
+                     Basket basket =basketRepository.getById(customerdto.getBasket().getId());
+
                     customer.get().setBasket(basket);
                     basket.setCustomer(customer.get());
 
@@ -163,5 +159,6 @@ public void delete(Long id) {
         }
         return list2;
     }
+
 
 }

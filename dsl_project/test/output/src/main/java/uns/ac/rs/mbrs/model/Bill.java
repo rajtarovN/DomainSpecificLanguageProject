@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -35,32 +36,27 @@ public  class Bill  {
     private List<ItemWithPrice>  itemWithPrice;
 
 
-    @Column(name="neki_tekst")
-    private String neki_tekst;
+    @Column(name="cashier")
+    private String cashier;
     @Column(name="deleted", unique = false)
     private boolean deleted;
 
+
+            @OneToOne
+                    @JsonIgnoreProperties(value = "bill", allowSetters = true)
+
+        private Address address;
 
             @ManyToOne
         (
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
         )
-                    @JsonIgnoreProperties(value = "basket", allowSetters = true)
+                    @JsonIgnoreProperties(value = "b, bill", allowSetters = true)
 
         private Customer customer;
 
     public Bill() {}
-
-            public Customer  getCustomer() {
-                return customer;
-            }
-            public void setCustomer(
-           Customer
-            customer
-            ) {
-                this.customer = customer;
-            }
     public boolean getDeleted() {
         return deleted;
     }

@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -26,37 +27,21 @@ public  class Address  {
     @Column(name="street")
     private String street;
 
-    @Column(name="city")
-    private String city;
+    @Column(name="number")
+    private String number;
 
-    @Column(name="zipcode")
-    private String zipCode;
+    @Column(name="zip")
+    private String zip;
     @Column(name="deleted", unique = false)
     private boolean deleted;
 
 
-            @OneToMany
-        (
-                cascade = CascadeType.ALL
-,                 fetch = FetchType.LAZY
-                 ,mappedBy = "address"        )
-                    @JsonIgnoreProperties(value = "product", allowSetters = true)
+            @OneToOne
+        @JoinColumn(name = "bill_id")                    @JsonIgnoreProperties(value = "c, address", allowSetters = true)
 
-        private List<Person>  probannn;
+        private Bill bill;
 
     public Address() {}
-
-            public  List< Person > getProbannn() {
-                return probannn;
-            }
-            public void setProbannn(
-                List<
-           Person
-                >
-            probannn
-            ) {
-                this.probannn = probannn;
-            }
     public boolean getDeleted() {
         return deleted;
     }

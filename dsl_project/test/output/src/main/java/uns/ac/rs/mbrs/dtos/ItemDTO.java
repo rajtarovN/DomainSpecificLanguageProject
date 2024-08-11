@@ -19,6 +19,8 @@ public class ItemDTO {
             private String name;
             private int quantity;
 
+            private List<Long> actionIds;
+
 
 
             private List<ItemWithPriceDTO>  itemWithPrice;

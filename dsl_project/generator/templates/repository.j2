@@ -49,7 +49,7 @@ public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}
     List<Action> findValidActions(@Param("currentDate") Date currentDate);
         {% endif %}
         {% if current_class.anotation.name == "bying" %}
-    @Query("SELECT iwp FROM {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} iwp WHERE iwp.item.id = :itemId AND iwp.iscurrent = true")
+        @Query("SELECT iwp FROM {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} iwp WHERE iwp.item.id = :itemId AND iwp.iscurrent = true")
      {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} findByItemIdAndIsCurrent(@Param("itemId") long itemId);
         {% endif %}
         {% if current_class.name == "customer" %}
@@ -57,4 +57,8 @@ public interface {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}
         Customer findByUsername(@Param("username")String username);
      {% endif %}
     {% endif %}
+    {%if current_class.anotation and current_class.anotation.name == 'item'%}
+    @Query("SELECT i FROM Item i JOIN i.action a WHERE a.id = :actionId")
+    List<Item> findAllByActionId(long actionId);
+    {%endif%}
 }

@@ -11,6 +11,8 @@ import java.util.Date;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
+                        List<Customer> findAllByBillId(Long id);
+
 
 
 

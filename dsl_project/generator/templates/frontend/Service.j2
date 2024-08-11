@@ -1,25 +1,31 @@
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AuthService from './auth.service';
 const ENDPOINTS = {
     BASE: 'http://localhost:8080/api/{{current_class.name[0]|lower}}{{current_class.name[1:]}}/',
 };
 
 class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
+    {% if current_class.anotation and (current_class.anotation.name == 'basket' or current_class.anotation.name == 'bill')%}
     getCustomersBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+    const headers = AuthService.authHeader(false);
         try {
             return await axios.get(
                 ENDPOINTS.BASE+"getCustomersBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}/"+id,
+                {headers: headers}
             );
         } catch (error) {
          toast.error('Failed to get element.');
             return error;
         }
     };
+    {%endif%}
     get{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async () => {
+    const headers = AuthService.authHeader(false);
         try {
             return await axios.get(
-                ENDPOINTS.BASE,
+                ENDPOINTS.BASE,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to get element.');
@@ -27,9 +33,10 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     getOne{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+    const headers = AuthService.authHeader(false);
         try {
             return await axios.get(
-                ENDPOINTS.BASE +id,
+                ENDPOINTS.BASE +id,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to get element.');
@@ -37,10 +44,12 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     create{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async ({{current_class.name[0]|lower}}{{current_class.name[1:]}}) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.post(
                 ENDPOINTS.BASE,
                 {{current_class.name[0]|lower}}{{current_class.name[1:]}}
+                ,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to create element.');
@@ -48,10 +57,12 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     update{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async ({{current_class.name[0]|lower}}{{current_class.name[1:]}}, id) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.put(
                 ENDPOINTS.BASE+id,
                 {{current_class.name[0]|lower}}{{current_class.name[1:]}}
+                ,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to update element.');
@@ -59,9 +70,10 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     delete{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = async (id) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.delete(
-                ENDPOINTS.BASE+id,
+                ENDPOINTS.BASE+id,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to delete element.');
@@ -71,9 +83,10 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
      {% if current_class.anotation%}
                     {% if current_class.anotation.name=="basket"%}
     addItemToBasket= async (basket_id, item_id, quantity) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.put(
-                ENDPOINTS.BASE+basket_id+"/"+item_id+"/"+quantity, //todo
+                ENDPOINTS.BASE+basket_id+"/"+item_id+"/"+quantity,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to add item to basket element.');
@@ -81,9 +94,10 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     removeItem = async (basketId, itemId) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.put(
-                ENDPOINTS.BASE+basketId+"/"+itemId, //todo
+                ENDPOINTS.BASE+basketId+"/"+itemId,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to remove item from basket element.');
@@ -93,10 +107,11 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
     {%endif%}
        {% if current_class.anotation.name=="bill"%}
     makeBill = async (basket) => {
+        const headers = AuthService.authHeader(false);
         try {
-            return await axios.post( //todo
+            return await axios.post( 
                 ENDPOINTS.BASE,
-                basket
+                basket ,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to make bill element.');
@@ -104,9 +119,10 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     makeBillWithId = async (id) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.post(
-                ENDPOINTS.BASE + `make-with-id/${id}`, //todo
+                ENDPOINTS.BASE + `make-with-id/${id}`,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to make bill element.');
@@ -114,6 +130,20 @@ class {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service {
         }
     };
     {%endif%}
+    {%endif%}
+
+     {% if current_class.anotation and current_class.anotation.name == 'item'%}
+    getItemsByActions= async (id) => {
+        const headers = AuthService.authHeader(false);
+        try {
+            return await axios.get(
+                ENDPOINTS.BASE+"getByAction/"+id,{headers: headers}
+            );
+        } catch (error) {
+        toast.error('Failed to get items by action element.');
+            return error;
+        }
+    };
     {%endif%}
     
 }

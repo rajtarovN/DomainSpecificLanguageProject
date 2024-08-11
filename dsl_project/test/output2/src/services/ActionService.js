@@ -1,25 +1,17 @@
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AuthService from './auth.service';
 const ENDPOINTS = {
     BASE: 'http://localhost:8080/api/action/',
 };
 
 class ActionService {
-    getCustomersByAction = async (id) => {
-        try {
-            return await axios.get(
-                ENDPOINTS.BASE+"getCustomersByAction/"+id,
-            );
-        } catch (error) {
-         toast.error('Failed to get element.');
-            return error;
-        }
-    };
     getAction = async () => {
+    const headers = AuthService.authHeader(false);
         try {
             return await axios.get(
-                ENDPOINTS.BASE,
+                ENDPOINTS.BASE,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to get element.');
@@ -27,9 +19,10 @@ class ActionService {
         }
     };
     getOneAction = async (id) => {
+    const headers = AuthService.authHeader(false);
         try {
             return await axios.get(
-                ENDPOINTS.BASE +id,
+                ENDPOINTS.BASE +id,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to get element.');
@@ -37,10 +30,12 @@ class ActionService {
         }
     };
     createAction = async (action) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.post(
                 ENDPOINTS.BASE,
                 action
+                ,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to create element.');
@@ -48,10 +43,12 @@ class ActionService {
         }
     };
     updateAction = async (action, id) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.put(
                 ENDPOINTS.BASE+id,
                 action
+                ,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to update element.');
@@ -59,15 +56,17 @@ class ActionService {
         }
     };
     deleteAction = async (id) => {
+        const headers = AuthService.authHeader(false);
         try {
             return await axios.delete(
-                ENDPOINTS.BASE+id,
+                ENDPOINTS.BASE+id,{headers: headers}
             );
         } catch (error) {
         toast.error('Failed to delete element.');
             return error;
         }
     };
+
     
 }
 

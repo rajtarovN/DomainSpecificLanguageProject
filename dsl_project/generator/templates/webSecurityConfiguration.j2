@@ -75,7 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/api/login").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
                 {% for current_class in model.classes %}
@@ -91,6 +91,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 {%endif%}
                 {%endif%}
                 {%endfor%}
+                .antMatchers("/api/item/getByAction/{actionId}").permitAll()
+                .antMatchers("/auth/register").permitAll()
                 .antMatchers("/logout").permitAll()
                 .anyRequest().authenticated().and()
                 .cors();
@@ -102,9 +104,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.POST, "/login");
+        web.ignoring().antMatchers(HttpMethod.POST, "/api/login");
         web.ignoring().antMatchers(HttpMethod.GET, "/logout");
-
+        web.ignoring().antMatchers(HttpMethod.POST, "/auth/register");
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/cusomer");
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/address/{id}");
         web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",

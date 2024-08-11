@@ -16,6 +16,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import itemService from '../../services/ItemService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,6 +45,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditAction = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
     name: '',
@@ -52,6 +57,8 @@ const EditAction = () => {
     originalCode: '',
   });
   const { id } = useParams();
+  const [currentItem, setCurrentItem] = useState([]);
+  const [allItem, setAllItem] = useState([]);
 
   useEffect(() => {
 
@@ -80,6 +87,18 @@ const EditAction = () => {
     fetchData();
       console.log('Component unmounted');
     };}
+    const fetchDataItem = async () => {
+      try {
+          const response2 = await itemService.getItem();
+          if (response2.status === 200) {
+            setAllItem(response2.data);
+        }
+      } catch (error) {
+       toast.error('Failed to create item. Please try again.');
+          console.error(error);
+      }
+  };
+  fetchDataItem();
   }, [id]);
 
 
@@ -96,6 +115,12 @@ const EditAction = () => {
         e.preventDefault();
         const fetchData = async () => {
           try {
+
+              let liItem = [];
+              for (let a of currentItem){
+                liItem.push(a.id);
+              }
+              formData['itemIds'] = liItem;
               const response = await actionService.updateAction(formData, id);
               if (response.status === 200) {
                toast.success('Item created successfully!');
@@ -113,6 +138,11 @@ const EditAction = () => {
     console.log(formData);
     const fetchData = async () => {
       try {
+              let li1 = [];
+              for (let a of currentItem){
+                li1.push(a.id);
+              }
+              formData['itemIds'] = li1;
           const response = await actionService.createAction(formData);
           if (response.status === 200) {
            toast.success('Item created successfully!');
@@ -131,6 +161,36 @@ const EditAction = () => {
     console.log('Form canceled');
   };
 
+  const handleRemoveItem = (id) => {
+    if (!currentItem || !allItem) return;
+
+    for (const item of currentItem) {
+      if (item.id === id) {
+        const updatedCurrentItem = currentItem.filter(itemItem => itemItem.id !== id);
+        setCurrentItem(updatedCurrentItem);
+        const updatedAllItem = [...allItem, item];
+        setAllItem(updatedAllItem);
+
+        break;
+      }
+    }
+  }
+
+
+  const handleAddItem = (id) => {
+    if (!currentItem || !allItem) return;
+
+    for (const item of allItem) {
+      if (item.id === id) {
+        const updatedAllItem = allItem.filter(itemItem => itemItem.id !== id);
+        setAllItem(updatedAllItem);
+        const updatedCurrentItem = [...currentItem, item];
+        setCurrentItem(updatedCurrentItem);
+
+        break;
+      }
+    }
+  }
 
 
   return (
@@ -139,19 +199,6 @@ const EditAction = () => {
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
-
-      <div className={classes.formGroup}>
-        <TextField
-          label="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          variant="outlined"
-        />
-      </div>
-
-
-
         <div className={classes.formGroup}>
         <TextField
           label="Original Code"
@@ -184,6 +231,63 @@ const EditAction = () => {
         />
       </div>
 
+      <div className={classes.formGroup}>
+        <TextField
+          label="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          variant="outlined"
+        />
+      </div>
+
+
+
+        Item
+        <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Add</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {currentItem.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">
+                  {item.id}
+                </TableCell>
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleRemoveItem(item.id)}>Remove</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer><br/>
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Remove</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {allItem.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">
+                  {item.id}
+                </TableCell>
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleAddItem(item.id)}>Add</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
           Submit

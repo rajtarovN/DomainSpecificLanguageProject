@@ -27,6 +27,13 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
         ) {
             this.itemMapper = itemMapper;}
  {% endif %}
+ {% if current_class.anotation and current_class.anotation.name=='action'%}
+  private final ItemMapper itemMapper;
+    public ActionMapper(
+            ItemMapper itemMapper
+    ) {
+        this.itemMapper = itemMapper;}
+ {%endif%}
 
     public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO toDTO({{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }} model) {
         {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO dto = new {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO();
@@ -67,6 +74,14 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
         dto.setDeleted(model.isDeleted());
         dto.setLoggedFirstTime(model.isLoggedFirstTime());
         dto.setRole(model.getRole().getName());
+        {%endif%}
+        {% if current_class.anotation and current_class.anotation.name=='action'%}
+        if (model.getItem()!=null){
+            dto.setItemIds(new ArrayList<>());
+            for (Item i : model.getItem()){
+                dto.getItemIds().add(i.getId());
+            }
+        }
         {%endif%}
         return dto;
     }

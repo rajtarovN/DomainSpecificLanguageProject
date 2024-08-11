@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 const NavBar = () => {
   const [showSubMenu, setShowSubMenu] = useState(false); // State to manage submenu visibility
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : ''
+  );
+  const handleRegister = () => {
+    navigate(`/register`);
+  };
 
   const navigate = useNavigate();
   const handleLogin = () => {
@@ -12,18 +20,46 @@ const NavBar = () => {
     navigate(`/home`);
   };
   {% for elem in model.classes %}
+  {%if elem.anotation and elem.anotation.name =="basket"%}
+   const handleBasketView = () => {
+    setShowSubMenu(!showSubMenu);
+    const id= JSON.parse(localStorage.getItem('user'))
+    ? JSON.parse(localStorage.getItem('id')).userType : "";
+    navigate(`/edit-basket/`+id);
+  };
+  {%else%}
   const handleTable{{elem.name}} = () => {
+  setShowSubMenu(!showSubMenu);
     navigate(`/table-{{elem.name|lower}}`);
   };
+  {%endif%}
   {% endfor %}
   const handleSubMenuClick = () => {
     setShowSubMenu(!showSubMenu);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate(`/`);
   };
 
   return (
     <nav style={styles.nav}>
       <ul style={styles.navList}>
-        <li style={styles.navItem}><a onClick={handleLogin} style={styles.navLink}>Login</a></li>
+         {!userType && (
+          <>
+            <li style={styles.navItem}>
+              <a onClick={handleRegister} style={styles.navLink}>Register</a>
+            </li>
+            <li style={styles.navItem}>
+              <a onClick={handleLogin} style={styles.navLink}>Login</a>
+            </li>
+          </>
+        )}
+        {userType && (
+          <li style={styles.navItem}>
+            <a onClick={handleLogout} style={styles.navLink}>Logout</a>
+          </li>
+        )}
         <li style={styles.navItem}><a onClick={handleHome}  style={styles.navLink}>Home</a></li>
         <li style={styles.navItem}><a href="#" style={styles.navLink}>Logout</a></li>
         <li style={styles.navItem}>
@@ -31,7 +67,17 @@ const NavBar = () => {
           {showSubMenu && (
             <ul style={styles.subMenu}>
             {% for elem in model.classes %}
-              <li><a onClick={handleTable{{elem.name}}} style={styles.navLink} href="#">Table {{elem.name}}</a></li>
+                {% if elem.name == 'Admin' %}
+                {(userType=='ADMIN') && (
+                 <li><a onClick={handleTable{{elem.name}}} style={styles.navLink} href="#">Table {{elem.name}}</a></li>)}
+                {%else%}
+                    {%if elem.name == 'Seller' or elem.name == 'Customer'%}
+                 {(userType=='ADMIN' || userType=='SELLER') && (
+                <li><a onClick={handleTable{{elem.name}}} style={styles.navLink} href="#">Table {{elem.name}}</a></li>)}
+                    {%else%}
+                <li><a onClick={handleTable{{elem.name}}} style={styles.navLink} href="#">Table {{elem.name}}</a></li>
+                    {%endif%}
+                {%endif%}
             {% endfor %}
             </ul>
           )}
@@ -59,20 +105,20 @@ const styles = {
     position: 'relative',
   },
   navLink: {
-    textDecoration: 'none', // Remove underline
-    color: '#fff', // Change font color to white
+    textDecoration: 'none',
+    color: '#fff',
 
   },
   subMenu: {
     listStyleType: 'none',
     width: '200px',
     position: 'absolute',
-    top: '200%', // Position submenu below the parent item
+    top: '200%',
     left: 0,
     backgroundColor: '#3f51b5',
     padding: '0.5rem',
     borderRadius: '0.5rem',
-    zIndex: 1, // Ensure submenu appears above other content
+    zIndex: 1,
     textAlign: 'left',
   },
 };

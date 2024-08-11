@@ -36,7 +36,10 @@ const BillView = () => {
   const classes = useStyles();
   const { id } = useParams();
   const [bill, setBill] = useState(NaN)
-
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,6 +47,7 @@ const BillView = () => {
           if (response.status === 200) {
               setBill(response.data);
           }
+            //bill
           const responseCustomer = await billService.getCustomersByBill(id);
       } catch (error) {
           console.error(error);
@@ -72,7 +76,8 @@ const BillView = () => {
     setIsDialogOpen(false);
   };
 
- //todo
+ 
+
 
 
   return (
@@ -83,21 +88,25 @@ const BillView = () => {
 
       <p>ID: {id}</p>
       <div className={classes.formGroup}>
-        <label>neki_tekst: </label>
-        <label> {  bill.neki_tekst  } </label>
+        <label>cashier: </label>
+        <label> {  bill.cashier  } </label>
       </div>
 
       <div className={classes.buttonGroup}>
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+        {(userType=='ADMIN' || userType=='SELLER') && (
+         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        {(userType=='ADMIN' || userType=='SELLER') && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
 
       </div>
+      {(userType=='ADMIN' || userType=='SELLER') && (
       < BillDelete
         open={isDialogOpen}
         id={delId}
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+      )}
     </div></div>
   );
 };

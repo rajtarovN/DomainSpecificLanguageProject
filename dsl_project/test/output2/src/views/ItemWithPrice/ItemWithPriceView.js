@@ -36,7 +36,10 @@ const ItemWithPriceView = () => {
   const classes = useStyles();
   const { id } = useParams();
   const [itemWithPrice, setItemWithPrice] = useState(NaN)
-
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,7 +47,6 @@ const ItemWithPriceView = () => {
           if (response.status === 200) {
               setItemWithPrice(response.data);
           }
-          const responseCustomer = await itemWithPriceService.getCustomersByItemWithPrice(id);
       } catch (error) {
           console.error(error);
       }
@@ -72,7 +74,8 @@ const ItemWithPriceView = () => {
     setIsDialogOpen(false);
   };
 
- //todo
+ 
+
 
 
   return (
@@ -84,16 +87,20 @@ const ItemWithPriceView = () => {
       <p>ID: {id}</p>
 
       <div className={classes.buttonGroup}>
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+        {(userType=='ADMIN' || userType=='SELLER') && (
+         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        {(userType=='ADMIN' || userType=='SELLER') && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
 
       </div>
+      {(userType=='ADMIN' || userType=='SELLER') && (
       < ItemWithPriceDelete
         open={isDialogOpen}
         id={delId}
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+      )}
     </div></div>
   );
 };

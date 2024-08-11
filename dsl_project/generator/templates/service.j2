@@ -21,6 +21,16 @@ import uns.ac.rs.mbrs.utils.DynamicCodeExecution;
 import java.util.Date;
         {%endif%}
     {%endif%}
+{% set basket_name_to = [] %}
+{% set item_name_to = [] %}
+{% for cl in model.classes%}
+    {% if cl.anotation and cl.anotation.name=="basket" %}
+        {% set _ = basket_name_to.append(cl.name) %}
+    {%endif%}
+    {% if cl.anotation and (cl.anotation.name=="item" or cl.anotation.name=="Item" ) %}
+        {% set _ = item_name_to.append(cl.name) %}
+    {%endif%}
+{%endfor%}
 
 
 @Service
@@ -59,10 +69,10 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
              private final DynamicCodeExecution dynamicCodeExecution;
         {%endif%}
         {% if current_class.anotation.name=="basket"%}
-            private final ItemRepository itemRepository; //todo ovo popravi
+            private final {{item_name_to[0][0] | capitalize}}{{item_name_to[0][1:]}}Repository {{item_name_to[0][0] | lower}}{{item_name_to[0][1:]}}Repository;
          {%endif%}
          {% if current_class.anotation.name=="bill"%}
-            private final BasketRepository basketRepository; //todo ovo popravi
+            private final {{basket_name_to[0][0] | capitalize}}{{basket_name_to[0][1:]}}Repository {{basket_name_to[0][0] | lower}}{{basket_name_to[0][1:]}}Repository;
          {%endif%}
     {%endif%}
 
@@ -99,10 +109,10 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
     DynamicCodeExecution dynamicCodeExecution
         {%endif%}
          {% if current_class.anotation.name=="basket"%}
-           ,ItemRepository itemRepository //todo ovo popravi
+           ,{{item_name_to[0][0] | capitalize}}{{item_name_to[0][1:]}}Repository {{item_name_to[0][0] | lower}}{{item_name_to[0][1:]}}Repository
          {%endif%}
          {% if current_class.anotation.name=="bill"%}
-           ,BasketRepository basketRepository //todo ovo popravi
+           ,{{basket_name_to[0][0] | capitalize}}{{basket_name_to[0][1:]}}Repository {{basket_name_to[0][0] | lower}}{{basket_name_to[0][1:]}}Repository
          {%endif%}
     {%endif%}
 ) {
@@ -151,10 +161,10 @@ public class {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}Ser
         this.dynamicCodeExecution = dynamicCodeExecution;
         {%endif%}
          {% if current_class.anotation.name=="basket"%}
-           this.itemRepository = itemRepository;//todo ovo popravi
+           this.{{item_name_to[0][0] | lower}}{{item_name_to[0][1:]}}Repository = {{item_name_to[0][0] | lower}}{{item_name_to[0][1:]}}Repository;
          {%endif%}
          {% if current_class.anotation.name=="bill"%}
-           this.basketRepository = basketRepository;//todo ovo popravi
+           this.{{basket_name_to[0][0] | lower}}{{basket_name_to[0][1:]}}Repository = {{basket_name_to[0][0] | lower}}{{basket_name_to[0][1:]}}Repository;
          {%endif%}
     {%endif%}
     }
@@ -233,8 +243,13 @@ public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO sav
                                     {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.set{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
                                     {{ prop.type | lower }}.set{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
                                 {% else %}
+                                    {%if prop.name=='customer' or prop.name=='Customer' %}
                                     if({% if current_class.anotation%} {% if current_class.anotation.name=="bill"%}basketdto{%else%}{{ current_class.name | lower }}dto{%endif%}{%else%}{{ current_class.name | lower }}dto{%endif%}.get{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}()!=null) {
-                                        {{ prop.type | capitalize }} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById({% if current_class.anotation%} {% if current_class.anotation.name=="bill"%}basketdto{%else%}{{ current_class.name | lower }}dto{%endif%}{%else%}{{ current_class.name | lower }}dto{%endif%}.get{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+                                        {% if is_str(prop.type) %}
+                                        {{ prop.type[0] | capitalize }}{{ prop.type[1:]}} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById({% if current_class.anotation%} {% if current_class.anotation.name=="bill"%}basketdto{%else%}{{ current_class.name | lower }}dto{%endif%}{%else%}{{ current_class.name | lower }}dto{%endif%}.get{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+                                        {%else%}
+                                        {{ prop.type.name[0] | capitalize }}{{ prop.type.name[1:]}} {{ prop.type | lower }} = {{ prop.type | lower }}Repository.getById({% if current_class.anotation%} {% if current_class.anotation.name=="bill"%}basketdto{%else%}{{ current_class.name | lower }}dto{%endif%}{%else%}{{ current_class.name | lower }}dto{%endif%}.get{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+                                        {%endif%}
                                         {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.set{% if prop.as_part!="" and prop.as_part!="*" %}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
                                         {% if prop.cardinality != 'OneToOne' %}
                                             {{ prop.type | lower }}.get{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}().add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
@@ -242,6 +257,7 @@ public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO sav
                                             {{ prop.type | lower }}.set{% if p.as_part!="" and p.as_part!="*" %}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
                                         {% endif %}
                                     }
+                                    {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
@@ -294,8 +310,8 @@ public {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}DTO sav
 
                                     {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(customer, bill);
                                 {%else%}
-                                {{ current_class.name | lower }}.set{{m.name[0]|capitalize}}{{m.name[1:]}}({{m.name[0]|lower}}{{m.name[1:]}}Repository.findByItemIdAndIsCurrent({{ current_class.name | lower }}dto.getItem.getId());
-                                 {{ current_class.name | lower }}.setTotalPrice(price);
+                                {{ current_class.name | lower }}.set{{m.name[0]|capitalize}}{{m.name[1:]}}({{m.name|lower}}Repository.findByItemIdAndIsCurrent({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getItem().getId()));
+                                 {{ current_class.name | lower }}.setTotalPrice({{m.name|lower}}Repository.findByItemIdAndIsCurrent({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getItem().getId()).getCurrentPrice());
                                     Customer customer = customerRepository.findByUsername({{basket_name[0][0]|lower}}{{basket_name[0][1:]}}dto.getCustomer().getUsername());
                                   {{action_name[0][0]|lower}}{{action_name[0][1:]}}Service.doAction{{action_name_f[0][0]|capitalize}}{{action_name_f[0][1:]}}(customer, bill);
                                 {% endif %}
@@ -367,7 +383,6 @@ public void doActionMake(Customer customer, Bill current_bill ) throws Exception
                 {{ prop.type | lower }}.set{% if p.as_part != "" and p.as_part!="*"%}{{ p.as_part[0] | capitalize }}{{ p.as_part[1:] }}{% else %}{{ p.name[0] | capitalize }}{{ p.name[1:] }}{% endif %}({{ p.name[0] | lower }}{{ p.name[1:] }}.get());
 
                 {% else %}
-                //todo pazi na liste
                 {% if prop.cardinality == 'OneToOne' %}
                 {{ prop.type | lower }}.set{% if p.as_part != "" and p.as_part!="*"%}{{ p.as_part[0] | capitalize }}{{ p.as_part[1:] }}{% else %}{{ p.name[0] | capitalize }}{{ p.name[1:] }}{% endif %}({{ p.name[0] | lower }}{{ p.name[1:] }}.get());
                 {%else%}
@@ -398,7 +413,7 @@ public void doActionMake(Customer customer, Bill current_bill ) throws Exception
 {% endif %}
         {% if prop.upper != -1 %}
         {% if not "_" in prop.mapped_by|string %}
-       //ovde
+
 {% set found = [] %}
 {% for model_cl in model.classes if not found %}
     {% if model_cl.name == prop.name %}
@@ -408,13 +423,25 @@ public void doActionMake(Customer customer, Bill current_bill ) throws Exception
                     if({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}()!=null) {
 
                     {% if prop.cardinality == 'OneToMany' %}
-                   {{ prop.type | capitalize }} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.getId());
+                    {% if is_str(prop.type)%}
+                    {{ prop.type[0] | capitalize }}{{ prop.type[1:]}} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.getId());
+
+                    {%else%}
+                    {{ prop.type.name[0] | capitalize }}{{ prop.type.name[1:]}} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.getId());
+
+                    {%endif%}
                     {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.get().set{% if p.as_part!="" and p.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
 
                     {{ prop.type | lower }}.set{% if p.as_part!="" and prop.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}({{ current_class.name[0]|lower }}{{ current_class.name[1:] }});
 
                     {% else %}
-                    {{ prop.type | capitalize }} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+                     {% if is_str(prop.type)%}
+                     {{ prop.type[0] | capitalize }}{{ prop.type[1:]}} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+
+                     {%else%}
+                     {{ prop.type.name[0] | capitalize }}{{ prop.type.name[1:]}} {{ prop.type | lower }} ={{ prop.type | lower }}Repository.getById({{ current_class.name | lower }}dto.get{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}(){%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}(){%endif%}.getId());
+
+                     {%endif%}
                     {{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.get().set{% if prop.as_part!="" and prop.as_part!="*"%}{{ prop.as_part[0]|capitalize }}{{ prop.as_part[1:]}}{%else%}{{ prop.name[0]|capitalize }}{{ prop.name[1:]}}{%endif%}({{ prop.type | lower }});
 {% if prop.cardinality != 'OneToOne' %}
                     {{ prop.type | lower }}.get{% if p.as_part!="" and p.as_part!="*"%}{{ p.as_part[0]|capitalize }}{{ p.as_part[1:]}}{%else%}{{ p.name[0]|capitalize }}{{ p.name[1:]}}{%endif%}().add({{ current_class.name[0]|lower }}{{ current_class.name[1:] }}.get());
@@ -623,7 +650,7 @@ return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}
                                 {% if m.anotation.how_much == "one" %}
             maybe{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}.get().setItem(null);
             maybe{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}.get().setQuantity(0);
-            return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}Repository.save(maybe{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}.get()));
+            //return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}Repository.save(maybe{{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}}.get()));
                                  {%else%}
             int ind =0;
             boolean found = false;
@@ -674,6 +701,7 @@ return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}
             customer.get().getBasket().setQuantity(new ArrayList<>());
             counter++;
             }
+            {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setItemWithPrice(itemWithPrice);
               {%else%}
 
                 Item o =customer.get().getBasket().getItem();
@@ -690,12 +718,12 @@ return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}
                     price += itemWithPrice.get(itemWithPrice.size()-1).getCurrentPrice();
                 customer.get().getBasket().setItem(null);
                 customer.get().getBasket().setQuantity(0);
+                {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setItemWithPrice(itemWithPrice.get(0));
         {%endif%}
         {%endif%}
         {%endif%}
         {%endfor%}
         {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setTotalPrice(price);
-        {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}.setItemWithPrice(itemWithPrice);
         actionService.doActionMake(customer.get(), {{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
         {{ current_class.name[0]|capitalize}}{{ current_class.name[1:]}} s = {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}Repository.save({{ current_class.name[0]|lower}}{{ current_class.name[1:]}});
         return {{ current_class.name[0]|lower}}{{ current_class.name[1:]}}Mapper.toDTO(s);}
@@ -703,4 +731,5 @@ return {{ current_class.name|lower }}Mapper.toDTO({{ current_class.name|lower }}
     }
      {%endif%}
 {%endif%}
+
 }

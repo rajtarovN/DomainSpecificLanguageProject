@@ -16,6 +16,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import addressService from '../../services/AddressService';
 import customerService from '../../services/CustomerService';
 
 const useStyles = makeStyles((theme) => ({
@@ -45,11 +46,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditBill = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
-    neki_tekst: '',
+    cashier: '',
   });
   const { id } = useParams();
+  const [addresss, setAddresss] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState('');
+
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState('');
 
@@ -57,6 +65,17 @@ const EditBill = () => {
   useEffect(() => {
 
 
+  const fetchDataAddress = async () => {
+      try {
+          const response= await addressService.getAddress();
+          if (response.status === 200) {
+            setAddresss(response.data);
+        }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+  fetchDataAddress();
   const fetchDataCustomer = async () => {
       try {
           const response= await customerService.getCustomer();
@@ -76,7 +95,7 @@ const EditBill = () => {
             const response = await billService.getOneBill(id);
             if (response.status === 200) {
               setFormData({
-                 neki_tekst: response.data.neki_tekst,
+                 cashier: response.data.cashier,
 
               })
             }
@@ -104,6 +123,12 @@ const EditBill = () => {
         e.preventDefault();
         const fetchData = async () => {
           try {
+              for(let j in addresss){
+                if (parseInt(selectedAddress)===parseInt(addresss[j].id)){
+                  formData['address'] = addresss[j];
+                  break;
+                }
+              }
               for(let j in customers){
                 if (parseInt(selectedCustomer)===parseInt(customers[j].id)){
                   formData['customer'] = customers[j];
@@ -127,8 +152,14 @@ const EditBill = () => {
     console.log(formData);
     const fetchData = async () => {
       try {
+              for(let j in addresss){
+                if (parseInt(selectedAddress)===parseInt(addresss[j].id)){
+                  formData['address'] = addresss[j];
+                  break;
+                }
+              }
               for(let j in customers){
-                if (parseInt(selectedCustomer)===parseInt(customers[j].id)){ //todo ovde verujem da ide name
+                if (parseInt(selectedCustomer)===parseInt(customers[j].id)){
                   formData['customer'] = customers[j];
                   break;
                 }
@@ -151,6 +182,10 @@ const EditBill = () => {
     console.log('Form canceled');
   };
 
+    const handleChangeAddress = (event) => {
+      console.log(event.target.value)
+        setSelectedAddress(event.target.value);
+    };
     const handleChangeCustomer = (event) => {
       console.log(event.target.value)
         setSelectedCustomer(event.target.value);
@@ -166,15 +201,31 @@ const EditBill = () => {
 
       <div className={classes.formGroup}>
         <TextField
-          label="neki_tekst"
-          name="neki_tekst"
-          value={formData.neki_tekst}
+          label="cashier"
+          name="cashier"
+          value={formData.cashier}
           onChange={handleChange}
           variant="outlined"
         />
       </div>
 
 
+
+
+      <div>
+            <label htmlFor="dvaSelect">Select Address: </label>
+            <NativeSelect id="dvaSelect" value={selectedAddress} onChange={handleChangeAddress}>
+                <option value="">--Please choose an option--</option>{
+                 addresss.map(address => (
+                    <option  key={
+                    address.id} value={
+                    address.id}>
+                        {
+                        address.id}
+                    </option >
+                ))}
+            </NativeSelect>
+        </div>
 
 
       <div>
@@ -191,7 +242,6 @@ const EditBill = () => {
                 ))}
             </NativeSelect>
         </div>
-
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">

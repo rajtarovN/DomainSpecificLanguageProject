@@ -45,6 +45,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditItemWithPrice = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
   currentPrice: 0,
@@ -134,7 +138,7 @@ const EditItemWithPrice = () => {
     const fetchData = async () => {
       try {
            for(let j in items){
-          if (parseInt(selectedItem)===parseInt(items[j].id)){ //todo ovde verujem da ide name
+          if (parseInt(selectedItem)===parseInt(items[j].id)){
             formData['item'] = items[j];
             break;
           }
@@ -195,7 +199,6 @@ const EditItemWithPrice = () => {
                     </option >
                 ))}
             </NativeSelect>
-
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">
           Submit

@@ -12,4 +12,8 @@ import java.util.Date;
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
 
+
+
+    @Query("SELECT i FROM Item i JOIN i.action a WHERE a.id = :actionId")
+    List<Item> findAllByActionId(long actionId);
 }

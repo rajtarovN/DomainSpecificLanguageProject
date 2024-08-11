@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -28,43 +29,25 @@ public  class Customer  extends User {
                 cascade = CascadeType.ALL
 ,                 fetch = FetchType.LAZY
         )
+                    @JsonIgnoreProperties(value = "a, customer", allowSetters = true)
 
         private List<Bill>  bill;
 
             @OneToOne
-        (
-                cascade = CascadeType.ALL
-,                 fetch = FetchType.LAZY
- ,mappedBy = "customer"         )
+                    @JsonIgnoreProperties(value = "customer", allowSetters = true)
 
         private Basket basket;
 
     public Customer() {}
-
-            public  List< Bill > getBill() {
-                return bill;
-            }
-            public void setBill(
-                List<
-           Bill
-                >
-            bill
-            ) {
-                this.bill = bill;
-            }
-            public Basket  getBasket() {
-                return basket;
-            }
-            public void setBasket(
-           Basket
-            basket
-            ) {
-                this.basket = basket;
-            }
     public boolean getDeleted() {
         return deleted;
     }
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
-}
+
+     public Customer(LoginDTO newUserDTO) {
+        this.deleted = false;
+        this.setUsername(newUserDTO.getUsername());
+        this.setPassword(newUserDTO.getPassword());
+    }}

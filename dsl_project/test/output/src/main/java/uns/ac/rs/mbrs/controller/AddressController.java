@@ -21,17 +21,20 @@ public class AddressController {
     private AddressService addressService;
 
     @GetMapping
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<List<AddressDTO>> findAll() {
         return ResponseEntity.ok().body(addressService.findAll());
     }
 
     @GetMapping("/")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<List<AddressDTO>> get() throws NotFoundException {
         List<AddressDTO> address = addressService.get();
         return ResponseEntity.ok().body(address);
     }
 
     @GetMapping("/{id}")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<AddressDTO> findOne(@PathVariable Long id) throws NotFoundException {
         AddressDTO address = addressService.findOne(id);
         return ResponseEntity.ok().body(address);
@@ -41,6 +44,7 @@ public class AddressController {
 
 
     @PostMapping
+                @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<AddressDTO> post(@RequestBody AddressDTO address) {
         AddressDTO address1 = addressService.save(address);
         if (address == null)
@@ -50,18 +54,22 @@ public class AddressController {
 
 
     @PutMapping("/{id}")
+                        @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CUSTOMER')")
     public ResponseEntity<AddressDTO> put(@PathVariable Long id, @RequestBody AddressDTO address) {
         AddressDTO address1 = addressService.update(id, address);
         return address != null ? ResponseEntity.ok(address1) : ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
+
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
      public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         addressService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/d/{id}")
+                    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<?> deleOne(@PathVariable Long id) {
         addressService.delete(id);
         return ResponseEntity.noContent().build();

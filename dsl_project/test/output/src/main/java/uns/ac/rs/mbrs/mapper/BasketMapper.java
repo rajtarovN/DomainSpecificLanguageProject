@@ -24,7 +24,6 @@ public class BasketMapper {
             if (model.getItem()!=null){
                 dto.setItem(itemMapper.toDTO(model.getItem()));
             }
-        dto.setFormular(model.getFormular());
         dto.setId(model.getId());
 
         return dto;
@@ -41,7 +40,6 @@ public class BasketMapper {
             if (model.getItem()!=null){
                 dto.setItem(itemMapper.toDTO(model.getItem()));
             }
-        dto.setFormular(model.getFormular());
         dto.setId(model.getId());
         dtos.add(dto);
         }
@@ -50,7 +48,6 @@ public class BasketMapper {
 
     public Basket toModel(BasketDTO dto) {
         Basket model = new Basket();
-        model.setFormular(dto.getFormular());
         return model;
     }
 }

@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -22,9 +23,12 @@ public  class Item  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+
             @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "item")
 
             private List<ItemWithPrice>  itemWithPrice;
+
                 @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
                 @JoinTable(
                         name = "item_basket",
@@ -32,7 +36,7 @@ public  class Item  {
                         inverseJoinColumns = @JoinColumn(name = "basket_id")
                 )
 
-                                @JsonIgnoreProperties(value = "customer", allowSetters = true)
+                                @JsonIgnoreProperties(value = "address, customer", allowSetters = true)
                 private List<Basket>  basket;
 
 
@@ -46,8 +50,21 @@ public  class Item  {
     private boolean deleted;
 
 
-    public Item() {}
+            @ManyToMany
+        (
+                cascade = CascadeType.ALL
+,                 fetch = FetchType.LAZY
+         )
+         @JoinTable(
+                    name = "action_item",
+                    joinColumns = @JoinColumn(name = "action_id"),
+                    inverseJoinColumns = @JoinColumn(name = "item_id")
+            )
+                    @JsonIgnoreProperties(value = "item", allowSetters = true)
 
+        private List<Action>  action;
+
+    public Item() {}
     public boolean getDeleted() {
         return deleted;
     }

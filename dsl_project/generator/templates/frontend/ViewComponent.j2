@@ -13,6 +13,14 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+{%if current_class.anotation and current_class.anotation.name == 'action'%}
+import itemService from '../../services/ItemService';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+{%endif%}
 import {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service from '../../services/{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Service';
 {% if current_class.anotation%}
      {% if current_class.anotation.name=="basket"%}
@@ -51,7 +59,13 @@ const [allItem, setAllItem] = useState([]);
      {%endif%}
   const { id } = useParams();
   const [{{current_class.name[0]|lower}}{{current_class.name[1:]}}, set{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}] = useState(NaN)
-
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
+        {%if current_class.anotation and current_class.anotation.name == 'action'%}
+    const [items, setItems] = useState([]);
+{%endif%}
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -64,7 +78,16 @@ const [allItem, setAllItem] = useState([]);
      {%endif%}
      {%endif%}
           }
+          {%if current_class.anotation and current_class.anotation.name == 'action'%}
+           const responseItems = await itemService.getItemsByActions(id);
+          if (responseItems.status === 200) {
+              setItems(responseItems.data);
+          }
+          {%endif%}
+           {% if current_class.anotation and (current_class.anotation.name == 'basket' or current_class.anotation.name == 'bill')%}
+            //{{current_class.anotation.name}}
           const responseCustomer = await {{current_class.name[0]|lower}}{{current_class.name[1:]}}Service.getCustomersBy{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(id);
+      {%endif%}
       } catch (error) {
           console.error(error);
       }
@@ -120,11 +143,11 @@ const [allItem, setAllItem] = useState([]);
     }
     fetchData();
   }
-     {%endif%} //todo
+     {%endif%} 
      {%endif%}
 
    {% if current_class.anotation%}
-                    {% if current_class.anotation.name=="item"%} //todo
+                    {% if current_class.anotation.name=="item"%} 
 
        const handleChange = (e) => {
     const { name, value } = e.target;
@@ -154,6 +177,12 @@ const [allItem, setAllItem] = useState([]);
   };
        {%endif%}{%endif%}
 
+       {%if current_class.anotation and current_class.anotation.name == 'action'%}
+        const handleView = (id) => {
+        navigate(`/item-view/${id}`);
+        };
+       {%endif%}
+
   return (
   <div>
     <ToastContainer />
@@ -167,6 +196,34 @@ const [allItem, setAllItem] = useState([]);
         <label>{% raw %} { {% endraw %} {{current_class.name[0]|lower}}{{current_class.name[1:]}}.{{prop}} {% raw %} } {% endraw %}</label>
       </div>
         {% endfor %}
+        {%if current_class.anotation and current_class.anotation.name == 'action'%}
+        <Grid container spacing={3}>
+        {items.map((item, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4}>
+            <Card className={classes.card}>
+              <CardContent>
+                <Typography className={classes.title} color="textSecondary" gutterBottom>
+                  Index: {index + 1}
+                </Typography>
+                <Typography variant="h5" component="h2">
+                  {item.name}
+                </Typography>
+                <Typography className={classes.pos} color="textSecondary">
+                  Quantity: {item.quantity}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small" variant="contained" color="secondary" onClick={() => handleView(item.id)}>
+                  View
+                </Button>
+
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+        {%endif%}
 
           {% if current_class.anotation%}
      {% if current_class.anotation.name=="basket"%}
@@ -225,16 +282,39 @@ const [allItem, setAllItem] = useState([]);
         <Button variant="contained" color="primary" onClick={handleMakeBill}>
          By
         </Button>{%endif%}{%endif%}
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+         {%if current_class.anotation  and  current_class.anotation.name == 'basket'%}{(userType=='CUSTOMER' ) && (
+        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        {%else%}
+        {(userType=='ADMIN' || userType=='SELLER') && (
+         <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        {%endif%}
+        {%if current_class.name == 'Admin' or current_class.name == 'Customer'%}{(userType=='ADMIN' ) && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
+        {%else%}
+        {(userType=='ADMIN' || userType=='SELLER') && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
+        {%endif%}
 
       </div>
+      {%if current_class.name == 'Admin' or current_class.name == 'Customer'%}
+      {(userType=='ADMIN' ) && (
       < {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete
         open={isDialogOpen}
         id={delId}
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+      )}
+      {%else%}
+      {(userType=='ADMIN' || userType=='SELLER') && (
+      < {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}Delete
+        open={isDialogOpen}
+        id={delId}
+        onCancel={handleCancelDelete}
+        onDelete={handleConfirmDelete}
+      />
+      )}
+      {%endif%}
     </div></div>
   );
 };

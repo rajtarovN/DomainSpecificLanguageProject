@@ -39,7 +39,10 @@ const BasketView = () => {
 const [allItem, setAllItem] = useState([]);
   const { id } = useParams();
   const [basket, setBasket] = useState(NaN)
-
+  const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -48,6 +51,7 @@ const [allItem, setAllItem] = useState([]);
               setBasket(response.data);
  setAllItem([response.data.item]);
           }
+            //basket
           const responseCustomer = await basketService.getCustomersByBasket(id);
       } catch (error) {
           console.error(error);
@@ -102,7 +106,8 @@ const [allItem, setAllItem] = useState([]);
     }
     fetchData();
   }
- //todo
+ 
+
 
 
   return (
@@ -112,10 +117,6 @@ const [allItem, setAllItem] = useState([]);
       <h2  >Nesto</h2>
 
       <p>ID: {id}</p>
-      <div className={classes.formGroup}>
-        <label>formular: </label>
-        <label> {  basket.formular  } </label>
-      </div>
 
 
       <TableContainer component={Paper}>
@@ -147,16 +148,20 @@ const [allItem, setAllItem] = useState([]);
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={handleMakeBill}>
          By
-        </Button>        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+        </Button>{(userType=='CUSTOMER' ) && (
+        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        {(userType=='ADMIN' || userType=='SELLER') && (
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
 
       </div>
+      {(userType=='ADMIN' || userType=='SELLER') && (
       < BasketDelete
         open={isDialogOpen}
         id={delId}
         onCancel={handleCancelDelete}
         onDelete={handleConfirmDelete}
       />
+      )}
     </div></div>
   );
 };

@@ -21,6 +21,11 @@ const useStyles = makeStyles({
 });
 
 const TableAction = () => {
+const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : ''
+);
 
   const handleAdd = () => {
     navigate(`/add-action`);
@@ -98,8 +103,10 @@ const TableAction = () => {
               <TableCell align="center">Index</TableCell>
               <TableCell align="center">name</TableCell>
               <TableCell align="center">view</TableCell>
-              <TableCell align="center">edit</TableCell>
-              <TableCell align="center">delete</TableCell>
+               {(userType=='ADMIN' || userType=='SELLER') && (
+               <TableCell align="center">edit</TableCell>)}
+               {(userType=='ADMIN' || userType=='SELLER') && (
+               <TableCell align="center">delete</TableCell>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -110,12 +117,14 @@ const TableAction = () => {
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleView(item.id)}>View</Button>
                 </TableCell>
+                {(userType=='ADMIN' || userType=='SELLER') && (
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleEdit(item.id)}>Edit</Button>
-                </TableCell>
+                </TableCell>)}
+                {(userType=='ADMIN' || userType=='SELLER') && (
                 <TableCell align="center">
                   <Button variant="contained" color="secondary" onClick={() => handleDelete(item.id)}>Delete</Button>
-                </TableCell>
+                </TableCell> )}
               </TableRow>
             ))}
           </TableBody>

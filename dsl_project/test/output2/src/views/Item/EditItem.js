@@ -16,6 +16,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import actionService from '../../services/ActionService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,12 +45,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditItem = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
     name: '',
     quantity: '',
   });
   const { id } = useParams();
+  const [currentAction, setCurrentAction] = useState([]);
+  const [allAction, setAllAction] = useState([]);
 
   useEffect(() => {
 
@@ -75,6 +82,18 @@ const EditItem = () => {
     fetchData();
       console.log('Component unmounted');
     };}
+    const fetchDataAction = async () => {
+      try {
+          const response2 = await actionService.getAction();
+          if (response2.status === 200) {
+            setAllAction(response2.data);
+        }
+      } catch (error) {
+       toast.error('Failed to create item. Please try again.');
+          console.error(error);
+      }
+  };
+  fetchDataAction();
   }, [id]);
 
 
@@ -91,6 +110,7 @@ const EditItem = () => {
         e.preventDefault();
         const fetchData = async () => {
           try {
+
               const response = await itemService.updateItem(formData, id);
               if (response.status === 200) {
                toast.success('Item created successfully!');
@@ -126,6 +146,36 @@ const EditItem = () => {
     console.log('Form canceled');
   };
 
+  const handleRemoveAction = (id) => {
+    if (!currentAction || !allAction) return;
+
+    for (const item of currentAction) {
+      if (item.id === id) {
+        const updatedCurrentAction = currentAction.filter(actionItem => actionItem.id !== id);
+        setCurrentAction(updatedCurrentAction);
+        const updatedAllAction = [...allAction, item];
+        setAllAction(updatedAllAction);
+
+        break;
+      }
+    }
+  }
+
+
+  const handleAddAction = (id) => {
+    if (!currentAction || !allAction) return;
+
+    for (const item of allAction) {
+      if (item.id === id) {
+        const updatedAllAction = allAction.filter(actionItem => actionItem.id !== id);
+        setAllAction(updatedAllAction);
+        const updatedCurrentAction = [...currentAction, item];
+        setCurrentAction(updatedCurrentAction);
+
+        break;
+      }
+    }
+  }
 
 
   return (
@@ -154,7 +204,6 @@ const EditItem = () => {
           variant="outlined"
         />
       </div>
-
 
 
 

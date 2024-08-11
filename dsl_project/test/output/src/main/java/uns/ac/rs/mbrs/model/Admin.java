@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -24,7 +25,6 @@ public  class Admin  extends User {
 
 
     public Admin() {}
-
     public boolean getDeleted() {
         return deleted;
     }

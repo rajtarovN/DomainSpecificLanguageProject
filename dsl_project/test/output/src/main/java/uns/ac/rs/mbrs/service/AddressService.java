@@ -22,36 +22,27 @@ public class AddressService  {
 
     private final AddressMapper addressMapper;
     private final AddressRepository addressRepository;
-    private final PersonRepository personRepository;
-    private final PersonMapper personMapper;
+    private final BillRepository billRepository;
+    private final BillMapper billMapper;
 
     public AddressService(
     AddressMapper addressMapper,
     AddressRepository addressRepository
-            ,PersonRepository personRepository
-            ,PersonMapper personMapper
+            ,BillRepository billRepository
+            ,BillMapper billMapper
 ) {
 
         this.addressMapper = addressMapper;
         this.addressRepository = addressRepository;
-        this.personRepository = personRepository;
+        this.billRepository = billRepository;
 
-        this.personMapper = personMapper;
+        this.billMapper = billMapper;
 
     }
   @Transactional
 public AddressDTO save( AddressDTO addressdto){
 
         Address address = addressMapper.toModel(addressdto);
-                List<Person> persons = new ArrayList<>();
-                for (Long d : addressdto.getPersonIds()) {
-                    Person person = personRepository.getById(d);
-                    persons.add(person);
-
-                                        person.setAddress(address);
-                                        person.setAddress(address);
-                }
-                address.setProbannn(persons);
     Address s = addressRepository.save(address);
     return addressMapper.toDTO(s);
 }
@@ -60,26 +51,21 @@ public AddressDTO save( AddressDTO addressdto){
     Optional<Address> address = addressRepository.findById(id);
     if (address.isPresent()){
             address.get().setStreet(addressdto.getStreet());
-            address.get().setCity(addressdto.getCity());
-            address.get().setZipCode(addressdto.getZipCode());
+            address.get().setNumber(addressdto.getNumber());
+            address.get().setZip(addressdto.getZip());
 
 
 
-        List<Person> persons = new ArrayList<>();
-        for (Long d : addressdto.getPersonIds()) {
-            Person person = personRepository.getById(d);
-            persons.add(person);
 
+                    if(addressdto.getBill()!=null) {
 
-                person.setAddress(address.get());
+                     Bill bill =billRepository.getById(addressdto.getBill().getId());
 
+                    address.get().setBill(bill);
+                    bill.setAddress(address.get());
 
-                person.setAddress(address.get());
+}
 
-
-        }
-
-        address.get().setProbannn(persons);
             Address s = addressRepository.save(address.get());
             return addressMapper.toDTO(s);
         }
@@ -97,11 +83,11 @@ public AddressDTO save( AddressDTO addressdto){
             if (address.getStreet() != null) {
                 existingAddress.setStreet(address.getStreet());
             }
-            if (address.getCity() != null) {
-                existingAddress.setCity(address.getCity());
+            if (address.getNumber() != null) {
+                existingAddress.setNumber(address.getNumber());
             }
-            if (address.getZipCode() != null) {
-                existingAddress.setZipCode(address.getZipCode());
+            if (address.getZip() != null) {
+                existingAddress.setZip(address.getZip());
             }
 
             return existingAddress;
@@ -136,10 +122,8 @@ public void delete(Long id) {
     if (maybeAddress.isPresent()) {
         Address existingAddress = maybeAddress.get();
         existingAddress.setDeleted(true);
-        if (existingAddress.getProbannn() != null){
-            for (Person p: existingAddress.getProbannn()){
-                p.setDeleted(true);
-            }
+        if (existingAddress.getBill() != null){
+            existingAddress.getBill().setDeleted(true);
         }
 
         addressRepository.save(existingAddress);
@@ -155,5 +139,6 @@ public void delete(Long id) {
         }
         return list2;
     }
+
 
 }

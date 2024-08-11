@@ -14,8 +14,8 @@ public class AddressMapper {
     public AddressDTO toDTO(Address model) {
         AddressDTO dto = new AddressDTO();
         dto.setStreet(model.getStreet());
-        dto.setCity(model.getCity());
-        dto.setZipCode(model.getZipCode());
+        dto.setNumber(model.getNumber());
+        dto.setZip(model.getZip());
         dto.setId(model.getId());
 
         return dto;
@@ -27,8 +27,8 @@ public class AddressMapper {
           AddressDTO dto = new AddressDTO();
 
         dto.setStreet(model.getStreet());
-        dto.setCity(model.getCity());
-        dto.setZipCode(model.getZipCode());
+        dto.setNumber(model.getNumber());
+        dto.setZip(model.getZip());
         dto.setId(model.getId());
         dtos.add(dto);
         }
@@ -38,8 +38,8 @@ public class AddressMapper {
     public Address toModel(AddressDTO dto) {
         Address model = new Address();
         model.setStreet(dto.getStreet());
-        model.setCity(dto.getCity());
-        model.setZipCode(dto.getZipCode());
+        model.setNumber(dto.getNumber());
+        model.setZip(dto.getZip());
         return model;
     }
 }

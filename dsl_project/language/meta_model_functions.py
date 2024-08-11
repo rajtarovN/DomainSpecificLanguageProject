@@ -1,21 +1,22 @@
 from .model import ForFunction, Function, Param, IfStatement, Variable, ShortFunctions, NewObjectStatement,\
     Operations, Condition, ClassWithGeters
 import copy
+import re
 
 
 function_names = []
-short_f_names = ["add", "sizeOf", "countFrom", "allOf", "anyOf", "noneOf", "min", "max", "removeFrom", "clear",
-                 "indexOf", "sumOf", 'averageOf', "selectIn", "existIn", "for", "selectTop"]
+short_f_names = ["sumOf", "averageOf", "productOf", "selectIn", "selectTop", "countFrom", "allOf", "anyOf", "noneOf",
+                 "min", "max", "for", "add", "sizeOf"]
 defined_classes = ["User", "Proizvodi", "Porudzbina", "ListProduct", "Order"]
 parameters_list = {}
 current_block = ""
-
+parsed_model = None
 
 def func_checker(text):
     global function_names, parameters_list, current_block
     functions_text = text.split("def")
     functions = []
-    def_var ={}
+    def_var = {}
     types = ('String', 'int', 'float', 'boolean', 'byte', 'short', 'long', 'double', 'char')
     for ft in functions_text[1:]:  # prvo pronadjem imena svih fja
         parts = ft.split("(")
@@ -37,7 +38,7 @@ def func_checker(text):
             if type_param == "":
                 type_param = next((t for t in defined_classes if t in p), "")
                 if type_param == "":
-                    raise Exception("Type of param isnt all right"+str(p))
+                    raise Exception("Type of param isnt all right "+str(p))
 
             name_param = p.split(type_param)[1]
             if ")" in name_param:
@@ -61,9 +62,10 @@ def func_checker(text):
 
     return functions, def_var
 
+
 def sent_func_checker(text):
     global function_names, parameters_list, current_block
-    def_var ={}
+    def_var = {}
     name_func = "make"
     parameters_list["person"] = 'person'
     parameters_list["bill"] = 'bill'
@@ -91,7 +93,9 @@ def statements_checker(text, defined_variables):
             line_num += 1
             continue
         found = False
-        for cl in defined_classes:  # new obj
+        for cl in defined_classes:# new obj
+            if "'" in cl:
+                cl = cl[1:-1]
             if line.startswith("new" + cl.upper() + "("):
                 list_statements.append(new_object_checker(line, cl, defined_variables))
                 found = True
@@ -144,12 +148,14 @@ def statements_checker(text, defined_variables):
                 v = None
                 if is_var_in_parent_block(defined_variables[part][1]):
                     found_var = find_var_in_defined_variables(part, defined_variables)
+                    find_all_chain_getters(found_var, new_parts)
                     v = ClassWithGeters(found_var, new_parts)
             else:
+                find_all_chain_getters(parameters_list[part], new_parts)
                 v = ClassWithGeters(parameters_list[part], new_parts)
             list_statements.append(v)
         else:
-            raise Exception("Nothing found" + str(line))
+            raise Exception("Nothing found " + str(line))
         line_num += 1
     return list_statements
 
@@ -165,8 +171,7 @@ def short_function_checker(line, defined_variables):
         value_as, value_where = None, None
         formula_part = None
         if rest_line.startswith("as:"):
-            value_as, rest_line = check_as_part(rest_line[3:], defined_variables)  # todo stavi u def var
-
+            value_as, rest_line = check_as_part(rest_line[3:], defined_variables, value.type)
             if rest_line.startswith("formula"):
                 formula_part, rest_line = for_func_formula(rest_line, defined_variables)
         if rest_line.startswith("where"):
@@ -179,13 +184,13 @@ def short_function_checker(line, defined_variables):
             in_index = rl.rfind("in:")
             rest_line = rl[in_index + 3:]
         else:
-             rest_line = rest_line[3:]
+            rest_line = rest_line[3:]
         posible_list, rest_line = check_posible_list(rest_line, defined_variables)
         return ShortFunctions(posible_list, name, None, None, first_part, None, None)
     elif name == "selectTop":
         number = rest_line.split("of")[0]
         value_posible, rest_line = check_posible_list(rest_line.split("of")[1], defined_variables)
-        value_as, rest_line = check_as_part(rest_line[3:], defined_variables)
+        value_as, rest_line = check_as_part(rest_line[3:], defined_variables, value_posible.type)
         value_where, rest_line = check_where_part(rest_line, defined_variables)
         return ShortFunctions(value_posible, name, value_where, value_as, None, number, None)
     else:
@@ -213,7 +218,7 @@ def for_func_formula(rest_line, defined_variables):
     r_l, r_line = rest_line[:ind_of_func], rest_line[ind_of_func:]
     r_l = r_l[7:]
     operation = operation_checker(r_l, defined_variables)
-    return operation, r_line  # todo ovde moze biti greska zbog direktong poziva operacije
+    return operation, r_line
 
 
 def for_func_as_part(rest_line, defined_variables):
@@ -229,9 +234,14 @@ def for_func_as_part(rest_line, defined_variables):
     if checked[0] is None:
         if check_if_contains_dot(as_part, defined_variables):
             name = as_part.split(".")[0]
+            find_all_chain_getters(name, as_part.split(".")[1:])
             return ClassWithGeters(name, as_part.split(".")[1:]), new_rest_line
         else:
-            new_var = Variable(as_part, None, None, None), new_rest_line  # todo type
+            if isinstance(checked[0].name, str):
+                as_part_type = checked[0].name
+            else:
+                as_part_type = checked[0].name.type
+            new_var = Variable(as_part, as_part_type, None, None), new_rest_line
             current_block = current_block + ":" + str(1)
             defined_variables[as_part] = [[new_var[0]], [current_block]]
             return new_var
@@ -248,15 +258,19 @@ def for_func_first_part(rest_line, defined_variables):
         if name in defined_variables.keys():
             if is_var_in_parent_block(defined_variables[name][1]):
                 found_var = find_var_in_defined_variables(name, defined_variables)
+                find_all_chain_getters(found_var, rest_line.split(".")[1:])
                 obj = ClassWithGeters(found_var, rest_line.split(".")[1:]), rest_line[index:]
                 return obj
         elif name in parameters_list.keys():
+            find_all_chain_getters(parameters_list[name], rest_line.split(".")[1:])
             return ClassWithGeters(parameters_list[name], rest_line.split(".")[1:]), rest_line[index:]
-    elif rest_line in defined_variables.keys():  # todo ovde moze doci do greske
+    elif rest_line in defined_variables.keys():
         if is_var_in_parent_block(defined_variables[rest_line][1]):
             return find_var_in_defined_variables(rest_line, defined_variables), rest_line[index:]
     elif rest_line in parameters_list.keys():
         return parameters_list[rest_line], rest_line[index:]
+    else:
+        raise Exception(f"Variable not defined {rest_line}")
 
 
 def check_posible_list(rest_line, defined_variables):
@@ -275,11 +289,16 @@ def check_posible_list(rest_line, defined_variables):
             res = short_function_checker(rest_line[index:], defined_variables)
             current_block = cur_b
             return res, rest_line[index:]
-    return id_or_chain(rest_line[:rest_line.find("as:")], defined_variables, index)[0], \
-        rest_line[rest_line.find("as:"):]
+    sending_rest_line = rest_line[:rest_line.find("as:")],
+    is_id = id_or_chain(sending_rest_line, defined_variables, index)
+    if is_id[0] is None:
+        raise Exception(f"Posible list {sending_rest_line} not defined.")
+    if isinstance(is_id[0], ClassWithGeters):
+        find_all_chain_getters(is_id[0].name, is_id[0].list_geters)
+    return is_id[0], rest_line[rest_line.find("as:"):]
 
 
-def check_as_part(rest_line, defined_variables):
+def check_as_part(rest_line, defined_variables, type_as):
     rest_line, last_part = rest_line, ""
     if "formula" in rest_line:
         last_part = "formula"+rest_line.split("formula")[1]
@@ -291,14 +310,17 @@ def check_as_part(rest_line, defined_variables):
     if check_if_condition_or_operation(rest_line, defined_variables, False):
         return operation_checker(rest_line, defined_variables), last_part
     id_n, rl = id_or_chain(rest_line, defined_variables, None, last_part)
+    if type_as.lower().startswith("list"):
+        type_as = type_as[4:]
     if id_n is None:
         if "." in rest_line:
-            var = Variable(rest_line.split(".")[0], "todo", None, None)  # todo tip i current block
+            var = Variable(rest_line.split(".")[0], type_as, None, None)
+            find_all_chain_getters(var, rest_line.split(".")[1:])
             clas = ClassWithGeters(var, rest_line.split(".")[1:])
             defined_variables[rest_line.split(".")[0]] = [[clas], [current_block]]
             return clas, last_part
         else:
-            var = Variable(rest_line.split(".")[0], "todo", None, None)  # todo tip i current block
+            var = Variable(rest_line.split(".")[0], type_as, None, None)
             defined_variables[rest_line.split(".")[0]] = [[var], [current_block]]
             return var, last_part
     return id_n, last_part
@@ -314,7 +336,7 @@ def check_where_part(rest_line, defined_variables):
         return value, ""
     elif check_if_condition_or_operation(rest_line, defined_variables, True):
         return check_one_condition(rest_line, defined_variables), ""
-    return None, None  # todo ili baciti gresku
+    return None, None
 
 
 def find_part_function(rest_line, defined_variables):
@@ -331,18 +353,21 @@ def find_part_function(rest_line, defined_variables):
 
 
 def id_or_chain(rest_line, defined_variables, in_index=None, return_line=""):
-    #  todo ovde ne treba none
     if in_index is not None:
         return_line = rest_line[in_index:]
+    if isinstance(rest_line, tuple):
+        rest_line = rest_line[0]
     if check_if_contains_dot(rest_line, defined_variables):
         name = rest_line.split(".")[0]
         if name in defined_variables.keys():
             if is_var_in_parent_block(defined_variables[name][1]):
                 found_var = find_var_in_defined_variables(name, defined_variables)
+                find_all_chain_getters(found_var, rest_line.split(".")[1:])
                 return ClassWithGeters(found_var, rest_line.split(".")[1:]), return_line
         elif name in parameters_list.keys():
+            find_all_chain_getters(parameters_list[name], rest_line.split(".")[1:])
             return ClassWithGeters(parameters_list[name], rest_line.split(".")[1:]), return_line
-    elif rest_line in defined_variables.keys():  # todo ovde moze doci do greske
+    elif rest_line in defined_variables.keys():
         if is_var_in_parent_block(defined_variables[rest_line][1]):
             return find_var_in_defined_variables(rest_line, defined_variables), return_line
     elif rest_line in parameters_list.keys():
@@ -361,7 +386,6 @@ def condition_checker(line, defined_variables):
     else:
         operator = None
         right_side = None
-
     return Condition(condition1, operator, right_side)
 
 
@@ -370,7 +394,6 @@ def operation_checker(line, defined_variables):
     operations = ['-', '*', '/', '%', '^', '+']
     parsed_line = parse_line(line, operations)
     left_side = parsed_line[0]
-    # todo podizati greske
     ls = ""
     for sfn in short_f_names:
         if sfn in left_side:
@@ -381,8 +404,12 @@ def operation_checker(line, defined_variables):
         if is_var_in_parent_block(defined_variables[left_side][1]):
             found_var = find_var_in_defined_variables(left_side, defined_variables)
             ls = found_var
+            if ls.type not in ["int","float", "double","short"]:
+                raise Exception(f"Type {ls.type} of variable {ls.name} not suports arithmetic operation")
     elif left_side in parameters_list.keys():
         ls = parameters_list[left_side]
+        if ls.type not in ["int", "float", "double", "short"]:
+            raise Exception(f"Type {ls.type} of variable {ls.name} not suports arithmetic operation")
     # elif left_side.startswith("#") and left_side.endswith("#"):
     #     ls = CopyName(left_side)
     elif check_if_contains_dot(left_side, defined_variables):
@@ -391,15 +418,21 @@ def operation_checker(line, defined_variables):
         if lef in defined_variables.keys():
             if is_var_in_parent_block(defined_variables[lef][1]):
                 found_var = find_var_in_defined_variables(lef, defined_variables)
+                find_all_chain_getters(found_var, left_s)
                 ls = ClassWithGeters(found_var, left_s)
+                check_type_for_arithmetic_logical_operation(ls, defined_variables)
         elif lef in parameters_list.keys():
+            find_all_chain_getters(parameters_list[lef], left_s)
             ls = ClassWithGeters(parameters_list[lef], left_s)
+            check_type_for_arithmetic_logical_operation(ls, defined_variables)
     elif check_if_string_value(left_side):
         ls = left_side
     else:
         ct_value = check_type(left_side)
         if ct_value[0] is not None:
             ls = ct_value[1], None
+            if ct_value[0]=="bool":
+                raise Exception("Arithmetic operation doesnt support boolean value")
     operator = parsed_line[1]
     right_side = operator.join(line.split(operator)[1:])
     result_right_side = None
@@ -407,8 +440,13 @@ def operation_checker(line, defined_variables):
         if is_var_in_parent_block(defined_variables[right_side][1]):
             found_var = find_var_in_defined_variables(right_side, defined_variables)
             result_right_side = found_var
+            if result_right_side.type not in ["int","float", "double","short"]:
+                raise Exception(f"Type {result_right_side.type} of variable {result_right_side.name} not suports arithmetic operation")
     elif right_side in parameters_list.keys():
         result_right_side = parameters_list[right_side]
+        if result_right_side.type not in ["int", "float", "double", "short"]:
+            raise Exception(
+                f"Type {result_right_side.type} of variable {result_right_side.name} not suports arithmetic operation")
     else:
         result_right_side = statements_checker(right_side, defined_variables)
     return Operations(ls, operator, result_right_side)
@@ -425,7 +463,7 @@ def one_line_condition_checker(line, defined_variables):
         if_statement = right_side
 
     if_statement = return_if_statement(if_statement, defined_variables)
-
+    extract_operands_conditions(left_side, defined_variables)
     return IfStatement(left_side, if_statement, None, None, else_statement)
 
 
@@ -435,13 +473,13 @@ def return_if_statement(if_statement, defined_variables):
 
 
 def variable_checker(line,
-                     defined_variables, spliting_char="="):  # obavezno dodati u recnik variablu, podici gresku ako postji i ako ne postoji
+                     defined_variables, spliting_char="="):
     types = ('String', 'int', 'float', 'boolean', 'byte', 'short', 'long', 'double', 'char')
     var_type = next((t for t in types if line.startswith(t)), "")
     if var_type == "" and (
-            line.split(spliting_char)[0] not in defined_variables.keys() and line.split(spliting_char)[0] not in parameters_list.keys() and
-            "." not in line.split(spliting_char)[0]):
-        return line
+            line.split(spliting_char)[0] not in defined_variables.keys() and line.split(spliting_char)[0] not in
+            parameters_list.keys() and "." not in line.split(spliting_char)[0]):
+        raise Exception(f"Variable {line.split(spliting_char)[0]} not defined.")
     if var_type != "":
         right_side = spliting_char.join(line.split(var_type)[1].split(spliting_char)[1:])
     else:
@@ -463,21 +501,24 @@ def variable_checker(line,
                 if b == current_block or is_var_in_parent_block(defined_variables[name][1]):
                     raise Exception("already defined variable in this block" + name)
     else:
-        if "." in line.split(spliting_char)[0] and check_if_contains_dot(line.split(spliting_char)[0], defined_variables):
+        if "." in line.split(spliting_char)[0] and check_if_contains_dot(line.split(spliting_char)[0],
+                                                                         defined_variables):
             name = line.split(spliting_char)[0].split(".")[0]
             rs_list = line.split(spliting_char)[0].split(".")[1:]
             if name in defined_variables.keys():
                 if is_var_in_parent_block(defined_variables[name][1]):
                     found_var = find_var_in_defined_variables(name, defined_variables)
+                    find_all_chain_getters(found_var, rs_list)
                     name = ClassWithGeters(found_var, rs_list)
             elif name in parameters_list.keys():
+                find_all_chain_getters(parameters_list[name], rs_list)
                 name = ClassWithGeters(parameters_list[name], rs_list)
         else:
             name = line.split(spliting_char)[0]
             if "." in name:
                 name = name.split(".")[0]
             if name not in defined_variables.keys() or name in parameters_list.keys():
-                raise Exception("variable is not defined"+name)
+                raise Exception("variable is not defined "+name)
             elif name in defined_variables.keys():
                 found = False
                 for b in defined_variables[name]:
@@ -527,6 +568,7 @@ def arguments_checker(string_args, defined_variables):
                 arguments.append(found_var)
                 continue
             elif a in parameters_list.keys():
+                find_all_chain_getters(parameters_list[a], arg.split(".")[1:])
                 arguments.append(ClassWithGeters(parameters_list[a], arg.split(".")[1:]))
                 continue
         elif check_if_string_value(arg):
@@ -558,7 +600,9 @@ def check_if_condition_or_operation(line, definde_variables, condition):
         if s in line:
             left_side = line.split(s)[0]
             if left_side.startswith("!"):
-                left_side= left_side[1:]
+                left_side = left_side[1:]
+            if check_if_contains_dot(left_side, definde_variables):
+                left_side = left_side.split(".")[0]
             if left_side in definde_variables.keys():
                 if is_var_in_parent_block(definde_variables[left_side][1]):
                     return True
@@ -569,10 +613,11 @@ def check_if_condition_or_operation(line, definde_variables, condition):
                     check_type(left_side)[1] or check_if_contains_dot(left_side, definde_variables):
                 #  ovo ipak mozda drugacije jer cu imati vec definisane
                 return True
+            raise Exception(f"Variable {left_side} in check is not defined")
     return False
 
 
-def check_if_its_variable(line):  # todo set value?
+def check_if_its_variable(line):
     if "apply" in line:
         return True
     for i in range(len(line)):
@@ -616,7 +661,9 @@ def if_statement_checker(lines, line, defined_variables):  # ovde bi trebalo pod
     if "else" in text[:6]:
         closing_else_index_in_text = find_bracket(text, "{")
         else_statements = statements_checker(text[:closing_else_index_in_text].split("else{")[1], defined_variables)
-
+    extract_operands_conditions(condition, defined_variables)
+    for elif_part in elif_conditions:
+        extract_operands_conditions(elif_part, defined_variables)
     return IfStatement(condition, list_statements_if, elif_conditions, elif_statements, else_statements)
 
 
@@ -751,7 +798,7 @@ def check_one_condition(first_part, defined_variables):
     else:
         operator = None
         right_side = None
-
+    check_type_for_arithmetic_logical_operation(left_operator, defined_variables, False)
     return Condition(left_operator, operator, right_side, negation)
 
 
@@ -773,6 +820,7 @@ def check_part_condition(first_part, defined_variables):
         first_part = first_part.split(".")[0]
         if first_part in defined_variables.keys() or first_part in parameters_list.keys():
             res = return_from_def_var_or_parameter_list(first_part, defined_variables)
+            find_all_chain_getters(res, second_part)
             ls = ClassWithGeters(res, second_part)
     elif check_if_string_value(first_part):
         ls = first_part
@@ -789,3 +837,86 @@ def return_from_def_var_or_parameter_list(first_part, defined_variables):
             return find_var_in_defined_variables(first_part, defined_variables)
     elif first_part in parameters_list.keys():
         return parameters_list[first_part]
+
+
+def extract_operands_conditions(expression, defined_variables):
+    pattern = r'\b\w+\b'
+    matches = re.findall(pattern, expression)
+    for element in matches:
+        if check_part_condition(element, defined_variables) is None and check_type(element)[0] is None:
+            raise Exception(f"Variable {element} not defined in {expression}")
+
+
+def check_is_class_exist(class_name, model_cl):
+    for model_class in model_cl.classes:
+        if isinstance(class_name, str) and isinstance(model_class, str):
+            if model_class[1:-1].lower() == class_name[1:-1].lower():
+                return model_class
+            continue
+        if isinstance(class_name, str):
+            if model_class.name[1:-1].lower() == class_name[1:-1].lower():
+                return model_class
+            continue
+        if isinstance(model_class, str):
+            if model_class[1:-1].lower() == class_name[1:-1].lower():
+                return model_class
+            continue
+        if isinstance(class_name, Variable):
+            if model_class.name[1:-1].lower() == class_name.type[1:-1].lower():
+                return model_class
+            continue
+        if model_class.name[1:-1].lower() == class_name.name[1:-1].lower():
+            return model_class
+    return None
+
+
+def find_all_chain_getters(clas_name, list_geters):
+    global parsed_model
+    found_name = check_is_class_exist(clas_name, parsed_model)
+    i = 0
+    if found_name is not None:
+        for geter in list_geters:
+            found = False
+            for atribute in found_name.attributes:
+                if atribute.name[1:-1] == geter:
+                    found = True
+                    break
+            if not found:
+                for relations in parsed_model.relations:
+                    for link in relations.list_couple:
+                        if link[0][1:-1] == found_name.name and link[1][1:-1] == geter:
+                            found = True
+                            break
+                    if found:
+                        break
+            if found and len(list_geters)-1 < i:
+                raise Exception(f"You inputed more than expected geters {list_geters}.")
+            if not found:
+                raise Exception(f"Geter {geter} not found.")
+        i += 1
+    else:
+        raise Exception(f"Class {clas_name.name} doesnt exist.")
+
+
+def check_type_for_arithmetic_logical_operation(class_with_geters, defined_variables, arithmetic=True):
+    global parsed_model
+    if isinstance(class_with_geters.name, str):
+        found_name = check_is_class_exist(defined_variables[class_with_geters.name][0][0], parsed_model)
+    else:
+        found_name = check_is_class_exist(class_with_geters.name.type, parsed_model)
+    i = 0
+    types = ["int","float", "double","short"]
+    if not arithmetic:
+        types = ["boolean"]
+    if found_name is not None:
+        for geter in class_with_geters.list_geters:
+            found = False
+            for atribute in found_name.attributes:
+                if atribute.name[1:-1] == geter and atribute.type not in types and len(class_with_geters.list_geters) - 1 == i:
+                    raise Exception(f"Type of {geter} not suports arithmetic operation")
+            if not found:
+                for ref_prop in found_name.reference_properties:
+                    if ref_prop.name.name == geter and ref_prop.name.type not in types and len(class_with_geters.list_geters) - 1 == i:
+                        raise Exception(f"Type of {geter} not suports arithmetic operation")
+
+            i += 1

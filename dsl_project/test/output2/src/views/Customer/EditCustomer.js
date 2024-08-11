@@ -46,6 +46,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditCustomer = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
   });
@@ -151,7 +155,7 @@ const EditCustomer = () => {
               }
               formData['billIds'] = li1;
               for(let j in baskets){
-                if (parseInt(selectedBasket)===parseInt(baskets[j].id)){ //todo ovde verujem da ide name
+                if (parseInt(selectedBasket)===parseInt(baskets[j].id)){
                   formData['basket'] = baskets[j];
                   break;
                 }
@@ -280,7 +284,6 @@ const EditCustomer = () => {
                 ))}
             </NativeSelect>
         </div>
-
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">

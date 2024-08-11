@@ -21,6 +21,11 @@ const useStyles = makeStyles({
 });
 
 const Table{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () => {
+const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : ''
+);
 
   const handleAdd = () => {
     navigate(`/add-{{current_class.name|lower}}`);
@@ -94,10 +99,15 @@ const Table{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =
       </div>
       {%endif%}
       {%else%}
+      {%if current_class.name=="Admin" or current_class.name == "Customer"%}
+       {(userType=='ADMIN') && (
+      {%else%}
+       {(userType=='ADMIN' || userType=='seller') && (
+      {%endif%}
       <div style={% raw %}{{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}{% endraw %}>
           <Button variant="contained" color="primary" {% raw %}onClick={ handleAdd }{% endraw %}>Add</Button>
           <h3 {% raw %}style={{ flexGrow: 1, textAlign: 'center' }}{% endraw %}>Address</h3>
-      </div>
+      </div> )}
       {%endif%}
       <br/>
       <TableContainer component={Paper}>
@@ -109,8 +119,18 @@ const Table{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =
               <TableCell align="center">{{prop}}</TableCell>
               {% endfor %}
               <TableCell align="center">view</TableCell>
-              <TableCell align="center">edit</TableCell>
-              <TableCell align="center">delete</TableCell>
+              {%if current_class.anotation  and  current_class.anotation.name == 'basket'%}{(userType=='CUSTOMER' ) && (
+              <TableCell align="center">edit</TableCell>)}
+              {%else%}
+               {(userType=='ADMIN' || userType=='SELLER') && (
+               <TableCell align="center">edit</TableCell>)}
+               {%endif%}
+              {%if current_class.name == 'Admin' or current_class.name == 'Customer'%}{(userType=='ADMIN' ) && (
+              <TableCell align="center">delete</TableCell>)}
+              {%else%}
+               {(userType=='ADMIN' || userType=='SELLER') && (
+               <TableCell align="center">delete</TableCell>)}
+              {%endif%}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -123,12 +143,27 @@ const Table{{current_class.name[0]|capitalize}}{{current_class.name[1:]}} = () =
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleView(item.id)}>View</Button>
                 </TableCell>
+                {%if current_class.anotation  and  current_class.anotation.name == 'basket'%}{(userType=='CUSTOMER' ) && (
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleEdit(item.id)}>Edit</Button>
-                </TableCell>
+                </TableCell>)}
+                {%else%}
+                {(userType=='ADMIN' || userType=='SELLER') && (
+                <TableCell align="center">
+                  <Button variant="contained" color="primary" onClick={() => handleEdit(item.id)}>Edit</Button>
+                </TableCell>)}
+                {%endif%}
+                {%if current_class.name == 'Admin' or current_class.name == 'Customer'%}{(userType=='ADMIN' ) && (
                 <TableCell align="center">
                   <Button variant="contained" color="secondary" onClick={() => handleDelete(item.id)}>Delete</Button>
                 </TableCell>
+                )}
+                {%else%}
+                {(userType=='ADMIN' || userType=='SELLER') && (
+                <TableCell align="center">
+                  <Button variant="contained" color="secondary" onClick={() => handleDelete(item.id)}>Delete</Button>
+                </TableCell> )}
+                {%endif%}
               </TableRow>
             ))}
           </TableBody>

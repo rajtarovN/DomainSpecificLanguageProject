@@ -45,9 +45,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditBasket = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
-    formular: '',
   });
   const { id } = useParams();
   const [customers, setCustomers] = useState([]);
@@ -73,10 +76,9 @@ const EditBasket = () => {
     return () => {
       const fetchData = async () => {
         try {
-            const response = await basketService.getOneBasket(id);
+            const response = await basketService.getCustomersByBasket(id);
             if (response.status === 200) {
               setFormData({
-                 formular: response.data.formular,
 
               })
             }
@@ -128,7 +130,7 @@ const EditBasket = () => {
     const fetchData = async () => {
       try {
               for(let j in customers){
-                if (parseInt(selectedCustomer)===parseInt(customers[j].id)){ //todo ovde verujem da ide name
+                if (parseInt(selectedCustomer)===parseInt(customers[j].id)){
                   formData['customer'] = customers[j];
                   break;
                 }
@@ -164,15 +166,6 @@ const EditBasket = () => {
       <h2  >My Form</h2>
       <p>ID: {id}</p>
 
-      <div className={classes.formGroup}>
-        <TextField
-          label="formular"
-          name="formular"
-          value={formData.formular}
-          onChange={handleChange}
-          variant="outlined"
-        />
-      </div>
 
 
 
@@ -191,7 +184,6 @@ const EditBasket = () => {
                 ))}
             </NativeSelect>
         </div>
-
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">

@@ -24,14 +24,14 @@ public class BasketService  {
     private final BasketRepository basketRepository;
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
-            private final ItemRepository itemRepository; //todo ovo popravi
+            private final ItemRepository itemRepository;
 
     public BasketService(
     BasketMapper basketMapper,
     BasketRepository basketRepository
             ,CustomerRepository customerRepository
             ,CustomerMapper customerMapper
-           ,ItemRepository itemRepository //todo ovo popravi
+           ,ItemRepository itemRepository
 ) {
 
         this.basketMapper = basketMapper;
@@ -40,7 +40,7 @@ public class BasketService  {
 
         this.customerMapper = customerMapper;
 
-           this.itemRepository = itemRepository;//todo ovo popravi
+           this.itemRepository = itemRepository;
     }
   @Transactional
 public BasketDTO save( BasketDTO basketdto) {
@@ -58,14 +58,14 @@ public BasketDTO save( BasketDTO basketdto) {
     public BasketDTO update(long id,BasketDTO basketdto) {
     Optional<Basket> basket = basketRepository.findById(id);
     if (basket.isPresent()){
-            basket.get().setFormular(basketdto.getFormular());
 
 
 
-       //ovde
+
                     if(basketdto.getCustomer()!=null) {
 
-                    Customer customer =customerRepository.getById(basketdto.getCustomer().getId());
+                     Customer customer =customerRepository.getById(basketdto.getCustomer().getId());
+
                     basket.get().setCustomer(customer);
                     customer.setBasket(basket.get());
 
@@ -85,9 +85,6 @@ public BasketDTO save( BasketDTO basketdto) {
         .findById(basket.getId())
         .map(existingBasket -> {
 
-            if (basket.getFormular() != null) {
-                existingBasket.setFormular(basket.getFormular());
-            }
 
             return existingBasket;
         })
@@ -191,4 +188,5 @@ return basketMapper.toDTO(basketRepository.save(maybeBasket.get()));
         }
         throw new NotFoundException("Basket or item didnt found");
     }
+
 }

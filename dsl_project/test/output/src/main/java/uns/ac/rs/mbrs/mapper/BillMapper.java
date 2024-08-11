@@ -13,7 +13,7 @@ public class BillMapper {
 
     public BillDTO toDTO(Bill model) {
         BillDTO dto = new BillDTO();
-        dto.setNeki_tekst(model.getNeki_tekst());
+        dto.setCashier(model.getCashier());
         dto.setId(model.getId());
 
         return dto;
@@ -24,7 +24,7 @@ public class BillMapper {
          for(Bill model : models){
           BillDTO dto = new BillDTO();
 
-        dto.setNeki_tekst(model.getNeki_tekst());
+        dto.setCashier(model.getCashier());
         dto.setId(model.getId());
         dtos.add(dto);
         }
@@ -33,7 +33,7 @@ public class BillMapper {
 
     public Bill toModel(BillDTO dto) {
         Bill model = new Bill();
-        model.setNeki_tekst(dto.getNeki_tekst());
+        model.setCashier(dto.getCashier());
         return model;
     }
 }

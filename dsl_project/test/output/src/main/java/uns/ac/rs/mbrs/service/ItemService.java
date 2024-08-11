@@ -22,14 +22,21 @@ public class ItemService  {
 
     private final ItemMapper itemMapper;
     private final ItemRepository itemRepository;
+    private final ActionRepository actionRepository;
+    private final ActionMapper actionMapper;
 
     public ItemService(
     ItemMapper itemMapper,
     ItemRepository itemRepository
+            ,ActionRepository actionRepository
+            ,ActionMapper actionMapper
 ) {
 
         this.itemMapper = itemMapper;
         this.itemRepository = itemRepository;
+        this.actionRepository = actionRepository;
+
+        this.actionMapper = actionMapper;
 
     }
   @Transactional
@@ -101,6 +108,11 @@ public void delete(Long id) {
     if (maybeItem.isPresent()) {
         Item existingItem = maybeItem.get();
         existingItem.setDeleted(true);
+        if (existingItem.getAction() != null){
+            for (Action p: existingItem.getAction()){
+                p.setDeleted(true);
+            }
+        }
 
         itemRepository.save(existingItem);
     }
@@ -115,5 +127,6 @@ public void delete(Long id) {
         }
         return list2;
     }
+
 
 }

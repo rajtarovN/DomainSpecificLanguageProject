@@ -44,6 +44,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditSeller = () => {
+ const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : '');
   const classes = useStyles();
   const [formData, setFormData] = useState({
   });
@@ -129,7 +133,6 @@ const EditSeller = () => {
     <form className={classes.root} onSubmit={handleSubmit}>
       <h2  >My Form</h2>
       <p>ID: {id}</p>
-
 
 
 

@@ -1,9 +1,0 @@
-@Bill(make, sth)
-class Bill{
-  'neki_tekst' String;
-}
-
-@Bill(make, sth)
-class NNNN{
-  'neki_tekst' String;
-}

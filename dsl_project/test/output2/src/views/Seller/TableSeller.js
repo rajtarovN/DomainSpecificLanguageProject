@@ -21,6 +21,11 @@ const useStyles = makeStyles({
 });
 
 const TableSeller = () => {
+const [userType] = useState(
+    JSON.parse(localStorage.getItem('user'))
+        ? JSON.parse(localStorage.getItem('user')).userType
+        : ''
+);
 
   const handleAdd = () => {
     navigate(`/add-seller`);
@@ -86,10 +91,11 @@ const TableSeller = () => {
     <ToastContainer />
     <div>
       <br/>
+       {(userType=='ADMIN' || userType=='seller') && (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Button variant="contained" color="primary" onClick={ handleAdd }>Add</Button>
           <h3 style={{ flexGrow: 1, textAlign: 'center' }}>Address</h3>
-      </div>
+      </div> )}
       <br/>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
@@ -97,8 +103,10 @@ const TableSeller = () => {
             <TableRow>
               <TableCell align="center">Index</TableCell>
               <TableCell align="center">view</TableCell>
-              <TableCell align="center">edit</TableCell>
-              <TableCell align="center">delete</TableCell>
+               {(userType=='ADMIN' || userType=='SELLER') && (
+               <TableCell align="center">edit</TableCell>)}
+               {(userType=='ADMIN' || userType=='SELLER') && (
+               <TableCell align="center">delete</TableCell>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -108,12 +116,14 @@ const TableSeller = () => {
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleView(item.id)}>View</Button>
                 </TableCell>
+                {(userType=='ADMIN' || userType=='SELLER') && (
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleEdit(item.id)}>Edit</Button>
-                </TableCell>
+                </TableCell>)}
+                {(userType=='ADMIN' || userType=='SELLER') && (
                 <TableCell align="center">
                   <Button variant="contained" color="secondary" onClick={() => handleDelete(item.id)}>Delete</Button>
-                </TableCell>
+                </TableCell> )}
               </TableRow>
             ))}
           </TableBody>

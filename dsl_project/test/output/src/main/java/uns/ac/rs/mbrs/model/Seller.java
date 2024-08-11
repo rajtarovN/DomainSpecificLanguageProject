@@ -11,6 +11,7 @@ import java.util.Date;
 import uns.ac.rs.mbrs.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import uns.ac.rs.mbrs.dtos.LoginDTO;
 
 @AllArgsConstructor
 @Entity
@@ -24,11 +25,14 @@ public  class Seller  extends User {
 
 
     public Seller() {}
-
     public boolean getDeleted() {
         return deleted;
     }
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+     public Seller(LoginDTO newUserDTO) {
+        this.setDeleted(false);
+        this.setUsername(newUserDTO.getUsername());
     }
 }

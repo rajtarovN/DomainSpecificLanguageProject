@@ -10,6 +10,11 @@ import java.util.stream.Collectors;
 @Component
 public class ActionMapper {
 
+  private final ItemMapper itemMapper;
+    public ActionMapper(
+            ItemMapper itemMapper
+    ) {
+        this.itemMapper = itemMapper;}
 
     public ActionDTO toDTO(Action model) {
         ActionDTO dto = new ActionDTO();
@@ -19,6 +24,12 @@ public class ActionMapper {
         dto.setName(model.getName());
         dto.setId(model.getId());
 
+        if (model.getItem()!=null){
+            dto.setItemIds(new ArrayList<>());
+            for (Item i : model.getItem()){
+                dto.getItemIds().add(i.getId());
+            }
+        }
         return dto;
     }
 

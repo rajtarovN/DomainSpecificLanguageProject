@@ -22,31 +22,38 @@ public class BillService  {
 
     private final BillMapper billMapper;
     private final BillRepository billRepository;
+    private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final ItemWithPriceRepository itemwithpriceRepository;
     private final ActionService  actionService;
-            private final BasketRepository basketRepository; //todo ovo popravi
+            private final BasketRepository basketRepository;
 
     public BillService(
     BillMapper billMapper,
     BillRepository billRepository
+            ,AddressRepository addressRepository
+            ,AddressMapper addressMapper
             ,CustomerRepository customerRepository
             ,CustomerMapper customerMapper
              ,ItemWithPriceRepository itemwithpriceRepository
             , ActionService  actionService
-           ,BasketRepository basketRepository //todo ovo popravi
+           ,BasketRepository basketRepository
 ) {
 
         this.billMapper = billMapper;
         this.billRepository = billRepository;
+        this.addressRepository = addressRepository;
+
+        this.addressMapper = addressMapper;
         this.customerRepository = customerRepository;
 
         this.customerMapper = customerMapper;
              this.itemwithpriceRepository = itemwithpriceRepository;
             this.actionService = actionService;
 
-           this.basketRepository = basketRepository;//todo ovo popravi
+           this.basketRepository = basketRepository;
     }
   @Transactional
 public BillDTO save( BasketDTO basketdto )  throws Exception{
@@ -77,14 +84,25 @@ public BillDTO save( BasketDTO basketdto )  throws Exception{
     public BillDTO update(long id,BillDTO billdto) {
     Optional<Bill> bill = billRepository.findById(id);
     if (bill.isPresent()){
-            bill.get().setNeki_tekst(billdto.getNeki_tekst());
+            bill.get().setCashier(billdto.getCashier());
 
 
 
-       //ovde
+
+                    if(billdto.getAddress()!=null) {
+
+                     Address address =addressRepository.getById(billdto.getAddress().getId());
+
+                    bill.get().setAddress(address);
+                    address.setBill(bill.get());
+
+}
+
+
                     if(billdto.getCustomer()!=null) {
 
-                    Customer customer =customerRepository.getById(billdto.getCustomer().getId());
+                     Customer customer =customerRepository.getById(billdto.getCustomer().getId());
+
                     bill.get().setCustomer(customer);
                     customer.getBill().add(bill.get());
 }
@@ -103,8 +121,8 @@ public BillDTO save( BasketDTO basketdto )  throws Exception{
         .findById(bill.getId())
         .map(existingBill -> {
 
-            if (bill.getNeki_tekst() != null) {
-                existingBill.setNeki_tekst(bill.getNeki_tekst());
+            if (bill.getCashier() != null) {
+                existingBill.setCashier(bill.getCashier());
             }
 
             return existingBill;
@@ -139,6 +157,9 @@ public void delete(Long id) {
     if (maybeBill.isPresent()) {
         Bill existingBill = maybeBill.get();
         existingBill.setDeleted(true);
+        if (existingBill.getAddress() != null){
+            existingBill.getAddress().setDeleted(true);
+        }
         if (existingBill.getCustomer() != null){
             existingBill.getCustomer().setDeleted(true);
         }
@@ -180,11 +201,12 @@ public void delete(Long id) {
             customer.get().getBasket().setQuantity(new ArrayList<>());
             counter++;
             }
+            bill.setItemWithPrice(itemWithPrice);
         bill.setTotalPrice(price);
-        bill.setItemWithPrice(itemWithPrice);
         actionService.doActionMake(customer.get(), bill);
         Bill s = billRepository.save(bill);
         return billMapper.toDTO(s);}
         throw new Exception("There is no customer with that id");
     }
+
 }
