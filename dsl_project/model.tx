@@ -42,7 +42,7 @@ VariableInit: Type ID "=" PosibleValuesForVariable ';';
 Variable: ( ChaneId) "=" PosibleValuesForVariable ';'?;
 VariableSF: (Type)? ( ChaneId) 'apply' ShortFunctions ';'? ;
 
-PosibleValuesForVariable: ( NewObject | Condition |  OneLineCondition | Operations | ChaneId | value);
+PosibleValuesForVariable: ( NewObject | OneLineCondition | Condition | Operations | ChaneId | value);
 
 NewObject: 'new' ID '(' Arguments? ')';
 

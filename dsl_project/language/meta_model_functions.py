@@ -1,5 +1,5 @@
 from .model import ForFunction, Function, Param, IfStatement, Variable, ShortFunctions, NewObjectStatement, \
-    Operations, Condition, ClassWithGeters
+    Operations, Condition, ClassWithGeters, Attribute
 import copy
 import re
 
@@ -82,15 +82,31 @@ def sent_func_checker(text):
 
 def add_data_to_clases(model):
     item_class = None
+    iwp_class = None
     for cl in model.classes:
         if cl.anotation and cl.anotation.name=="item":
             item_class = cl
-            break
+            item_class.attributes.append(Attribute("quantity", "int"))
+            item_class.attributes.append(Attribute("name", "String")) #item with price basket
+        elif cl.anotation and cl.anotation.name=="basket":
+            cl.attributes.append(Attribute("quantity", "int"))
+        elif cl.anotation and cl.anotation.name=="bill":
+            cl.attributes.append(Attribute("totalPrice", "double"))
+        elif cl.anotation and cl.anotation.name == "bying":
+            iwp_class = cl
+            cl.attributes.append(Attribute("currentPrice", "double"))
+
     for cl in model.classes:
         if cl.anotation and cl.anotation.name=="action":
             model.relations.append([cl.name, item_class.name])
-            break
-
+        elif cl.anotation and cl.anotation.name == "basket":
+            model.relations.append([cl.name, item_class.name])
+            model.relations.append([cl.name, "customer"])
+        elif cl.anotation and cl.anotation.name == "bill":
+            model.relations.append([cl.name, "customer"])
+            model.relations.append([cl.name, iwp_class.name])
+        elif cl.anotation and cl.anotation.name == "bying":
+            model.relations.append([cl.name, item_class])
 
 
 def statements_checker(text, defined_variables):
@@ -479,9 +495,12 @@ def operation_checker(line, defined_variables):
                 raise Exception(f"Type {result_right_side.type} of variable {result_right_side.name} not suports arithmetic operation")
     elif right_side in parameters_list.keys():
         result_right_side = parameters_list[right_side]
-        if result_right_side.type not in ["int", "float", "double", "short"]:
+        if (not isinstance(result_right_side, str)) and result_right_side.type not in ["int", "float", "double", "short"]:
             raise Exception(
                 f"Type {result_right_side.type} of variable {result_right_side.name} not suports arithmetic operation")
+        if isinstance(result_right_side, str) and result_right_side not in ["int", "float", "double", "short"]:
+            raise Exception(
+                f"Type {result_right_side} of variable {right_side} not suports arithmetic operation")
     else:
         result_right_side = statements_checker(right_side, defined_variables)
     return Operations(ls, operator, result_right_side)
@@ -679,7 +698,9 @@ def if_statement_checker(lines, line, defined_variables):  # ovde bi trebalo pod
     else_statements = []
     old_text = 'e'+";".join(lines)[len(condition) - 3 + index_in_text:]
     text = old_text
-    while "elif" in text[:4]:
+    if text[1] == "}":
+        text = text[2:]
+    while "elif" in text[:6]:
         el_condition = text.split("elif")[1].split("{")[0]
         if el_condition in elif_conditions:
             raise Exception("You have two same elif conditions")
@@ -908,13 +929,21 @@ def check_is_class_exist(class_name, model_cl):
 
 def find_all_chain_getters(clas_name, list_geters):
     global parsed_model
-    found_name = check_is_class_exist(clas_name, parsed_model)
+    if isinstance(clas_name, ClassWithGeters):
+        print(clas_name.name)
+        print(type(clas_name))
+        found_name = check_is_class_exist(clas_name.variable, parsed_model)
+    else:
+        found_name = check_is_class_exist(clas_name, parsed_model)
     i = 0
     if found_name is not None:
         for geter in list_geters:
             found = False
             for atribute in found_name.attributes:
                 if atribute.name[1:-1] == geter:
+                    found = True
+                    break
+                elif atribute.name == geter:
                     found = True
                     break
             if not found:
@@ -945,6 +974,8 @@ def check_type_for_arithmetic_logical_operation(class_with_geters, defined_varia
     global parsed_model
     if isinstance(class_with_geters.name, str):
         found_name = check_is_class_exist(defined_variables[class_with_geters.name][0][0], parsed_model)
+    elif isinstance(class_with_geters.name, ClassWithGeters):
+        found_name = check_is_class_exist(class_with_geters.name.variable.type, parsed_model)
     else:
         found_name = check_is_class_exist(class_with_geters.name.type, parsed_model)
     i = 0
