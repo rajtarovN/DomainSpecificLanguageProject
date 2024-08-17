@@ -1,6 +1,6 @@
 from textx import TextXSemanticError
 from .model import *
-from .meta_model_functions import *
+# from .meta_model_functions import *
 
 def nelly_checker(nelly_model):
     file_parts = nelly_model.split("file")

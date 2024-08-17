@@ -41,7 +41,7 @@ public class ActionController {
     }
 
     @PostMapping
-            @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+          //  @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<ActionDTO> post(@RequestBody ActionDTO action) {
         ActionDTO action1 = actionService.save(action);
         if (action == null)

@@ -1,7 +1,9 @@
-from .model import ForFunction, Function, Param, IfStatement, Variable, ShortFunctions, NewObjectStatement,\
+from .model import ForFunction, Function, Param, IfStatement, Variable, ShortFunctions, NewObjectStatement, \
     Operations, Condition, ClassWithGeters
 import copy
 import re
+
+from .meta_model import nelly_checker
 
 
 function_names = []
@@ -64,14 +66,31 @@ def func_checker(text):
 
 
 def sent_func_checker(text):
-    global function_names, parameters_list, current_block
+    global function_names, parameters_list, current_block, parsed_model
     def_var = {}
     name_func = "make"
     parameters_list["person"] = 'person'
     parameters_list["bill"] = 'bill'
-    text = text[1:-1]
+    parameters_list["action"] = 'action'
+    classes_text, text = text.split("file{")
+    parsed_model = nelly_checker(classes_text)
+    add_data_to_clases(parsed_model)
+    text = text[:-1]
     statements = statements_checker(text, def_var)
     return Function(name_func, statements, copy.deepcopy(parameters_list)), def_var
+
+
+def add_data_to_clases(model):
+    item_class = None
+    for cl in model.classes:
+        if cl.anotation and cl.anotation.name=="item":
+            item_class = cl
+            break
+    for cl in model.classes:
+        if cl.anotation and cl.anotation.name=="action":
+            model.relations.append([cl.name, item_class.name])
+            break
+
 
 
 def statements_checker(text, defined_variables):
@@ -96,11 +115,12 @@ def statements_checker(text, defined_variables):
         for cl in defined_classes:# new obj
             if "'" in cl:
                 cl = cl[1:-1]
-            if line.startswith("new" + cl.upper() + "("):
+            if line.lower().startswith("new" + cl.lower() + "("):
                 list_statements.append(new_object_checker(line, cl, defined_variables))
                 found = True
                 break
         if found:
+            line_num += 1
             continue
 
         if line.startswith("if"):
@@ -171,7 +191,13 @@ def short_function_checker(line, defined_variables):
         value_as, value_where = None, None
         formula_part = None
         if rest_line.startswith("as:"):
-            value_as, rest_line = check_as_part(rest_line[3:], defined_variables, value.type)
+            if isinstance(value, ClassWithGeters):
+                type_value = "List"
+                if value.list_geters[-1]=="item":
+                    type_value+="Item"
+                value_as, rest_line = check_as_part(rest_line[3:], defined_variables, "ListItem")
+            else:
+                value_as, rest_line = check_as_part(rest_line[3:], defined_variables, value.type)
             if rest_line.startswith("formula"):
                 formula_part, rest_line = for_func_formula(rest_line, defined_variables)
         if rest_line.startswith("where"):
@@ -190,7 +216,13 @@ def short_function_checker(line, defined_variables):
     elif name == "selectTop":
         number = rest_line.split("of")[0]
         value_posible, rest_line = check_posible_list(rest_line.split("of")[1], defined_variables)
-        value_as, rest_line = check_as_part(rest_line[3:], defined_variables, value_posible.type)
+        if isinstance(value_posible, ClassWithGeters):
+            type_value = "List"
+            if value_posible.list_geters[-1] == "item":
+                type_value += "Item"
+            value_as, rest_line = check_as_part(rest_line[3:], defined_variables, type_value)
+        else:
+            value_as, rest_line = check_as_part(rest_line[3:], defined_variables, value_posible.type)
         value_where, rest_line = check_where_part(rest_line, defined_variables)
         return ShortFunctions(value_posible, name, value_where, value_as, None, number, None)
     else:
@@ -289,7 +321,10 @@ def check_posible_list(rest_line, defined_variables):
             res = short_function_checker(rest_line[index:], defined_variables)
             current_block = cur_b
             return res, rest_line[index:]
-    sending_rest_line = rest_line[:rest_line.find("as:")],
+    if "as:" in rest_line:
+        sending_rest_line = rest_line[:rest_line.find("as:")],
+    else:
+        sending_rest_line=rest_line,
     is_id = id_or_chain(sending_rest_line, defined_variables, index)
     if is_id[0] is None:
         raise Exception(f"Posible list {sending_rest_line} not defined.")
@@ -848,25 +883,26 @@ def extract_operands_conditions(expression, defined_variables):
 
 
 def check_is_class_exist(class_name, model_cl):
-    for model_class in model_cl.classes:
-        if isinstance(class_name, str) and isinstance(model_class, str):
-            if model_class[1:-1].lower() == class_name[1:-1].lower():
+    if model_cl is not None:
+        for model_class in model_cl.classes:
+            if isinstance(class_name, str) and isinstance(model_class, str):
+                if model_class[1:-1].lower() == class_name[1:-1].lower():
+                    return model_class
+                continue
+            if isinstance(class_name, str):
+                if model_class.name[1:-1].lower() == class_name[1:-1].lower():
+                    return model_class
+                continue
+            if isinstance(model_class, str):
+                if model_class[1:-1].lower() == class_name[1:-1].lower():
+                    return model_class
+                continue
+            if isinstance(class_name, Variable):
+                if model_class.name[1:-1].lower() == class_name.type[1:-1].lower():
+                    return model_class
+                continue
+            if model_class.name[1:-1].lower() == class_name.name[1:-1].lower():
                 return model_class
-            continue
-        if isinstance(class_name, str):
-            if model_class.name[1:-1].lower() == class_name[1:-1].lower():
-                return model_class
-            continue
-        if isinstance(model_class, str):
-            if model_class[1:-1].lower() == class_name[1:-1].lower():
-                return model_class
-            continue
-        if isinstance(class_name, Variable):
-            if model_class.name[1:-1].lower() == class_name.type[1:-1].lower():
-                return model_class
-            continue
-        if model_class.name[1:-1].lower() == class_name.name[1:-1].lower():
-            return model_class
     return None
 
 
@@ -883,12 +919,19 @@ def find_all_chain_getters(clas_name, list_geters):
                     break
             if not found:
                 for relations in parsed_model.relations:
+
+                    if isinstance(relations, list):
+                        if relations[0].lower() == found_name.name.lower() and relations[1].lower() == geter.lower():
+                            found = True
+                        break
                     for link in relations.list_couple:
                         if link[0][1:-1] == found_name.name and link[1][1:-1] == geter:
                             found = True
                             break
                     if found:
                         break
+            if geter=="id":
+                return True
             if found and len(list_geters)-1 < i:
                 raise Exception(f"You inputed more than expected geters {list_geters}.")
             if not found:
@@ -916,7 +959,12 @@ def check_type_for_arithmetic_logical_operation(class_with_geters, defined_varia
                     raise Exception(f"Type of {geter} not suports arithmetic operation")
             if not found:
                 for ref_prop in found_name.reference_properties:
-                    if ref_prop.name.name == geter and ref_prop.name.type not in types and len(class_with_geters.list_geters) - 1 == i:
-                        raise Exception(f"Type of {geter} not suports arithmetic operation")
+                    if isinstance(ref_prop.name, str):
+                        if ref_prop.name == geter and ref_prop.type not in types and len(
+                                class_with_geters.list_geters) - 1 == i:
+                            raise Exception(f"Type of {geter} not suports arithmetic operation")
+                    else:
+                        if ref_prop.name.name == geter and ref_prop.name.type not in types and len(class_with_geters.list_geters) - 1 == i:
+                            raise Exception(f"Type of {geter} not suports arithmetic operation")
 
             i += 1

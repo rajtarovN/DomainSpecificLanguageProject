@@ -53,11 +53,13 @@ public ActionDTO save( ActionDTO actiondto) {
 
             Action action = actionMapper.toModel(actiondto);
                 List<Item> items = new ArrayList<>();
-                for (Long d : actiondto.getItemIds()) {
-                    Item item = itemRepository.getById(d);
-                    items.add(item);
+                if (actiondto.getItemIds()!=null) {
+                    for (Long d : actiondto.getItemIds()) {
+                        Item item = itemRepository.getById(d);
+                        items.add(item);
 
-                                        item.getAction().add(action);
+                        item.getAction().add(action);
+                    }
                 }
                 action.setItem(items);
         String transformedCode = callPyController.callPythonPost(actiondto.getOriginalCode());

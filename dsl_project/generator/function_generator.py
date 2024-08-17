@@ -287,7 +287,6 @@ def generate_sap_func(statement, name, block=0, id="", operation="a"):
 def generate_select_in_top_func(statement, name, block=0, id=""):
     new_var = "new_var" + str(block)
     generated_code = "List<Object> " + new_var + " = new ArrayList<>;"
-    print(statement.name)
     possible_list = statement.posible_list
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
@@ -323,7 +322,6 @@ def generate_count_in_func(statement, name, block=0, id=""):
     new_var = "new_var" + str(block)
     generated_code = "int " + new_var + " = 0;"
     possible_list = statement.posible_list
-    print(type(possible_list))
     if isinstance(possible_list, ClassWithGeters):
         possible_list = generate_chane_code(possible_list, True)
     elif isinstance(possible_list, Variable):
@@ -509,8 +507,10 @@ def generate_arguments(arguments):
     generated = ""
     i = 0
     for arg in arguments:
-        if type(arg) == "ClassWithGeters":
+        if isinstance(arg, ClassWithGeters):
             generated += generate_chane_code(arg, True)
+        elif isinstance(arg, list):
+            generated += generate_arguments(arg)
         else:
             generated += arg
         if i == len(arguments) - 1:

@@ -25,7 +25,7 @@ Bill: 'Bill' '(' (ID (',' ID)*)? ')' ;
 Bying: 'Bying' '(' ('one' | 'more') ')' ;
 Action: 'Action' ID;
 
-Function:  '{' Statement* '}';
+Function:  'file' '{' Statement* '}';
 
 ParameterList: Param *( ',' Param) ;
 
@@ -42,9 +42,9 @@ VariableInit: Type ID "=" PosibleValuesForVariable ';';
 Variable: ( ChaneId) "=" PosibleValuesForVariable ';'?;
 VariableSF: (Type)? ( ChaneId) 'apply' ShortFunctions ';'? ;
 
-PosibleValuesForVariable: (value |  Condition |  OneLineCondition | Operations | NewObject |ChaneId);
+PosibleValuesForVariable: ( NewObject | Condition |  OneLineCondition | Operations | ChaneId | value);
 
-NewObject: "new" ID '(' Arguments ')';
+NewObject: 'new' ID '(' Arguments? ')';
 
 IfStatement:
     'if' Conditions '{'

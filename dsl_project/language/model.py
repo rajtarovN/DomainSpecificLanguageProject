@@ -117,7 +117,7 @@ class LinkProperty:
         self.mapped_by = mapped_by
         self.as_part = as_part
     def __str__(self):
-        return " "+self.name+" "+str(self.type)+" "+ self.cardinality
+        return " "+self.name+" "+str(self.type)
 
 class Anotation(object):
     def __init__(self, name):

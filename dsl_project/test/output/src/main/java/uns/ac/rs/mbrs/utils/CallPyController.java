@@ -31,7 +31,7 @@ public class CallPyController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ModelContent modelContent = new ModelContent(data);
+        ModelContent modelContent = new ModelContent(getModelClasses()+data);
         String json = "";
         try {
             json = objectMapper.writeValueAsString(modelContent);
@@ -42,5 +42,37 @@ public class CallPyController {
         HttpEntity<String> request = new HttpEntity<>(json, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
         return response.getBody();
+    }
+
+    private String getModelClasses() {
+        return "@Bill(make, sth)\n" +
+                "class Bill{\n" +
+                "  'cashier' String;\n" +
+                "}\n" +
+                "\n" +
+                "@Bying(more)\n" +
+                "class ItemWithPrice{\n" +
+                "}\n" +
+                "@Basket\n" +
+                "class Basket{\n" +
+                "}\n" +
+                "@Item\n" +
+                "class Item{\n" +
+                "    'name' String;\n" +
+                "    'quantity' int;\n" +
+                "}\n" +
+                "@Actionmake\n" +
+                "class Action{\n" +
+                "    'name' String;\n" +
+                "}\n" +
+                "class Address{\n" +
+                "    'street' String;\n" +
+                "    'number' String;\n" +
+                "    'zip' String;\n" +
+                "}\n" +
+                "OneToOne{\n" +
+                "    'Bill' to: 'Address';\n" +
+                "}\n" +
+                "file";
     }
 }
