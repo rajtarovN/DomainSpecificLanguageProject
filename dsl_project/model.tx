@@ -56,7 +56,7 @@ IfStatement:
         Statement* '}')?
 ;
 
-OneLineCondition: Conditions '?' (PosibleValuesForVariable  ) 'or:' (PosibleValuesForVariable )  ';';
+OneLineCondition: Conditions '?' (PosibleValuesForVariable  ) 'or:' (PosibleValuesForVariable ) ;
 
 Conditions: Condition ( LogicalOperator Condition )*;
 

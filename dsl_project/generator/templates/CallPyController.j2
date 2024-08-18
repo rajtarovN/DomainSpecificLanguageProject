@@ -31,7 +31,7 @@ public class CallPyController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ModelContent modelContent = new ModelContent(data);
+        ModelContent modelContent = new ModelContent(getModelClasses()+data);
         String json = "";
         try {
             json = objectMapper.writeValueAsString(modelContent);
@@ -42,5 +42,10 @@ public class CallPyController {
         HttpEntity<String> request = new HttpEntity<>(json, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
         return response.getBody();
+    }
+
+     private String getModelClasses() {
+        return "{{model_code}}"
+         +"file";
     }
 }

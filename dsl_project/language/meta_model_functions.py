@@ -98,15 +98,21 @@ def add_data_to_clases(model):
 
     for cl in model.classes:
         if cl.anotation and cl.anotation.name=="action":
-            model.relations.append([cl.name, item_class.name])
+            model.relations[0].list_couple.append([cl.name, item_class.name])
+            model.relations[0].list_couple.append([item_class.name, cl.name])
         elif cl.anotation and cl.anotation.name == "basket":
-            model.relations.append([cl.name, item_class.name])
-            model.relations.append([cl.name, "customer"])
+            model.relations[0].list_couple.append([cl.name, item_class.name])
+            model.relations[0].list_couple.append([cl.name, "customer"])
+            model.relations[0].list_couple.append([item_class.name, cl.name])
+            model.relations[0].list_couple.append(["customer", cl.name])
         elif cl.anotation and cl.anotation.name == "bill":
-            model.relations.append([cl.name, "customer"])
-            model.relations.append([cl.name, iwp_class.name])
+            model.relations[0].list_couple.append([cl.name, "customer"])
+            model.relations[0].list_couple.append([cl.name, iwp_class.name])
+            model.relations[0].list_couple.append(["customer", cl.name])
+            model.relations[0].list_couple.append([iwp_class.name, cl.name])
         elif cl.anotation and cl.anotation.name == "bying":
-            model.relations.append([cl.name, item_class])
+            model.relations[0].list_couple.append([cl.name, item_class.name])
+            model.relations[0].list_couple.append([item_class.name, cl.name])
 
 
 def statements_checker(text, defined_variables):
@@ -271,8 +277,8 @@ def for_func_formula(rest_line, defined_variables):
 
 def for_func_as_part(rest_line, defined_variables):
     global current_block
-    indexes = [rest_line.find("on:"), rest_line.find("formula"), rest_line.find("sum"), rest_line.find("average"),
-               rest_line.find("product")]
+    indexes = [rest_line.find("formula"), rest_line.find("sumFrom"), rest_line.find("averageFrom"),
+               rest_line.find("productFrom")]
     indexes.extend([rest_line.find(name) for name in short_f_names])
     new_indexes = [x for x in indexes if x != -1]
     first_op = min(new_indexes)
@@ -285,8 +291,10 @@ def for_func_as_part(rest_line, defined_variables):
             find_all_chain_getters(name, as_part.split(".")[1:])
             return ClassWithGeters(name, as_part.split(".")[1:]), new_rest_line
         else:
-            if isinstance(checked[0].name, str):
+            if checked[0] is not None and isinstance(checked[0].name, str):
                 as_part_type = checked[0].name
+            elif checked[0] is None:
+                as_part_type = as_part
             else:
                 as_part_type = checked[0].name.type
             new_var = Variable(as_part, as_part_type, None, None), new_rest_line
@@ -930,8 +938,6 @@ def check_is_class_exist(class_name, model_cl):
 def find_all_chain_getters(clas_name, list_geters):
     global parsed_model
     if isinstance(clas_name, ClassWithGeters):
-        print(clas_name.name)
-        print(type(clas_name))
         found_name = check_is_class_exist(clas_name.variable, parsed_model)
     else:
         found_name = check_is_class_exist(clas_name, parsed_model)
@@ -954,7 +960,10 @@ def find_all_chain_getters(clas_name, list_geters):
                             found = True
                         break
                     for link in relations.list_couple:
-                        if link[0][1:-1] == found_name.name and link[1][1:-1] == geter:
+                        if link[0][1:-1].lower() == found_name.name.lower() and link[1][1:-1].lower() == geter.lower():
+                            found = True
+                            break
+                        if link[0].lower() == found_name.name.lower() and link[1].lower() == geter.lower():
                             found = True
                             break
                     if found:
@@ -964,7 +973,7 @@ def find_all_chain_getters(clas_name, list_geters):
             if found and len(list_geters)-1 < i:
                 raise Exception(f"You inputed more than expected geters {list_geters}.")
             if not found:
-                raise Exception(f"Geter {geter} not found.")
+                raise Exception(f"Geter {geter} not found. ({clas_name} {list_geters})")
         i += 1
     else:
         raise Exception(f"Class {clas_name.name} doesnt exist.")

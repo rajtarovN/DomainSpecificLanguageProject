@@ -247,14 +247,6 @@ def add_item_to_action(clases, relations):
                                          "", ""))
     item_class.reference_properties.append(LinkProperty(action_class.name, action_class,-1, "ManyToMany", 'LAZY', 'ALL',
                                          action_class.name.lower() + "_" + item_class.name.lower(), ""))
-    # for cl in clases:
-    #     print("--------------------------")
-    #     print(cl.name)
-    #     print("==========================")
-    #     for ro in cl.reference_properties:
-    #         print(ro)
-    # raise Exception("Obrisi ovaj exc")
-
 
 
 def add_roles(clases, relations):
@@ -301,7 +293,6 @@ def check_one_to_many(clases, relations):
     else:
         return
     for otm in one_to_many.list_couple:
-        print(type(many_to_one))
         for mto in many_to_one:
             if ((otm[0] == mto[0] and otm[1] == mto[1]) or
                     (otm[1] == mto[0] and otm[0] == mto[1])):

@@ -44,6 +44,7 @@ def generate_if_statement(statement, generated_code, def_var, param_list ):  # o
 
 
 def generate_variable_statement(statement, generated_code, main_statemant,definde_var, param_list  ):
+    print(statement)
     type_var = ""
     if generated_code is None:
         generated_code = ""
@@ -76,13 +77,16 @@ def generate_variable_statement(statement, generated_code, main_statemant,defind
             # todo proveri tipove da li takvi budu, i prosledi
             # neku matricu tipova
             generated_code += "0;"
+            if isinstance(statement, IfStatement):
+                generated_code += generate_one_line_condition(statement, main_statemant.name, definde_var,
+                                                              param_list)
         elif main_statemant.type == "boolean":
             generated_code += "true;"
         else:
             if name_var[-1] != "(":
                 generated_code += ";"
             else:
-                generated_code += generate_one_line_condition(statement, main_statemant.name, definde_var, param_list) + ";"
+                generated_code += generate_one_line_condition(statement, main_statemant.name, definde_var, param_list)
         return generated_code
     elif isinstance(statement, Operations):
         if type_var != "":
@@ -174,18 +178,20 @@ def generate_one_line_condition(statement, name, definde_var, param_list):
         name = generate_chane_code(name, False)
     elif isinstance(name, Param) or isinstance(name, Variable):
         name = name.name
+
     if name[-1] == "(": #ovdee
         # saving_value = "double savingVal = "
         for stmt in statement.if_statements:
             generated_code += generate_variable_statement(stmt, name, None, definde_var,param_list)
         generated_code += ");}"
     else:
-        generated_code += name + " = " + generate_variable_statement(statement.if_statements, "", None, definde_var,param_list) + "}"
+        generated_code += name + " = " + generate_variable_statement(statement.if_statements[0], "", None, definde_var,param_list) + "}"
     if statement.else_statements is not None:
         if name[-1] == "(":
+            print("else:::")
             generated_code += "else{" + generate_variable_statement(statement.else_statements[0], name, None, definde_var,param_list) + ");}"
         else:
-            generated_code += "else{" + name + " = " + generate_variable_statement(statement.else_statements[0], name,
+            generated_code += "else{" + name + " = " + generate_variable_statement(statement.else_statements[0], "",
                                                                              None, definde_var, param_list) + ";}"
 
     return generated_code
@@ -288,7 +294,7 @@ def generate_sap_func(statement, name, block=0, id="", operation="a"):
     gen_code = as_part
     if statement.formula_part is not None:
         gen_code = generate_operation(statement.formula_part)
-    generated_code += new_var + " = " + new_var + operation + "(" + gen_code + ")"
+    generated_code += new_var + " = " + new_var + operation + "(" + gen_code + ");"
 
     if statement.where_part is not None:
         generated_code += "}"
@@ -432,7 +438,7 @@ def generate_min_max_func(statement, name, block=0, max_min=">"):
         generated_code += new_var + " = " + statement.as_part.name + ";}}"
     else:
         generated_code += new_var + " = " + as_part + ";}}"
-    generated_code += name + "=" + new_var + ";"
+    generated_code += "Object " + name + "=" + new_var + ";"
     return generated_code
 
 

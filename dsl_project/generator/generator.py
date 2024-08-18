@@ -156,9 +156,10 @@ def generate(output_path):#todo
     folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils'
     folder.mkdir(parents=True, exist_ok=True)
     output_path = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs' / 'utils' / file_name
-
+    f = open("../test/shop.add", "r")
+    model_code = f.read() 
     with output_path.open('w', encoding="utf-8") as f:
-       f.write(template.render())
+       f.write(template.render(model_code))
 
 
     template = jinja_env.get_template('notFoundExc.j2')
@@ -463,7 +464,6 @@ def generate(output_path):#todo
         output_html_path = output_folder2 / 'src' / 'services' / file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('frontend/ViewComponent.j2')
@@ -473,7 +473,6 @@ def generate(output_path):#todo
         output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         if cl.anotation is not None:
@@ -485,7 +484,6 @@ def generate(output_path):#todo
                 output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
 
                 with output_html_path.open('w') as f:
-                    # print(model)
                     f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('frontend/DeleteElement.j2')
@@ -495,7 +493,6 @@ def generate(output_path):#todo
         output_html_path =output_folder2 / 'src' / 'views' / cl.name  / file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('frontend/EditComponent.j2')
@@ -505,7 +502,6 @@ def generate(output_path):#todo
         output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('frontend/Table.j2')
@@ -515,10 +511,7 @@ def generate(output_path):#todo
         output_html_path = output_folder2 / 'src' / 'views' / cl.name / file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
-
-
 
     #bek
         template = jinja_env.get_template('model.j2')
@@ -528,7 +521,6 @@ def generate(output_path):#todo
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'model'/ file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl, custom_transform=custom_transform))
 
         template = jinja_env.get_template('dto.j2')
@@ -538,7 +530,6 @@ def generate(output_path):#todo
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/'dtos'/ file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
 
@@ -550,7 +541,6 @@ def generate(output_path):#todo
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/'mapper'/ file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('repository.j2')
@@ -560,7 +550,6 @@ def generate(output_path):#todo
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/'repository'/ file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('controller.j2')
@@ -570,7 +559,6 @@ def generate(output_path):#todo
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/'controller'/ file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl))
 
         template = jinja_env.get_template('service.j2')
@@ -579,15 +567,10 @@ def generate(output_path):#todo
         folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs'/ 'service'
         folder.mkdir(parents=True, exist_ok=True)
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'service' / file_name
-        # env = Environment(loader=FileSystemLoader('templates'))
-        # env.filters['is_str'] = is_str
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, current_class=cl, is_str=is_str))
 
-    # print(len(model.enums))
     for enum in model.enums:
-        # print(enum.values)
         template = jinja_env.get_template('enum.j2')
         file_name = enum.name + '.java'
         folder = output_folder / 'src' / 'main' / 'java' / 'uns' / 'ac' / 'rs' / 'mbrs'/ 'enums'
@@ -595,5 +578,4 @@ def generate(output_path):#todo
         output_html_path = output_folder / 'src' / 'main' / 'java'/'uns'/'ac'/'rs'/'mbrs'/ 'enums' / file_name
 
         with output_html_path.open('w') as f:
-            # print(model)
             f.write(template.render(model=model, enum=enum))
