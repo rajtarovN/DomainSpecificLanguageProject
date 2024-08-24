@@ -40,7 +40,8 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
          {% if current_class.anotation%}
             {% if current_class.anotation.name == "basket" %}
             if (model.getQuantity()!=null){
-                dto.setQuantity(model.getQuantity());
+               List<Integer> quantities = new ArrayList<>(model.getQuantity());
+            dto.setQuantity(quantities);
             }
             if (model.getItem()!=null){
                 dto.setItem(itemMapper.toDTO(model.getItem()));
@@ -94,7 +95,8 @@ public class {{ current_class.name[0]|capitalize }}{{ current_class.name[1:] }}M
          {% if current_class.anotation%}
             {% if current_class.anotation.name == "basket" %}
             if (model.getQuantity()!=null){
-                dto.setQuantity(model.getQuantity());
+                List<Integer> quantities = new ArrayList<>(model.getQuantity());
+            dto.setQuantity(quantities);
             }
             if (model.getItem()!=null){
                 dto.setItem(itemMapper.toDTO(model.getItem()));

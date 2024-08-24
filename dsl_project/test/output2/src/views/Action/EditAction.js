@@ -197,8 +197,7 @@ const EditAction = () => {
   <div>
     <ToastContainer />
     <form className={classes.root} onSubmit={handleSubmit}>
-      <h2  >My Form</h2>
-      <p>ID: {id}</p>
+      <h2  >Action</h2>
         <div className={classes.formGroup}>
         <TextField
           label="Original Code"
@@ -206,6 +205,7 @@ const EditAction = () => {
           value={formData.originalCode}
           onChange={handleChange}
           variant="outlined"
+          style={{ width: '600px' }}
         />
       </div>
       <div className={classes.formGroup}>
@@ -243,22 +243,26 @@ const EditAction = () => {
 
 
 
-        Item
+        Item for action
         <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
+        <Table className={classes.table}  style={{ width: '800px' }}  aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="center">Id</TableCell>
-              <TableCell align="center">Add</TableCell>
+              <TableCell align="center" style={{ width: '50px' }}>Id</TableCell>
+              <TableCell align="center" style={{ width: '100px' }}>Name</TableCell>
+              <TableCell align="center" style={{ width: '80px' }}>Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {currentItem.map((item, index) => (
               <TableRow key={index}>
-                <TableCell align="center">
+                <TableCell style={{ width: '50px' }} align="center">
                   {item.id}
                 </TableCell>
-                <TableCell align="center">
+                <TableCell  style={{ width: '100px' }} align="center">
+                  {item.name}
+                </TableCell>
+                <TableCell  style={{ width: '80px' }} align="center">
                   <Button variant="contained" color="primary" onClick={() => handleRemoveItem(item.id)}>Remove</Button>
                 </TableCell>
               </TableRow>
@@ -266,21 +270,26 @@ const EditAction = () => {
           </TableBody>
         </Table>
       </TableContainer><br/>
+      Item to add
       <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
+        <Table className={classes.table} style={{ width: '800px' }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="center">Id</TableCell>
-              <TableCell align="center">Remove</TableCell>
+              <TableCell align="center" style={{ width: '50px' }}>Id</TableCell>
+              <TableCell align="center" style={{ width: '100px' }}>Name</TableCell>
+              <TableCell align="center"  style={{ width: '80px' }} >Add</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {allItem.map((item, index) => (
               <TableRow key={index}>
-                <TableCell align="center">
+                <TableCell align="center" style={{ width: '50px' }}>
                   {item.id}
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align="center" style={{ width: '100px' }}>
+                  {item.name}
+                </TableCell>
+                <TableCell  style={{ width: '80px' }}  align="center">
                   <Button variant="contained" color="primary" onClick={() => handleAddItem(item.id)}>Add</Button>
                 </TableCell>
               </TableRow>

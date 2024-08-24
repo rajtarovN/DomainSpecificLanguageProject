@@ -84,7 +84,6 @@ const NavBar = () => {
           </li>
         )}
         <li style={styles.navItem}><a onClick={handleHome}  style={styles.navLink}>Home</a></li>
-        <li style={styles.navItem}><a href="#" style={styles.navLink}>Logout</a></li>
         <li style={styles.navItem}>
           <a href="#" style={styles.navLink} onClick={handleSubMenuClick}>Elements</a>
           {showSubMenu && (

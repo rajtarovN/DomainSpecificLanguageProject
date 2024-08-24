@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import basketService from '../../services/BasketService';
 import billService from '../../services/BillService';
 import itemService from '../../services/ItemService';
+import TextField from '@material-ui/core/TextField';
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -37,6 +38,7 @@ const BasketView = () => {
   const navigate = useNavigate();
   const classes = useStyles();
 const [allItem, setAllItem] = useState([]);
+const [allQuantity, setAllQuantity] = useState([]);
   const { id } = useParams();
   const [basket, setBasket] = useState(NaN)
   const [userType] = useState(
@@ -48,11 +50,15 @@ const [allItem, setAllItem] = useState([]);
       try {
           const response = await basketService.getOneBasket(id);
           if (response.status === 200) {
+              const items = Array.isArray(response.data.item) ? response.data.item : [response.data.item];
               setBasket(response.data);
- setAllItem([response.data.item]);
+              setAllItem(items);
+              setAllQuantity(response.data.quantity);
+              console.log(response.data);
           }
+          
             //basket
-          const responseCustomer = await basketService.getCustomersByBasket(id);
+          //const responseCustomer = await basketService.getCustomersByBasket(id);
       } catch (error) {
           console.error(error);
       }
@@ -114,17 +120,25 @@ const [allItem, setAllItem] = useState([]);
   <div>
     <ToastContainer />
     <div className={classes.root}>
-      <h2  >Nesto</h2>
-
-      <p>ID: {id}</p>
-
-
+      <h2  >Basket</h2>
+      <div className={classes.formGroup}>
+        <TextField
+        InputProps={{
+          readOnly: true,
+        }}
+          label="Total price"
+          name="Total price"
+          value={200}
+          variant="outlined"
+        />
+      </div>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell align="center">Id</TableCell>
               <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Quantity</TableCell>
               <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
@@ -138,6 +152,9 @@ const [allItem, setAllItem] = useState([]);
                   {item.name}
                 </TableCell>
                 <TableCell align="center">
+                  {allQuantity[index]}
+                </TableCell>
+                <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleRemoveItem(item.id)}>Remove</Button>
                 </TableCell>
               </TableRow>
@@ -148,8 +165,9 @@ const [allItem, setAllItem] = useState([]);
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" onClick={handleMakeBill}>
          By
-        </Button>{(userType=='CUSTOMER' ) && (
-        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)}
+        </Button>
+        {/* {(userType=='CUSTOMER' ) && (
+        <Button variant="contained" color="primary" onClick={() => handleEdit(id)}>Edit</Button>)} */}
         {(userType=='ADMIN' || userType=='SELLER') && (
         <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>)}
 

@@ -21,16 +21,16 @@ public class AddressMapper {
         return dto;
     }
 
-     public List<AddressDTO> toDTO(List<Address> models) {
+    public List<AddressDTO> toDTO(List<Address> models) {
         List<AddressDTO> dtos = new ArrayList<AddressDTO>();
          for(Address model : models){
-          AddressDTO dto = new AddressDTO();
+            AddressDTO dto = new AddressDTO();
 
-        dto.setStreet(model.getStreet());
-        dto.setNumber(model.getNumber());
-        dto.setZip(model.getZip());
-        dto.setId(model.getId());
-        dtos.add(dto);
+            dto.setStreet(model.getStreet());
+            dto.setNumber(model.getNumber());
+            dto.setZip(model.getZip());
+            dto.setId(model.getId());
+            dtos.add(dto);
         }
         return dtos;
     }

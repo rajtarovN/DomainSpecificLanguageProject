@@ -215,7 +215,7 @@ const EditAddress = () => {
                     </option >
                 ))}
             </NativeSelect>
-        </div>
+      </div>
 
       <div className={classes.buttonGroup}>
         <Button variant="contained" color="primary" type="submit">

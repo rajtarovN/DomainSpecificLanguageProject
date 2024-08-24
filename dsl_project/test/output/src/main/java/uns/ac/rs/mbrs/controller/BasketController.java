@@ -38,7 +38,7 @@ public class BasketController {
     public ResponseEntity<BasketDTO> findOne(@PathVariable Long id) throws NotFoundException {
         BasketDTO basket = basketService.findOne(id);
         return ResponseEntity.ok().body(basket);
-    }
+       }
 
     @PostMapping
                     @PreAuthorize("hasRole('CUSTOMER')")
@@ -65,7 +65,7 @@ public class BasketController {
     @DeleteMapping("/{id}")
 
                     @PreAuthorize("hasAnyRole('ADMIN')")
-     public ResponseEntity<?> deleteOne(@PathVariable Long id) {
+    public ResponseEntity<?> deleteOne(@PathVariable Long id) {
         basketService.delete(id);
         return ResponseEntity.noContent().build();
     }

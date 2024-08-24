@@ -40,6 +40,7 @@ Statement: (VariableInit | Variable | IfStatement |VariableSF );
 VariableInit: Type ID "=" PosibleValuesForVariable ';';
 
 Variable: ( ChaneId) "=" PosibleValuesForVariable ';'?;
+
 VariableSF: (Type)? ( ChaneId) 'apply' ShortFunctions ';'? ;
 
 PosibleValuesForVariable: ( NewObject | OneLineCondition | Condition | Operations | ChaneId | value);
@@ -86,18 +87,13 @@ Any:        'anyOf' 	  PosibleLists 				('as:' ID)?          WherePart;
 NoOne:      'noneOf' 	  PosibleLists 				('as:' ID)?          WherePart;
 Min:        'min'		  PosibleLists   			('as:' (ChaneId))?  (WherePart)?;
 Max:        'max' 		  PosibleLists   			('as:' (ChaneId))?  (WherePart)?;
-
 Size:       'sizeOf' 	  PosibleLists ;
 Add:        'add' 		  (ChaneId)                 'in:' PosibleLists;
-
 ForEach:    'for' 		  ( ChaneId) 			 'as:' ( ChaneId) (ForOperation)?  ShortFunctions;
 
 ForOperation: ('sumFrom'|'averageFrom'|'productFrom' );
 PosibleLists: ( ChaneId | SelectIn);
-
 WherePart: 'where'  (Conditions | All| Any | NoOne);
 UsingFormula: 'formula' Operations;
-
 ShortFunctions: ( Size| Product | Count | All | Any | NoOne | Min | Max | Add |SelectTop| Sum |Average | SelectIn | ForEach);
-
 value: (INT | STRING | FLOAT | BOOL );

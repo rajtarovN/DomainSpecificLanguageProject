@@ -13,6 +13,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TextField from '@material-ui/core/TextField';
 {%if current_class.anotation and current_class.anotation.name == 'action'%}
 import itemService from '../../services/ItemService';
 import Grid from '@material-ui/core/Grid';
@@ -54,6 +55,7 @@ const {{current_class.name[0]|capitalize}}{{current_class.name[1:]}}View = () =>
   const classes = useStyles();
 {% if current_class.anotation%}
      {% if current_class.anotation.name=="basket"%}
+const [allQuantity, setAllQuantity] = useState([]);
 const [allItem, setAllItem] = useState([]);
      {%endif%}
      {%endif%}
@@ -74,7 +76,10 @@ const [allItem, setAllItem] = useState([]);
               set{{current_class.name[0]|capitalize}}{{current_class.name[1:]}}(response.data);
               {% if current_class.anotation%}
      {% if current_class.anotation.name=="basket"%}
- setAllItem([response.data.item]);
+     const items = Array.isArray(response.data.item) ? response.data.item : [response.data.item];
+              setBasket(response.data);
+              setAllItem(items);
+              setAllQuantity(response.data.quantity);
      {%endif%}
      {%endif%}
           }
@@ -234,6 +239,7 @@ const [allItem, setAllItem] = useState([]);
             <TableRow>
               <TableCell align="center">Id</TableCell>
               <TableCell align="center">Name</TableCell>
+               <TableCell align="center">Quantity</TableCell>
               <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
@@ -245,6 +251,9 @@ const [allItem, setAllItem] = useState([]);
                 </TableCell>
                 <TableCell align="center">
                   {item.name}
+                </TableCell>
+                <TableCell align="center">
+                  {allQuantity[index]}
                 </TableCell>
                 <TableCell align="center">
                   <Button variant="contained" color="primary" onClick={() => handleRemoveItem(item.id)}>Remove</Button>

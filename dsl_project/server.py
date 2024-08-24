@@ -44,7 +44,7 @@ def process_model():
         metamodel = create_metamodel()
         model = metamodel.model_from_str(model_content)
         param_li = {}
-        param_li["person"] = 'person'
+        param_li["customer"] = 'customer'
         param_li["bill"] = 'bill'
         param_li["action"] = 'action'
         output_txt = main_statement_generator(model[0].statements, "", model[1], param_li)

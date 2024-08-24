@@ -69,7 +69,7 @@ def sent_func_checker(text):
     global function_names, parameters_list, current_block, parsed_model
     def_var = {}
     name_func = "make"
-    parameters_list["person"] = 'person'
+    parameters_list["customer"] = 'customer'
     parameters_list["bill"] = 'bill'
     parameters_list["action"] = 'action'
     classes_text, text = text.split("file{")
@@ -906,9 +906,13 @@ def return_from_def_var_or_parameter_list(first_part, defined_variables):
 def extract_operands_conditions(expression, defined_variables):
     pattern = r'\b\w+\b'
     matches = re.findall(pattern, expression)
+    first_elem = ""
     for element in matches:
+        if first_elem + "."+element in expression:
+            element = first_elem + "."+element
         if check_part_condition(element, defined_variables) is None and check_type(element)[0] is None:
             raise Exception(f"Variable {element} not defined in {expression}")
+        first_elem = element
 
 
 def check_is_class_exist(class_name, model_cl):
@@ -944,8 +948,13 @@ def find_all_chain_getters(clas_name, list_geters):
     i = 0
     if found_name is not None:
         for geter in list_geters:
+            if list_geters.index(geter)!=0:
+                geter_before = list_geters[list_geters.index(geter)-1]
+                found_name = check_is_class_exist(geter_before, parsed_model)
             found = False
+            print(found_name)
             for atribute in found_name.attributes:
+                print(atribute)
                 if atribute.name[1:-1] == geter:
                     found = True
                     break
@@ -953,8 +962,8 @@ def find_all_chain_getters(clas_name, list_geters):
                     found = True
                     break
             if not found:
-                for relations in parsed_model.relations:
 
+                for relations in parsed_model.relations:
                     if isinstance(relations, list):
                         if relations[0].lower() == found_name.name.lower() and relations[1].lower() == geter.lower():
                             found = True
@@ -982,7 +991,13 @@ def find_all_chain_getters(clas_name, list_geters):
 def check_type_for_arithmetic_logical_operation(class_with_geters, defined_variables, arithmetic=True):
     global parsed_model
     if isinstance(class_with_geters.name, str):
-        found_name = check_is_class_exist(defined_variables[class_with_geters.name][0][0], parsed_model)
+        try:
+            found_name = check_is_class_exist(defined_variables[class_with_geters.name][0][0], parsed_model)
+        except KeyError:
+            try:
+                found_name = check_is_class_exist(parameters_list[class_with_geters.name], parsed_model)
+            except:
+                raise Exception(f"therre is no element {class_with_geters.name}")
     elif isinstance(class_with_geters.name, ClassWithGeters):
         found_name = check_is_class_exist(class_with_geters.name.variable.type, parsed_model)
     else:
