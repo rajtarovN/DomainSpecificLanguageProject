@@ -250,7 +250,7 @@ def short_function_checker(line, defined_variables):
     else:
         line = line[3:]
         list_name, rest_line = for_func_first_part(line[:line.find("as:")], defined_variables), line[line.find("as:"):]
-        as_part, rest_line = for_func_as_part(rest_line, defined_variables)
+        as_part, rest_line = for_func_as_part(rest_line, defined_variables, list_name)
         for_function = None
 
         if rest_line.startswith("sumFrom") and not rest_line.startswith("sumOf"):
@@ -275,7 +275,7 @@ def for_func_formula(rest_line, defined_variables):
     return operation, r_line
 
 
-def for_func_as_part(rest_line, defined_variables):
+def for_func_as_part(rest_line, defined_variables, types=None):
     global current_block
     indexes = [rest_line.find("formula"), rest_line.find("sumFrom"), rest_line.find("averageFrom"),
                rest_line.find("productFrom")]
@@ -291,12 +291,15 @@ def for_func_as_part(rest_line, defined_variables):
             find_all_chain_getters(name, as_part.split(".")[1:])
             return ClassWithGeters(name, as_part.split(".")[1:]), new_rest_line
         else:
-            if checked[0] is not None and isinstance(checked[0].name, str):
-                as_part_type = checked[0].name
-            elif checked[0] is None:
-                as_part_type = as_part
+            if types is not None:
+                as_part_type =  print(types[0].list_geters[-1])
             else:
-                as_part_type = checked[0].name.type
+                if checked[0] is not None and isinstance(checked[0].name, str):
+                    as_part_type = checked[0].name
+                elif checked[0] is None:
+                    as_part_type = as_part
+                else:
+                    as_part_type = checked[0].name.type
             new_var = Variable(as_part, as_part_type, None, None), new_rest_line
             current_block = current_block + ":" + str(1)
             defined_variables[as_part] = [[new_var[0]], [current_block]]
@@ -309,7 +312,6 @@ def for_func_first_part(rest_line, defined_variables):
     global current_block
     index = rest_line.find("as:")
     if check_if_contains_dot(rest_line, defined_variables):
-
         name = rest_line.split(".")[0]
         if name in defined_variables.keys():
             if is_var_in_parent_block(defined_variables[name][1]):
@@ -379,8 +381,8 @@ def check_as_part(rest_line, defined_variables, type_as):
             defined_variables[rest_line.split(".")[0]] = [[clas], [current_block]]
             return clas, last_part
         else:
-            var = Variable(rest_line.split(".")[0], type_as, None, None)
-            defined_variables[rest_line.split(".")[0]] = [[var], [current_block]]
+            var = Variable(rest_line, type_as, None, None)
+            defined_variables[rest_line] = [[var], [current_block]]
             return var, last_part
     return id_n, last_part
 
@@ -875,11 +877,9 @@ def check_part_condition(first_part, defined_variables):
             current_block = cur_b
             return ls
     ls = None
-
     if first_part in defined_variables.keys() or first_part in parameters_list.keys():
         ls = return_from_def_var_or_parameter_list(first_part, defined_variables)
     elif check_if_contains_dot(first_part, defined_variables):
-
         second_part = first_part.split(".")[1:]
         first_part = first_part.split(".")[0]
         if first_part in defined_variables.keys() or first_part in parameters_list.keys():
@@ -931,7 +931,8 @@ def check_is_class_exist(class_name, model_cl):
                     return model_class
                 continue
             if isinstance(class_name, Variable):
-                if model_class.name[1:-1].lower() == class_name.type[1:-1].lower():
+                if model_class.name[1:-1].lower() == class_name.type[1:-1].lower()\
+                        or model_class.name.lower() == class_name.type.lower():
                     return model_class
                 continue
             if model_class.name[1:-1].lower() == class_name.name[1:-1].lower():
@@ -952,9 +953,7 @@ def find_all_chain_getters(clas_name, list_geters):
                 geter_before = list_geters[list_geters.index(geter)-1]
                 found_name = check_is_class_exist(geter_before, parsed_model)
             found = False
-            print(found_name)
             for atribute in found_name.attributes:
-                print(atribute)
                 if atribute.name[1:-1] == geter:
                     found = True
                     break

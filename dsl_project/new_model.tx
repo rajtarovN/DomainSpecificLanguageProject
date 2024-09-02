@@ -1,0 +1,99 @@
+Model: ( Class | Enum | Relations | Function)*;
+
+Class: (Anotation)? 'class' ID '{' (Attribute)* '}';
+
+Attribute: name Type ';' ;
+
+Type: ('String' | 'int' | 'float' | 'boolean' | 'byte' | 'short' |  'long' |  'double' | 'char');
+
+Enum: 'enum' ID '{' (enumName)* '}';
+
+enumName: STRING ';' ;
+
+Relations: (OneToOne | OneToMany | ManyToOne | ManyToMany);
+
+OneToOne: 'OneToOne' '{' Link* '}';
+OneToMany: 'OneToMany''{' Link* '}';
+ManyToOne: 'ManyToOne' '{' Link* '}';
+ManyToMany: 'ManyToMany' '{' Link* '}';
+
+Link: name 'to:' name ('as:' ID)? ';';
+name: STRING;
+
+Anotation: '@' (Bill | Chargeable  | Action | 'Basket' | 'Item');
+Bill: 'Bill' '(' (ID (',' ID)*)? ')' ;
+Chargeable : 'Chargeable ' '(' ('one' | 'more') ')' ;
+Action: 'Action' ID;
+
+Function:  'file' '{' Statement* '}';
+
+ParameterList: Param +[','] ;
+
+Param: (Type| ID) ID ;
+
+Arguments: Argument +[','];
+
+Argument: (value | ShortFunctions |Operations | ChaneId);
+
+Statement: (VariableInit | Variable | IfStatement |VariableSF );
+
+VariableInit: Type ID "=" PosibleValuesForVariable ';';
+
+Variable: ( ChaneId) "=" PosibleValuesForVariable ';'?;
+
+VariableSF: (Type)? ( ChaneId) 'apply' ShortFunctions ';'? ;
+
+PosibleValuesForVariable: ( NewObject | OneLineCondition | Condition | Operations | ChaneId | value);
+
+NewObject: 'new' ID '(' Arguments? ')';
+
+IfStatement:
+    'if' Conditions '{'
+        Statement*
+        '}'
+    ('elif' Conditions '{'
+       Statement* '}')*
+    ('else' '{'
+        Statement* '}')?
+;
+
+OneLineCondition: Conditions '?' (PosibleValuesForVariable  ) 'or:' (PosibleValuesForVariable ) ;
+
+Conditions: Condition ( LogicalOperator Condition )*;
+
+LogicalOperator: ('&&' | '||');
+
+Negation: '!';
+
+Condition:  Negation?  ( value | ChaneId) RelationOperator Negation? ( value | ChaneId) ;
+
+RelationOperator: ('==' | '!=' | '>' | '<' | '>=' | '<=') ;
+
+Operations: (( INT | FLOAT | ChaneId) Operator Operations) | ( INT | FLOAT |  ChaneId);
+
+Operator: ('+' | '-' | '*' | '/' | '%' | '^');
+
+ChaneId: ID ('.' ID)*;
+
+Sum:        'sumOf' 	  PosibleLists 				(('as:' (ChaneId)   (UsingFormula)?   WherePart)?);
+Average:    'averageOf'   PosibleLists 				('as:' ( ChaneId  ) (UsingFormula)?   WherePart)?;
+Product:    'productOf'   PosibleLists 				('as:' ( ChaneId  ) (UsingFormula)?   WherePart)?;
+
+SelectTop:  'selectTop'   INT 'of' PosibleLists   	'as:'  ID           (WherePart)?;
+SelectIn:   'selectIn' 	  PosibleLists 				'as:'  ID            WherePart;
+Count:      'countFrom'   PosibleLists 				('as:' ID)?         (WherePart)?;
+All:        'allOf' 	  PosibleLists 				('as:' ID)?          WherePart ;
+Any:        'anyOf' 	  PosibleLists 				('as:' ID)?          WherePart;
+NoOne:      'noneOf' 	  PosibleLists 				('as:' ID)?          WherePart;
+Min:        'min'		  PosibleLists   			('as:' (ChaneId))?  (WherePart)?;
+Max:        'max' 		  PosibleLists   			('as:' (ChaneId))?  (WherePart)?;
+Size:       'sizeOf' 	  PosibleLists ;
+Add:        'add' 		  (ChaneId)                 'in:' PosibleLists;
+ForEach:    'for' 		  ( ChaneId) 			 'as:' ( ChaneId) (ForOperation)?  ShortFunctions;
+
+ForOperation: ('sumFrom'|'averageFrom'|'productFrom' );
+PosibleLists: ( ChaneId | SelectIn);
+WherePart: 'where'  (Conditions | All| Any | NoOne);
+UsingFormula: 'formula' Operations;
+ShortFunctions: ( Size| Product | Count | All | Any | NoOne | Min | Max | Add |SelectTop| Sum |Average | SelectIn | ForEach);
+value: (INT | STRING | FLOAT | BOOL );

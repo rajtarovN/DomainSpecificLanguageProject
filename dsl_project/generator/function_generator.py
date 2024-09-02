@@ -44,7 +44,6 @@ def generate_if_statement(statement, generated_code, def_var, param_list ):  # o
 
 
 def generate_variable_statement(statement, generated_code, main_statemant,definde_var, param_list  ):
-    print(statement)
     type_var = ""
     if generated_code is None:
         generated_code = ""
@@ -365,6 +364,7 @@ def generate_count_in_func(statement, name, block=0, id=""):
     generated_code += "for(Object " + as_part + " : " + possible_list + " ){"
 
     if statement.where_part is not None:
+        print(statement.where_part)
         condition = re.sub(r'&&', ' && ', condition_generator(statement.where_part))
         condition = re.sub(r'\s*\|\|\s*', ' || ', condition)
         generated_code += "if(" + condition + "){"
