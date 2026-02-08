@@ -1,0 +1,4 @@
+int b apply for customer.basket.item as: it countFrom action.item as: e where e.id ==item.id; 
+bill.totalPrice = b >3? bill.totalPrice – 300 or: bill.totalPrice; 
+
+ 

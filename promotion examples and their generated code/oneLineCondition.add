@@ -1,0 +1,1 @@
+double b = bill.totalPrice > 2000 ? bill.totalPrice - 500 or: bill.totalPrice;

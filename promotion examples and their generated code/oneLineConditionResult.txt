@@ -1,0 +1,6 @@
+double b=0;
+if(bill.totalPrice>2000){
+	b = bill.getTotalPrice() - 500;
+}else{
+	b = bill.getTotalPrice();
+}

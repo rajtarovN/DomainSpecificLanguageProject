@@ -1,0 +1,14 @@
+Item new_var0;
+if(action.getItem().size()>0){
+	new_var0 = action.getItem().get(0);
+else{
+	new_var0=null;
+}
+for(Item e : action.getItem()){
+	if(e.getPrice>20){
+		if(e.getPrice()>new_var0.getPrice()){
+			new_var0=e;
+		}
+	}
+}
+Item b=new_var0;

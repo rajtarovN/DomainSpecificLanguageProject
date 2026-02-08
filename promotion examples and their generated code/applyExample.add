@@ -1,0 +1,1 @@
+int b apply max action.item as: e.price where e.price>20;
