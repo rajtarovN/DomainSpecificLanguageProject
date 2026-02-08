@@ -1,0 +1,29 @@
+@Bill(make, sth)
+class Bill{
+  'cashier' String;
+}
+
+@Bying(more)
+class ItemWithPrice{
+}
+@Basket
+class Basket{
+}
+@Item
+class Item{
+    'name' String;
+    'quantity' int;
+}
+@Actionmake
+class Action{
+    'name' String;
+}
+class Address{
+    'street' String;
+    'number' String;
+    'zip' String;
+}
+OneToOne{
+    'Bill' to: 'Address';
+}
+
